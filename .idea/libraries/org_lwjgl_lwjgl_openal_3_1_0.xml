@@ -1,0 +1,29 @@
+<component name="libraryTable">
+  <library name="org.lwjgl:lwjgl-openal:3.1.0" type="repository">
+    <properties maven-id="org.lwjgl:lwjgl-openal:3.1.0" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-openal-3.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-3.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-openal-3.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-3.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-openal-natives-linux.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-openal-natives-macos.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-openal-natives-windows.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-openal-3.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-3.1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-openal-3.1.0-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-openal-3.1.0-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-openal-3.1.0-javadoc.jar!/" />
+    </JAVADOC>
+    <NATIVE>
+      <root url="file://$PROJECT_DIR$/native" />
+    </NATIVE>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-openal-3.1.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-openal-3.1.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-openal-3.1.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
