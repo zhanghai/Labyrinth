@@ -17,5 +17,7 @@
     <orderEntry type="library" name="org.lwjgl:lwjgl-stb:3.1.0" level="project" />
     <orderEntry type="library" name="org.lwjgl:lwjgl-egl:3.1.0" level="project" />
     <orderEntry type="library" name="org.dyn4j:dyn4j:3.2.3" level="project" />
+    <orderEntry type="library" name="egl-natives-macos1" level="project" />
+    <orderEntry type="library" name="natives" level="project" />
   </component>
 </module>

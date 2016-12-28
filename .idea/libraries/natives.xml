@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="natives">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/natives/egl-natives-macos.jar!/" />
+      <root url="jar://$PROJECT_DIR$/natives/opengles-natives-macos.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
