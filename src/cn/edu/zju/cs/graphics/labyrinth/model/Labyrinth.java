@@ -18,7 +18,13 @@ public class Labyrinth {
     };
 
     private SortedSet<Entity<?>> mEntities = new TreeSet<>(ENTITY_COMPARATOR);
-    private World mWorld = new World();
+    private World mWorld;
+    {
+        mWorld = new World();
+        // TODO
+        mWorld.getSettings().setRestitutionVelocity(0);
+    }
+    private boolean mWorldStarted;
 
     public void addEntity(Entity<?> entity) {
         mEntities.add(entity);
@@ -35,7 +41,12 @@ public class Labyrinth {
     }
 
     public void update(double elapsedTime) {
-        mWorld.updatev(elapsedTime);
+        if (!mWorldStarted) {
+            mWorld.setAccumulatedTime(elapsedTime);
+            mWorldStarted = true;
+            return;
+        }
+        mWorld.update(elapsedTime, Integer.MAX_VALUE);
     }
 
     public World getWorld() {
