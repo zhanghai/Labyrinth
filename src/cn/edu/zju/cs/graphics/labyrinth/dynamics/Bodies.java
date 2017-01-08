@@ -4,6 +4,7 @@ import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Circle;
 import org.dyn4j.geometry.Rectangle;
+import org.dyn4j.geometry.Slice;
 
 public class Bodies {
 
@@ -28,6 +29,11 @@ public class Bodies {
     public static Body newWall(double width, double height) {
         return new Body()
                 .addFixture(new BodyFixture(new Rectangle(width, height)));
+    }
+
+    public static Body newConvexWall(double radius) {
+        return new Body()
+                .addFixture(new BodyFixture(new Slice(radius, Math.PI / 2)));
     }
 
     public static Body newFinishHole() {

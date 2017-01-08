@@ -3,9 +3,9 @@ package cn.edu.zju.cs.graphics.labyrinth.model;
 import cn.edu.zju.cs.graphics.labyrinth.dynamics.Bodies;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.Renderers;
 
-public class Wall extends BaseWall<Wall> {
+public class ConvexWall extends BaseWall<ConvexWall> {
 
-    public Wall(double width, double height) {
-        super(Bodies.newWall(width, height), Renderers.WALL);
+    public ConvexWall(double radius) {
+        super(Bodies.newConvexWall(radius), Renderers.CONVEX_WALL);
     }
 }
