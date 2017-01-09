@@ -2,7 +2,8 @@ package cn.edu.zju.cs.graphics.labyrinth.rendering;
 
 import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
 import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
-import org.dyn4j.geometry.Transform;
+import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
+import org.dyn4j.geometry.Rectangle;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import static org.lwjgl.stb.STBImage.*;
@@ -60,14 +61,13 @@ public class PrototypeRenders {
     private static FloatBuffer sBallVertexBufferData;
     static {
         sBallVertexBufferData = BufferUtils.createFloatBuffer(6 * 2);
-        float inverseSqrt2 = 1f / (float) Math.sqrt(2);
         sBallVertexBufferData
-                .put(0f).put(inverseSqrt2)
-                .put(inverseSqrt2).put(0f)
-                .put(0f).put(-inverseSqrt2)
-                .put(0f).put(inverseSqrt2)
-                .put(-inverseSqrt2).put(0f)
-                .put(0f).put(-inverseSqrt2)
+                .put(0f).put(0.5f)
+                .put(0.5f).put(0f)
+                .put(0f).put(-0.5f)
+                .put(0f).put(0.5f)
+                .put(-0.5f).put(0f)
+                .put(0f).put(-0.5f)
                 .flip();
     }
     private static FloatBuffer sBallColorBuffer;
@@ -75,6 +75,27 @@ public class PrototypeRenders {
         sBallColorBuffer = BufferUtils.createFloatBuffer(4);
         sBallColorBuffer
                 .put(0.5f).put(0.5f).put(0.5f).put(1f)
+                .flip();
+    }
+
+    private static int sWallVertexBuffer;
+    private static FloatBuffer sWallVertexBufferData;
+    static {
+        sWallVertexBufferData = BufferUtils.createFloatBuffer(6 * 2);
+        sWallVertexBufferData
+                .put(0.5f).put(0.5f)
+                .put(-0.5f).put(0.5f)
+                .put(-0.5f).put(-0.5f)
+                .put(0.5f).put(0.5f)
+                .put(0.5f).put(-0.5f)
+                .put(-0.5f).put(-0.5f)
+                .flip();
+    }
+    private static FloatBuffer sWallColorBuffer;
+    static {
+        sWallColorBuffer = BufferUtils.createFloatBuffer(4);
+        sWallColorBuffer
+                .put(1f).put(1f).put(0f).put(1f)
                 .flip();
     }
 
@@ -105,6 +126,9 @@ public class PrototypeRenders {
         glBufferData(GL_ARRAY_BUFFER,sCircleBallVertexBuffer,GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER,0);
 
+
+        sBallVertexBuffer = GlUtils.createVertexArrayBuffer(sBallVertexBufferData, GL_STATIC_DRAW);
+        sWallVertexBuffer = GlUtils.createVertexArrayBuffer(sWallVertexBufferData, GL_STATIC_DRAW);
     }
 
     private static String makeShaderResource(String name) {
@@ -113,34 +137,60 @@ public class PrototypeRenders {
 
     public static void setViewProjectionMatrix(Matrix4f viewProjectionMatrix) {
         glUseProgram(sPrototypeProgram);
-        //glUniformMatrix4fv(sViewProjectionMatrixUniform, false, viewProjectionMatrix.get(sViewProjectionMatrixBuffer));
+
+        glUniformMatrix4fv(sViewProjectionMatrixUniform, false,
+                viewProjectionMatrix.get(sViewProjectionMatrixBuffer));
+
         glUseProgram(0);
     }
 
-    private static FloatBuffer getModelMatrixBuffer(Entity<?> entity) {
-        Transform transform = entity.getBody().getTransform();
-        sModelMatrix
+    private static Matrix4f getModelMatrix(Entity<?> entity) {
+        return sModelMatrix
                 .identity()
-                .translate((float) transform.getTranslationX(),
-                        (float) transform.getTranslationY(), 0)
-                .rotateZ((float) transform.getRotation());
-        return sModelMatrix.get(sModelMatrixBuffer);
+                .translate((float) entity.getPositionX(),
+                        (float) entity.getPositionY(), 0f)
+                .rotateZ((float) entity.getRotation());
+    }
+
+    private static FloatBuffer getModelMatrixBuffer(Entity<?> entity) {
+        return getModelMatrix(entity).get(sModelMatrixBuffer);
+    }
+
+    private static Matrix4f getModelMatrixForWall(Wall wall) {
+        Rectangle rectangle = (Rectangle) wall.getBody().getFixture(0).getShape();
+        return getModelMatrix(wall).scale((float) rectangle.getWidth(),
+                (float) rectangle.getHeight(), 1f);
+    }
+
+    private static FloatBuffer getModelMatrixBufferForWall(Wall wall) {
+        return getModelMatrixForWall(wall).get(sModelMatrixBuffer);
+    }
+
+    private static void renderPrototype(int vertexBuffer, FloatBuffer modelMatrixBuffer,
+                                        FloatBuffer colorBuffer, int points,int way) {
+        glUseProgram(sPrototypeProgram);
+        glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+        glEnableVertexAttribArray(sPositionAttribute);
+        glVertexAttribPointer(sPositionAttribute, 2, GL_FLOAT, false, 0, 0L);
+        glUniformMatrix4fv(sModelMatrixUniform, false, modelMatrixBuffer);
+        glDrawArrays(way, 0, points);
+        glDisableVertexAttribArray(sPositionAttribute);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glUseProgram(0);
     }
 
     public static final Renderer<Ball> BALL = new Renderer<Ball>() {
         @Override
         public void render(Ball ball) {
 
-            glUseProgram(sPrototypeProgram);
-            glBindBuffer(GL_ARRAY_BUFFER, sCircleBallVertexBufferIndex);
-            glEnableVertexAttribArray(sPositionAttribute);
-            glVertexAttribPointer(sPositionAttribute, 2, GL_FLOAT, false, 0, 0L);
-            glUniformMatrix4fv(sModelMatrixUniform, false, getModelMatrixBuffer(ball));
-            glUniform4fv(sColorUniform, sBallColorBuffer);
-            glDrawArrays(GL_TRIANGLE_FAN, 0, sPoints);
-            glDisableVertexAttribArray(sPositionAttribute);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            glUseProgram(0);
+            renderPrototype(sBallVertexBuffer, getModelMatrixBuffer(ball), sBallColorBuffer,sPoints,GL_TRIANGLE_FAN);
+        }
+    };
+
+    public static final Renderer<Wall> WALL = new Renderer<Wall>() {
+        @Override
+        public void render(Wall wall) {
+            renderPrototype(sWallVertexBuffer, getModelMatrixBufferForWall(wall), sWallColorBuffer,sPoints,GL_TRIANGLE_FAN);
         }
     };
 

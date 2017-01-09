@@ -4,22 +4,16 @@ import org.dyn4j.dynamics.Settings;
 import org.dyn4j.dynamics.World;
 import org.dyn4j.geometry.Vector2;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.List;
 
 public class Labyrinth {
 
-    private static final Comparator<Entity<?>> ENTITY_COMPARATOR = new Comparator<Entity<?>>() {
-        @Override
-        public int compare(Entity<?> entity1, Entity<?> entity2) {
-            // TODO
-            return 0;
-        }
-    };
+    private static final double ROTATION_MAX = 45;
+    private static final double GRAVITY = 10;
 
-    private SortedSet<Entity<?>> mEntities = new TreeSet<>(ENTITY_COMPARATOR);
+    private List<Entity<?>> mEntities = new ArrayList<>();
     private World mWorld;
     {
         mWorld = new World();
@@ -32,22 +26,62 @@ public class Labyrinth {
     }
     private double mWorldTimeSeconds;
 
-    public void addEntity(Entity<?> entity) {
+    private double mRotationX;
+    private double mRotationY;
+
+    public Labyrinth addEntity(Entity<?> entity) {
         mEntities.add(entity);
         mWorld.addBody(entity.getBody());
+        return this;
     }
 
-    public void removeEntity(Entity<?> entity) {
+    public Labyrinth removeEntity(Entity<?> entity) {
         mWorld.removeBody(entity.getBody());
         mEntities.remove(entity);
+        return this;
     }
 
-    public SortedSet<Entity<?>> getEntities() {
-        return Collections.unmodifiableSortedSet(mEntities);
+    public List<Entity<?>> getEntities() {
+        return Collections.unmodifiableList(mEntities);
     }
 
-    public Vector2 getGravity() {
-        return mWorld.getGravity();
+    public double getRotationX() {
+        return mRotationX;
+    }
+
+    public void setRotationX(double rotationX) {
+        if (rotationX > ROTATION_MAX) {
+            return;
+        }
+        mRotationX = rotationX;
+        updateGravity();
+    }
+
+    public void addRotationX(double amount) {
+        setRotationX(mRotationX + amount);
+    }
+
+    public double getRotationY() {
+        return mRotationY;
+    }
+
+    public void setRotationY(double rotationY) {
+        if (rotationY > ROTATION_MAX) {
+            return;
+        }
+        mRotationY = rotationY;
+        updateGravity();
+    }
+
+    public void addRotationY(double amount) {
+        setRotationY(mRotationY + amount);
+    }
+
+    private void updateGravity() {
+        mWorld.getGravity().set(GRAVITY * Math.sin(Math.toRadians(mRotationX)),
+                GRAVITY * Math.sin(Math.toRadians(mRotationY)));
+        System.out.println(String.format("RotationX: %f, RotationY: %f, Gravity: %s", mRotationX,
+                mRotationY, mWorld.getGravity()));
     }
 
     public void update() {
