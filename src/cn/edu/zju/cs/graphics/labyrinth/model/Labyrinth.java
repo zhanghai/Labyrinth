@@ -1,19 +1,28 @@
 package cn.edu.zju.cs.graphics.labyrinth.model;
 
+import cn.edu.zju.cs.graphics.labyrinth.dynamics.Bodies;
+import cn.edu.zju.cs.graphics.labyrinth.util.MathUtils;
 import org.dyn4j.dynamics.Settings;
+import org.dyn4j.dynamics.Step;
+import org.dyn4j.dynamics.StepAdapter;
 import org.dyn4j.dynamics.World;
+import org.dyn4j.dynamics.contact.ContactAdapter;
+import org.dyn4j.dynamics.contact.ContactPoint;
 import org.dyn4j.geometry.Vector2;
+import org.joml.Math;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 public class Labyrinth {
 
     private static final double ROTATION_MAX = 45;
-    private static final double GRAVITY = 10;
+    private static final double GRAVITY = 20;
 
     private List<Entity<?>> mEntities = new ArrayList<>();
+    private List<Runnable> mPostOnStepEndList = new ArrayList<>();
     private World mWorld;
     {
         mWorld = new World();
@@ -23,6 +32,16 @@ public class Labyrinth {
         settings.setAutoSleepingEnabled(false);
         // TODO: Always restitution?
         settings.setRestitutionVelocity(0);
+        mWorld.addListener(new StepAdapter() {
+            @Override
+            public void end(Step step, World world) {
+                Iterator<Runnable> iterator = mPostOnStepEndList.iterator();
+                while (iterator.hasNext()) {
+                    iterator.next().run();
+                    iterator.remove();
+                }
+            }
+        });
     }
     private double mWorldTimeSeconds;
 
@@ -84,6 +103,52 @@ public class Labyrinth {
                 mRotationY, mWorld.getGravity()));
     }
 
+    public Labyrinth addListener(final Listener listener) {
+        mWorld.addListener(new ContactAdapter() {
+            @Override
+            public void sensed(ContactPoint point) {
+                Entity<?> entity1 = Entity.ofBody(point.getBody1());
+                Entity<?> entity2 = Entity.ofBody(point.getBody2());
+                Ball ball;
+                Entity<?> sensor;
+                if (entity1 instanceof Ball) {
+                    ball = (Ball) entity1;
+                    sensor = entity2;
+                } else {
+                    ball = (Ball) entity2;
+                    sensor = entity1;
+                }
+                BaseHole<?> hole = (BaseHole<?>) sensor;
+                if (MathUtils.distance(ball, hole) < Bodies.HOLE_RADIUS) {
+                    listener.onBallFallenIntoHole(ball, hole, point);
+                } else {
+                    listener.onBallFallingIntoHole(ball, hole, point);
+                }
+            }
+            @Override
+            public boolean begin(ContactPoint point) {
+                Entity<?> entity1 = Entity.ofBody(point.getBody1());
+                Entity<?> entity2 = Entity.ofBody(point.getBody2());
+                Ball ball;
+                Entity<?> other;
+                if (entity1 instanceof Ball) {
+                    ball = (Ball) entity1;
+                    other = entity2;
+                } else {
+                    ball = (Ball) entity2;
+                    other = entity1;
+                }
+                listener.onBallHitEntity(ball, other, point);
+                return true;
+            }
+        });
+        return this;
+    }
+
+    public void postOnStepEnd(Runnable runnable) {
+        mPostOnStepEndList.add(runnable);
+    }
+
     public void update() {
         double currentTimeSeconds = System.currentTimeMillis() / 1000d;
         if (mWorldTimeSeconds == 0) {
@@ -100,7 +165,36 @@ public class Labyrinth {
         }
     }
 
-    public World getWorld() {
-        return mWorld;
+    public interface Listener {
+        /**
+         * Modification of the {@link World} is permitted from this methods.
+         * <p>
+         * If a body is to be removed, make sure to return false to disable the contact.  Otherwise
+         * the contact between the bodies will still be resolved even if the body has been removed.
+         * If a body is removed you should check the remaining contacts for that body and return
+         * false from the those methods as well.
+         * </p>
+         */
+        void onBallFallingIntoHole(Ball ball, BaseHole hole, ContactPoint point);
+        /**
+         * Modification of the {@link World} is permitted from this methods.
+         * <p>
+         * If a body is to be removed, make sure to return false to disable the contact.  Otherwise
+         * the contact between the bodies will still be resolved even if the body has been removed.
+         * If a body is removed you should check the remaining contacts for that body and return
+         * false from the those methods as well.
+         * </p>
+         */
+        void onBallFallenIntoHole(Ball ball, BaseHole hole, ContactPoint point);
+        /**
+         * Modification of the {@link World} is permitted from this methods.
+         * <p>
+         * If a body is to be removed, make sure to return false to disable the contact.  Otherwise
+         * the contact between the bodies will still be resolved even if the body has been removed.
+         * If a body is removed you should check the remaining contacts for that body and return
+         * false from the those methods as well.
+         * </p>
+         */
+        void onBallHitEntity(Ball ball, Entity<?> entity, ContactPoint point);
     }
 }

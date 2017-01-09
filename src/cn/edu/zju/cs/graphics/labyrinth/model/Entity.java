@@ -3,18 +3,26 @@ package cn.edu.zju.cs.graphics.labyrinth.model;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.Renderable;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.Renderer;
 import org.dyn4j.dynamics.Body;
+import org.dyn4j.dynamics.Force;
+import org.dyn4j.geometry.Vector2;
 
 public abstract class Entity<EntityType extends Entity<EntityType>> implements Renderable {
 
     private Body mBody;
     private Renderer<EntityType> mRenderer;
 
+    public static <EntityType extends Entity<EntityType>> EntityType ofBody(Body body) {
+        //noinspection unchecked
+        return (EntityType) body.getUserData();
+    }
+
     public Entity(Body body, Renderer<EntityType> renderer) {
         mBody = body;
+        mBody.setUserData(this);
         mRenderer = renderer;
     }
 
-    public Body getBody() {
+    Body getBody() {
         return mBody;
     }
 

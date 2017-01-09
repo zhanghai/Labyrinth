@@ -1,4 +1,4 @@
-package cn.edu.zju.cs.graphics.labyrinth.rendering;
+package cn.edu.zju.cs.graphics.labyrinth.util;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;

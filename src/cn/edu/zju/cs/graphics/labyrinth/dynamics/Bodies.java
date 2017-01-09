@@ -7,10 +7,12 @@ import org.dyn4j.geometry.MassType;
 
 public class Bodies {
 
-    private static final double BALL_RADIUS = 0.5;
+    // Smaller to fall in the hole easier; holes have the diameter of 1.
+    private static final double BALL_RADIUS = 0.45;
     private static final double BALL_RESTITUTION = 0.2;
     private static final double WALL_RESTITUTION = BALL_RESTITUTION;
-    private static final double HOLE_RADIUS = BALL_RADIUS;
+    // The ball has radius.
+    public static final double HOLE_RADIUS = 0.05;
 
     private Bodies() {}
 

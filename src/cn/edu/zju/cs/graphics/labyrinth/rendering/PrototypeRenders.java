@@ -4,7 +4,7 @@ import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
 import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
 import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
-import org.dyn4j.geometry.Rectangle;
+import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 
@@ -29,12 +29,12 @@ public class PrototypeRenders {
     static {
         sBallVertexBufferData = BufferUtils.createFloatBuffer(6 * 2);
         sBallVertexBufferData
-                .put(0f).put(0.5f)
-                .put(0.5f).put(0f)
-                .put(0f).put(-0.5f)
-                .put(0f).put(0.5f)
-                .put(-0.5f).put(0f)
-                .put(0f).put(-0.5f)
+                .put(0f).put(0.45f)
+                .put(0.45f).put(0f)
+                .put(0f).put(-0.45f)
+                .put(0f).put(0.45f)
+                .put(-0.45f).put(0f)
+                .put(0f).put(-0.45f)
                 .flip();
     }
     private static FloatBuffer sBallColorBuffer;

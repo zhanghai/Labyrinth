@@ -1,10 +1,15 @@
 package cn.edu.zju.cs.graphics.labyrinth;
 
 import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
+import cn.edu.zju.cs.graphics.labyrinth.model.BaseHole;
+import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
+import cn.edu.zju.cs.graphics.labyrinth.model.FinishHole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Labyrinth;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.PrototypeRenders;
+import org.dyn4j.dynamics.contact.ContactPoint;
+import org.dyn4j.geometry.Vector2;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
@@ -24,7 +29,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengles.GLES20.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-public class LabyrinthPrototypeApplication {
+public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
 
     private static final float LABYRINTH_WIDTH = 30;
     private static final float LABYRINTH_LENGTH = 20;
@@ -170,7 +175,39 @@ public class LabyrinthPrototypeApplication {
                         LABYRINTH_LENGTH - 0.5))
                 .addEntity(new Wall(1d, LABYRINTH_LENGTH, 0.5, LABYRINTH_LENGTH / 2d))
                 .addEntity(new Hole(LABYRINTH_WIDTH - 2.5, LABYRINTH_LENGTH - 2.5))
-                .addEntity(new Ball(2.5, 2.5));
+                .addEntity(new Hole(4.5, 4.5))
+                .addEntity(new Hole(2.2d, 4.5))
+                .addEntity(new Ball(2.5, 2.5))
+                .addListener(this);
+    }
+
+    @Override
+    public void onBallFallingIntoHole(Ball ball, BaseHole hole, ContactPoint point) {
+        Vector2 distance = new Vector2(hole.getPositionX(), hole.getPositionY())
+                .subtract(ball.getPositionX(), ball.getPositionY());
+        ball.applyForce(Vector2.create(1d / distance.getMagnitude(), distance.getDirection()));
+        Vector2 velocity = ball.getVelocity();
+        Vector2 tangentVelocity = new Vector2(velocity).subtract(distance.multiply(
+                distance.dot(velocity) / distance.getMagnitudeSquared()));
+        ball.applyForce(Vector2.create(10d * tangentVelocity.getMagnitude(),
+                tangentVelocity.getDirection() + Math.PI));
+    }
+
+    @Override
+    public void onBallFallenIntoHole(Ball ball, BaseHole hole, ContactPoint point) {
+        ball.stopMotion();
+        if (hole instanceof Hole) {
+            // TODO: Die.
+        } else if (hole instanceof FinishHole) {
+            // TODO: Victory.
+        } else {
+            throw new IllegalStateException("Unknown type of hole: " + hole);
+        }
+    }
+
+    @Override
+    public void onBallHitEntity(Ball ball, Entity<?> entity, ContactPoint point) {
+        // TODO: Audio.
     }
 
     private void update() {
