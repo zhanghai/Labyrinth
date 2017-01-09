@@ -1,6 +1,8 @@
 package cn.edu.zju.cs.graphics.labyrinth.model;
 
+import org.dyn4j.dynamics.Settings;
 import org.dyn4j.dynamics.World;
+import org.dyn4j.geometry.Vector2;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,8 +23,12 @@ public class Labyrinth {
     private World mWorld;
     {
         mWorld = new World();
-        // TODO
-        mWorld.getSettings().setRestitutionVelocity(0);
+        mWorld.setGravity(new Vector2(World.ZERO_GRAVITY));
+        Settings settings = mWorld.getSettings();
+        // Gravity can change from zero.
+        settings.setAutoSleepingEnabled(false);
+        // TODO: Always restitution?
+        settings.setRestitutionVelocity(0);
     }
     private double mWorldTimeSeconds;
 
@@ -38,6 +44,10 @@ public class Labyrinth {
 
     public SortedSet<Entity<?>> getEntities() {
         return Collections.unmodifiableSortedSet(mEntities);
+    }
+
+    public Vector2 getGravity() {
+        return mWorld.getGravity();
     }
 
     public void update() {

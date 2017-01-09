@@ -1,6 +1,8 @@
 package cn.edu.zju.cs.graphics.labyrinth.rendering;
 
 import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
+import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
+import org.dyn4j.geometry.Transform;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 
@@ -13,6 +15,7 @@ public class PrototypeRenders {
 
     private static int sPrototypeProgram;
     private static int sPositionAttribute;
+    private static Matrix4f sModelMatrix = new Matrix4f();
     private static int sModelMatrixUniform;
     private static FloatBuffer sModelMatrixBuffer = BufferUtils.createFloatBuffer(16);
     private static int sViewProjectionMatrixUniform;
@@ -67,6 +70,16 @@ public class PrototypeRenders {
         glUseProgram(0);
     }
 
+    private static FloatBuffer getModelMatrixBuffer(Entity<?> entity) {
+        Transform transform = entity.getBody().getTransform();
+        sModelMatrix
+                .identity()
+                .translate((float) transform.getTranslationX(),
+                        (float) transform.getTranslationY(), 0)
+                .rotateZ((float) transform.getRotation());
+        return sModelMatrix.get(sModelMatrixBuffer);
+    }
+
     public static final Renderer<Ball> BALL = new Renderer<Ball>() {
         @Override
         public void render(Ball ball) {
@@ -74,8 +87,7 @@ public class PrototypeRenders {
             glBindBuffer(GL_ARRAY_BUFFER, sBallVertexBuffer);
             glEnableVertexAttribArray(sPositionAttribute);
             glVertexAttribPointer(sPositionAttribute, 2, GL_FLOAT, false, 0, 0L);
-            // TODO
-            glUniformMatrix4fv(sModelMatrixUniform, false, new Matrix4f().get(sModelMatrixBuffer));
+            glUniformMatrix4fv(sModelMatrixUniform, false, getModelMatrixBuffer(ball));
             glUniform4fv(sColorUniform, sBallColorBuffer);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glDisableVertexAttribArray(sPositionAttribute);

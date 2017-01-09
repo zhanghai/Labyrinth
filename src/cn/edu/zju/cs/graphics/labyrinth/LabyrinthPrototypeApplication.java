@@ -88,11 +88,24 @@ public class LabyrinthPrototypeApplication {
                     return;
                 }
                 switch (key) {
-                    case GLFW_KEY_W:
-                        // TODO
-                        break;
                     case GLFW_KEY_ESCAPE:
                         glfwSetWindowShouldClose(window, true);
+                        break;
+                    case GLFW_KEY_LEFT:
+                    case GLFW_KEY_A:
+                        mLabyrinth.getGravity().add(-1, 0);
+                        break;
+                    case GLFW_KEY_RIGHT:
+                    case GLFW_KEY_F:
+                        mLabyrinth.getGravity().add(1, 0);
+                        break;
+                    case GLFW_KEY_DOWN:
+                    case GLFW_KEY_D:
+                        mLabyrinth.getGravity().add(0, -1);
+                        break;
+                    case GLFW_KEY_UP:
+                    case GLFW_KEY_W:
+                        mLabyrinth.getGravity().add(0, 1);
                         break;
                 }
             }
