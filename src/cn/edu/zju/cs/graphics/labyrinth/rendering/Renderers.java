@@ -8,11 +8,11 @@ import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 
 public interface Renderers {
 
-    Renderer<Ball> BALL = PrototypeRenders.BALL;
+    Renderer<Ball> BALL = PrototypeRenderers.BALL;
 
-    Renderer<Wall> WALL = PrototypeRenders.WALL;
+    Renderer<Wall> WALL = PrototypeRenderers.WALL;
 
-    Renderer<Hole> HOLE = PrototypeRenders.HOLE;
+    Renderer<Hole> HOLE = PrototypeRenderers.HOLE;
 
     // TODO
     Renderer<ConvexWall> CONVEX_WALL = null;

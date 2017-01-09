@@ -4,7 +4,7 @@ import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
 import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Labyrinth;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
-import cn.edu.zju.cs.graphics.labyrinth.rendering.PrototypeRenders;
+import cn.edu.zju.cs.graphics.labyrinth.rendering.PrototypeRenderers;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
@@ -24,7 +24,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengles.GLES20.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-public class LabyrinthPrototypeApplication {
+public class LabyrinthApplication {
 
     private static final float LABYRINTH_WIDTH = 30;
     private static final float LABYRINTH_LENGTH = 20;
@@ -160,7 +160,7 @@ public class LabyrinthPrototypeApplication {
         //debugProc = glDebugMessageCallback();
 
         glClearColor(1f, 1f, 1f, 1f);
-        PrototypeRenders.initialize();
+        PrototypeRenderers.initialize();
 
         mLabyrinth = new Labyrinth()
 
@@ -179,7 +179,7 @@ public class LabyrinthPrototypeApplication {
         mViewMatrix.identity();
         mProjectionMatrix.setOrtho2D(0, LABYRINTH_WIDTH, 0, LABYRINTH_LENGTH);
         mProjectionMatrix.mul(mViewMatrix, mViewProjectionMatrix);
-        PrototypeRenders.setViewProjectionMatrix(mViewProjectionMatrix);
+        PrototypeRenderers.setViewProjectionMatrix(mViewProjectionMatrix);
 
         mLabyrinth.update();
     }
@@ -218,5 +218,4 @@ public class LabyrinthPrototypeApplication {
             glfwTerminate();
         }
     }
-
 }

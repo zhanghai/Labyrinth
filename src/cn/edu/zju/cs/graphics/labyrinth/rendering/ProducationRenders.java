@@ -4,7 +4,7 @@ import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
 import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
 import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
-import org.dyn4j.geometry.Rectangle;
+import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import static org.lwjgl.stb.STBImage.*;
@@ -16,7 +16,7 @@ import static cn.edu.zju.cs.graphics.labyrinth.DemoUtils.*;
 
 import static org.lwjgl.opengles.GLES20.*;
 
-public class PrototypeRenders {
+public class ProducationRenders {
 
     private static int sPrototypeProgram1, sPrototypeProgram2;
     private static int sPositionAttribute, sPositionAttribute2;
@@ -29,7 +29,6 @@ public class PrototypeRenders {
     private static int sTex1, sTex2, sTex;
     private static float sBallX = 0,sBallY = 0;
     private static int sBallVertexBuffer;
-
 
     // new circle-based ball
     private static int sCircleBallVertexBufferIndex;

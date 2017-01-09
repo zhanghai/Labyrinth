@@ -7,7 +7,7 @@ import cn.edu.zju.cs.graphics.labyrinth.model.FinishHole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Labyrinth;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
-import cn.edu.zju.cs.graphics.labyrinth.rendering.PrototypeRenders;
+import cn.edu.zju.cs.graphics.labyrinth.rendering.PrototypeRenderers;
 import org.dyn4j.dynamics.contact.ContactPoint;
 import org.dyn4j.geometry.Vector2;
 import org.joml.Matrix4f;
@@ -165,7 +165,7 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
         //debugProc = glDebugMessageCallback();
 
         glClearColor(1f, 1f, 1f, 1f);
-        PrototypeRenders.initialize();
+        PrototypeRenderers.initialize();
 
         mLabyrinth = new Labyrinth()
                 .addEntity(new Wall(LABYRINTH_WIDTH, 1d, LABYRINTH_WIDTH / 2d, 0.5))
@@ -215,7 +215,7 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
         mViewMatrix.identity();
         mProjectionMatrix.setOrtho2D(0, LABYRINTH_WIDTH, 0, LABYRINTH_LENGTH);
         mProjectionMatrix.mul(mViewMatrix, mViewProjectionMatrix);
-        PrototypeRenders.setViewProjectionMatrix(mViewProjectionMatrix);
+        PrototypeRenderers.setViewProjectionMatrix(mViewProjectionMatrix);
 
         mLabyrinth.update();
     }

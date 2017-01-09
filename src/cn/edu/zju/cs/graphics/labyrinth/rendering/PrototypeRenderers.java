@@ -13,7 +13,7 @@ import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengles.GLES20.*;
 
-public class PrototypeRenders {
+public class PrototypeRenderers {
 
     private static int sPrototypeProgram;
     private static int sPositionAttribute;
