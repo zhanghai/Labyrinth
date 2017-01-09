@@ -23,7 +23,6 @@ public class Labyrinth {
 
     private List<Entity<?>> mEntities = new ArrayList<>();
     private Listener mListener;
-    private List<Runnable> mPostOnStepEndList = new ArrayList<>();
     private World mWorld;
     {
         mWorld = new World();
@@ -33,16 +32,6 @@ public class Labyrinth {
         settings.setAutoSleepingEnabled(false);
         // TODO: Always restitution?
         settings.setRestitutionVelocity(0);
-        mWorld.addListener(new StepAdapter() {
-            @Override
-            public void end(Step step, World world) {
-                Iterator<Runnable> iterator = mPostOnStepEndList.iterator();
-                while (iterator.hasNext()) {
-                    iterator.next().run();
-                    iterator.remove();
-                }
-            }
-        });
         mWorld.addListener(new ContactAdapter() {
             @Override
             public void sensed(ContactPoint point) {
@@ -57,11 +46,15 @@ public class Labyrinth {
                     ball = (Ball) entity2;
                     sensor = entity1;
                 }
-                BaseHole<?> hole = (BaseHole<?>) sensor;
-                if (MathUtils.distance(ball, hole) < Bodies.HOLE_RADIUS) {
-                    mListener.onBallFallenIntoHole(ball, hole);
-                } else {
-                    mListener.onBallFallingTowardsHole(ball, hole);
+                if (sensor instanceof BaseHole<?>) {
+                    BaseHole<?> hole = (BaseHole<?>) sensor;
+                    if (MathUtils.distance(ball, hole) < Bodies.HOLE_RADIUS) {
+                        mListener.onBallFallenIntoHole(ball, hole);
+                    } else {
+                        mListener.onBallFallingTowardsHole(ball, hole);
+                    }
+                } else if (sensor instanceof Magnet) {
+                    // TODO
                 }
             }
             @Override
@@ -151,10 +144,6 @@ public class Labyrinth {
         return this;
     }
 
-    public void postOnStepEnd(Runnable runnable) {
-        mPostOnStepEndList.add(runnable);
-    }
-
     public void update() {
 
         double currentTimeSeconds = System.currentTimeMillis() / 1000d;
@@ -184,6 +173,18 @@ public class Labyrinth {
     }
 
     public interface Listener {
+
+        /**
+         * Modification of the {@link World} is permitted from this methods.
+         * <p>
+         * If a body is to be removed, make sure to return false to disable the contact.  Otherwise
+         * the contact between the bodies will still be resolved even if the body has been removed.
+         * If a body is removed you should check the remaining contacts for that body and return
+         * false from the those methods as well.
+         * </p>
+         */
+        void onBallFallingTowardsMagnet(Ball ball, Magnet magnet);
+
         /**
          * Modification of the {@link World} is permitted from this methods.
          * <p>
@@ -194,6 +195,7 @@ public class Labyrinth {
          * </p>
          */
         void onBallFallingTowardsHole(Ball ball, BaseHole hole);
+
         /**
          * Modification of the {@link World} is permitted from this methods.
          * <p>
@@ -204,6 +206,7 @@ public class Labyrinth {
          * </p>
          */
         void onBallFallenIntoHole(Ball ball, BaseHole hole);
+
         /**
          * Modification of the {@link World} is permitted from this methods.
          * <p>

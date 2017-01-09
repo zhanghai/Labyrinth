@@ -64,7 +64,7 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
             throw new AssertionError("Failed to create the GLFW window");
         }
 
-        System.out.println("Play with W/A/S/D");
+        System.out.println("Change gravity with W/A/S/D, reset gravity with 0");
         glfwSetFramebufferSizeCallback(mWindow, mFramebufferSizeCallback =
                 new GLFWFramebufferSizeCallback() {
                     @Override
@@ -165,6 +165,11 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
                 .addEntity(new Magnet(LABYRINTH_WIDTH / 2d, 2d))
                 .addEntity(new Ball(2.5, 2.5))
                 .setListener(this);
+    }
+
+    @Override
+    public void onBallFallingTowardsMagnet(Ball ball, Magnet magnet) {
+        // TODO
     }
 
     @Override
