@@ -20,6 +20,36 @@ public class PrototypeRenders {
     private static int sColorUniform;
 
     private static int sBallVertexBuffer;
+
+
+    // new circle-based ball
+    private static int sCircleBallVertexBufferIndex;
+    private static FloatBuffer sCircleBallVertexBuffer;
+    private final static int sPoints = 100;
+
+    private static float[] genCircle2d(float rad, int points, float x, float y) {
+        float[] verts = new float[points * 2 + 2];
+        boolean first = true;
+        float fx = 0;
+        float fy = 0;
+        int c = 0;
+        for (int i = 0; i < points; ++i) {
+            float fi = 2 * (float)Math.PI * i / points;
+            float xa = rad * (float)(Math.sin(fi + Math.PI)) + x;
+            float ya = rad * (float)(Math.cos(fi + Math.PI)) + y;
+            if (first) {
+                first = false;
+                fx = xa;
+                fy = ya;
+            }
+            verts[c] = xa;
+            verts[c + 1] = ya;
+            c += 2;
+        }
+        verts[c] = fx;
+        verts[c + 1] = fy;
+        return verts;
+    }
     private static FloatBuffer sBallVertexBufferData;
     static {
         sBallVertexBufferData = BufferUtils.createFloatBuffer(6 * 2);
@@ -54,6 +84,16 @@ public class PrototypeRenders {
         glBindBuffer(GL_ARRAY_BUFFER, sBallVertexBuffer);
         glBufferData(GL_ARRAY_BUFFER, sBallVertexBufferData, GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        //new circle-based ball
+        sCircleBallVertexBufferIndex = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER,sCircleBallVertexBufferIndex);
+        sCircleBallVertexBuffer = BufferUtils.createFloatBuffer(sPoints * 4);
+        sCircleBallVertexBuffer.put(genCircle2d(1,sPoints,0,0));
+        sCircleBallVertexBuffer.position(0);
+        glBufferData(GL_ARRAY_BUFFER,sCircleBallVertexBuffer,GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER,0);
+
     }
 
     private static String makeShaderResource(String name) {
@@ -71,16 +111,18 @@ public class PrototypeRenders {
         @Override
         public void render(Ball ball) {
             glUseProgram(sPrototypeProgram);
-            glBindBuffer(GL_ARRAY_BUFFER, sBallVertexBuffer);
+            glBindBuffer(GL_ARRAY_BUFFER, sCircleBallVertexBufferIndex);
             glEnableVertexAttribArray(sPositionAttribute);
             glVertexAttribPointer(sPositionAttribute, 2, GL_FLOAT, false, 0, 0L);
             // TODO
             glUniformMatrix4fv(sModelMatrixUniform, false, new Matrix4f().get(sModelMatrixBuffer));
             glUniform4fv(sColorUniform, sBallColorBuffer);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
+            glDrawArrays(GL_TRIANGLE_FAN, 0, sPoints);
             glDisableVertexAttribArray(sPositionAttribute);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glUseProgram(0);
         }
     };
+
+
 }
