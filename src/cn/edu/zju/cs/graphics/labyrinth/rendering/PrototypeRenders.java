@@ -5,9 +5,13 @@ import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
 import org.dyn4j.geometry.Transform;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
+import static org.lwjgl.stb.STBImage.*;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import static cn.edu.zju.cs.graphics.labyrinth.DemoUtils.*;
 
 import static org.lwjgl.opengles.GLES20.*;
 
@@ -21,7 +25,7 @@ public class PrototypeRenders {
     private static int sViewProjectionMatrixUniform;
     private static FloatBuffer sViewProjectionMatrixBuffer = BufferUtils.createFloatBuffer(16);
     private static int sColorUniform;
-
+    private static int sTex;
     private static int sBallVertexBuffer;
 
 
@@ -78,11 +82,14 @@ public class PrototypeRenders {
 
         sPrototypeProgram = GlUtils.createProgram(makeShaderResource("prototype.vs"),
                 makeShaderResource("prototype.fs"));
+        int tex = genTexture();
+        sTex = GlUtils.getUniformLocation(sPrototypeProgram,"uTexture");
+        glUniform1i(sTex,tex);
         sPositionAttribute = GlUtils.getAttribLocation(sPrototypeProgram, "aPosition");
         sModelMatrixUniform = GlUtils.getUniformLocation(sPrototypeProgram, "uModelMatrix");
-        sViewProjectionMatrixUniform = GlUtils.getUniformLocation(sPrototypeProgram,
-                "uViewProjectionMatrix");
-        sColorUniform = GlUtils.getUniformLocation(sPrototypeProgram, "uColor");
+        //sViewProjectionMatrixUniform = GlUtils.getUniformLocation(sPrototypeProgram,
+        //        "uViewProjectionMatrix");
+        //sColorUniform = GlUtils.getUniformLocation(sPrototypeProgram, "uColor");
 
         sBallVertexBuffer = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, sBallVertexBuffer);
@@ -93,7 +100,7 @@ public class PrototypeRenders {
         sCircleBallVertexBufferIndex = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER,sCircleBallVertexBufferIndex);
         sCircleBallVertexBuffer = BufferUtils.createFloatBuffer(sPoints * 4);
-        sCircleBallVertexBuffer.put(genCircle2d(1,sPoints,0,0));
+        sCircleBallVertexBuffer.put(genCircle2d(0.5f,sPoints,0,0));
         sCircleBallVertexBuffer.position(0);
         glBufferData(GL_ARRAY_BUFFER,sCircleBallVertexBuffer,GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER,0);
@@ -106,7 +113,7 @@ public class PrototypeRenders {
 
     public static void setViewProjectionMatrix(Matrix4f viewProjectionMatrix) {
         glUseProgram(sPrototypeProgram);
-        glUniformMatrix4fv(sViewProjectionMatrixUniform, false, viewProjectionMatrix.get(sViewProjectionMatrixBuffer));
+        //glUniformMatrix4fv(sViewProjectionMatrixUniform, false, viewProjectionMatrix.get(sViewProjectionMatrixBuffer));
         glUseProgram(0);
     }
 
@@ -123,6 +130,7 @@ public class PrototypeRenders {
     public static final Renderer<Ball> BALL = new Renderer<Ball>() {
         @Override
         public void render(Ball ball) {
+
             glUseProgram(sPrototypeProgram);
             glBindBuffer(GL_ARRAY_BUFFER, sCircleBallVertexBufferIndex);
             glEnableVertexAttribArray(sPositionAttribute);
@@ -136,5 +144,20 @@ public class PrototypeRenders {
         }
     };
 
-
+    private static int genTexture() throws IOException {
+        int tex = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, tex);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        ByteBuffer imageBuffer;
+        IntBuffer w = BufferUtils.createIntBuffer(1);
+        IntBuffer h = BufferUtils.createIntBuffer(1);
+        IntBuffer comp = BufferUtils.createIntBuffer(1);
+        ByteBuffer image;
+        imageBuffer = ioResourceToByteBuffer("cn/edu/zju/cs/graphics/labyrinth/texture/ball.png", 1024 * 8);
+        image = stbi_load_from_memory(imageBuffer,w,h,comp,3);
+        glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,w.get(0),h.get(0),0,GL_RGB,GL_UNSIGNED_BYTE,image);
+        stbi_image_free(image);
+        return tex;
+    }
 }
