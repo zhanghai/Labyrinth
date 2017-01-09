@@ -5,7 +5,7 @@ import cn.edu.zju.cs.graphics.labyrinth.rendering.Renderers;
 
 public class ConvexWall extends BaseWall<ConvexWall> {
 
-    public ConvexWall(double radius) {
-        super(Bodies.newConvexWall(radius), Renderers.CONVEX_WALL);
+    public ConvexWall(double radius, double positionX, double positionY) {
+        super(Bodies.newConvexWall(radius, positionX, positionY), Renderers.CONVEX_WALL);
     }
 }

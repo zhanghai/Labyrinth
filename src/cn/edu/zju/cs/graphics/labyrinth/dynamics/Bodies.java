@@ -13,6 +13,7 @@ public class Bodies {
     private static final double WALL_RESTITUTION = BALL_RESTITUTION;
     // The ball has radius.
     public static final double HOLE_RADIUS = 0.05;
+    public static final double MAGNET_SIZE = 2d;
 
     private Bodies() {}
 
@@ -35,12 +36,13 @@ public class Bodies {
         return setBodyPosition(body, positionX, positionY);
     }
 
-    public static Body newConvexWall(double radius) {
+    public static Body newConvexWall(double radius, double positionX, double positionY) {
         BodyFixture fixture = new BodyFixture(Geometry.createSlice(radius, Math.toRadians(90)));
-        fixture.setRestitution(0.5);
-        return new Body()
+        fixture.setRestitution(WALL_RESTITUTION);
+        Body body = new Body()
                 .addFixture(fixture)
                 .setMass(MassType.INFINITE);
+        return setBodyPosition(body, positionX, positionY);
     }
 
     public static Body newHole(double positionX, double positionY) {
@@ -53,6 +55,15 @@ public class Bodies {
 
     public static Body newFinishHole(double positionX, double positionY) {
         return newHole(positionX, positionY);
+    }
+
+    public static Body newMagnet(double positionX, double positionY) {
+        BodyFixture fixture = new BodyFixture(Geometry.createSquare(MAGNET_SIZE));
+        fixture.setRestitution(WALL_RESTITUTION);
+        Body body = new Body()
+                .addFixture(fixture)
+                .setMass(MassType.INFINITE);
+        return setBodyPosition(body, positionX, positionY);
     }
 
     private static Body setBodyPosition(Body body, double x, double y) {

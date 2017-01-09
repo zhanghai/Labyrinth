@@ -4,6 +4,7 @@ import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
 import cn.edu.zju.cs.graphics.labyrinth.model.ConvexWall;
 import cn.edu.zju.cs.graphics.labyrinth.model.FinishHole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
+import cn.edu.zju.cs.graphics.labyrinth.model.Magnet;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 
 public interface Renderers {
@@ -18,4 +19,6 @@ public interface Renderers {
     Renderer<Hole> HOLE = PrototypeRenderers.HOLE;
 
     Renderer<FinishHole> FINISH_HOLE = PrototypeRenderers.FINISH_HOLE;
+
+    Renderer<Magnet> MAGNET = PrototypeRenderers.MAGNET;
 }

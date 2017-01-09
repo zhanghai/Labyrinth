@@ -4,6 +4,7 @@ import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
 import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
 import cn.edu.zju.cs.graphics.labyrinth.model.FinishHole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
+import cn.edu.zju.cs.graphics.labyrinth.model.Magnet;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
 import org.joml.Matrix4f;
@@ -67,11 +68,11 @@ public class PrototypeRenderers {
                 .flip();
     }
 
-    private static int sHoleVertexBuffer;
-    private static FloatBuffer sHoleVertexBufferData;
+    private static int sBaseHoleVertexBuffer;
+    private static FloatBuffer sBaseHoleVertexBufferData;
     static {
-        sHoleVertexBufferData = BufferUtils.createFloatBuffer(6 * 2);
-        sHoleVertexBufferData
+        sBaseHoleVertexBufferData = BufferUtils.createFloatBuffer(6 * 2);
+        sBaseHoleVertexBufferData
                 .put(0f).put(0.5f)
                 .put(0.5f).put(0f)
                 .put(0f).put(-0.5f)
@@ -96,6 +97,27 @@ public class PrototypeRenderers {
                 .flip();
     }
 
+    private static int sMagnetVertexBuffer;
+    private static FloatBuffer sMagnetVertexBufferData;
+    static {
+        sMagnetVertexBufferData = BufferUtils.createFloatBuffer(6 * 2);
+        sMagnetVertexBufferData
+                .put(1f).put(1f)
+                .put(-1f).put(1f)
+                .put(-1f).put(-1f)
+                .put(1f).put(1f)
+                .put(1f).put(-1f)
+                .put(-1f).put(-1f)
+                .flip();
+    }
+    private static FloatBuffer sMagnetColorBuffer;
+    static {
+        sMagnetColorBuffer = BufferUtils.createFloatBuffer(4);
+        sMagnetColorBuffer
+                .put(0f).put(0f).put(1f).put(1f)
+                .flip();
+    }
+
 
     public static void initialize() throws IOException {
 
@@ -109,7 +131,10 @@ public class PrototypeRenderers {
 
         sBallVertexBuffer = GlUtils.createVertexArrayBuffer(sBallVertexBufferData, GL_STATIC_DRAW);
         sWallVertexBuffer = GlUtils.createVertexArrayBuffer(sWallVertexBufferData, GL_STATIC_DRAW);
-        sHoleVertexBuffer = GlUtils.createVertexArrayBuffer(sHoleVertexBufferData, GL_STATIC_DRAW);
+        sBaseHoleVertexBuffer = GlUtils.createVertexArrayBuffer(sBaseHoleVertexBufferData,
+                GL_STATIC_DRAW);
+        sMagnetVertexBuffer = GlUtils.createVertexArrayBuffer(sMagnetVertexBufferData,
+                GL_STATIC_DRAW);
     }
 
     private static String makeShaderResource(String name) {
@@ -175,15 +200,22 @@ public class PrototypeRenderers {
     public static final Renderer<Hole> HOLE = new Renderer<Hole>() {
         @Override
         public void render(Hole hole) {
-            renderPrototype(sHoleVertexBuffer, getModelMatrixBuffer(hole), sHoleColorBuffer);
+            renderPrototype(sBaseHoleVertexBuffer, getModelMatrixBuffer(hole), sHoleColorBuffer);
         }
     };
 
     public static final Renderer<FinishHole> FINISH_HOLE = new Renderer<FinishHole>() {
         @Override
         public void render(FinishHole finishHole) {
-            renderPrototype(sHoleVertexBuffer, getModelMatrixBuffer(finishHole),
+            renderPrototype(sBaseHoleVertexBuffer, getModelMatrixBuffer(finishHole),
                     sFinishHoleColorBuffer);
+        }
+    };
+
+    public static final Renderer<Magnet> MAGNET = new Renderer<Magnet>() {
+        @Override
+        public void render(Magnet magnet) {
+            renderPrototype(sMagnetVertexBuffer, getModelMatrixBuffer(magnet), sMagnetColorBuffer);
         }
     };
 }

@@ -6,6 +6,7 @@ import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
 import cn.edu.zju.cs.graphics.labyrinth.model.FinishHole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Labyrinth;
+import cn.edu.zju.cs.graphics.labyrinth.model.Magnet;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.PrototypeRenderers;
 import org.dyn4j.dynamics.contact.ContactPoint;
@@ -28,13 +29,13 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
 
-    private static final float LABYRINTH_WIDTH = 30;
-    private static final float LABYRINTH_LENGTH = 20;
+    private static final float LABYRINTH_WIDTH = 18;
+    private static final float LABYRINTH_LENGTH = 12;
 
     private long mWindow;
-    private int mWidth = 640;
+    private int mWidth = 720;
     private int mHeight = 480;
-    private int mFrameBufferWidth = 640;
+    private int mFrameBufferWidth = 720;
     private int mFrameBufferHeight = 480;
 
     private Matrix4f mProjectionMatrix = new Matrix4f();
@@ -140,18 +141,28 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
         PrototypeRenderers.initialize();
 
         mLabyrinth = new Labyrinth()
+                .addEntity(new Hole(1.5, LABYRINTH_LENGTH - 1.5))
+                .addEntity(new Hole(LABYRINTH_WIDTH / 4d + 1d, 1.5))
+                .addEntity(new Hole(LABYRINTH_WIDTH / 2d - 1d, LABYRINTH_LENGTH - 1.5))
+                .addEntity(new Hole(LABYRINTH_WIDTH / 2d - 0.5, 3.5))
+                .addEntity(new Hole(LABYRINTH_WIDTH / 2d + 0.5, 3.5))
+                .addEntity(new Hole(LABYRINTH_WIDTH / 2d + 1d, LABYRINTH_LENGTH - 1.5))
+                .addEntity(new Hole(LABYRINTH_WIDTH * 3d / 4d - 1, 1.5))
+                .addEntity(new Hole(LABYRINTH_WIDTH - 1.5, LABYRINTH_LENGTH - 1.5))
+                .addEntity(new FinishHole(LABYRINTH_WIDTH - 2.5, 1.5))
                 .addEntity(new Wall(LABYRINTH_WIDTH, 1d, LABYRINTH_WIDTH / 2d, 0.5))
                 .addEntity(new Wall(1d, LABYRINTH_LENGTH, LABYRINTH_WIDTH - 0.5,
                         LABYRINTH_LENGTH / 2d))
                 .addEntity(new Wall(LABYRINTH_WIDTH, 1d, LABYRINTH_WIDTH / 2d,
                         LABYRINTH_LENGTH - 0.5))
                 .addEntity(new Wall(1d, LABYRINTH_LENGTH, 0.5, LABYRINTH_LENGTH / 2d))
-                .addEntity(new Wall(LABYRINTH_WIDTH / 2, 1d, LABYRINTH_WIDTH / 4,
-                        LABYRINTH_LENGTH / 2d))
-                .addEntity(new Hole(LABYRINTH_WIDTH - 2.5, LABYRINTH_LENGTH - 2.5))
-                .addEntity(new Hole(4.5, 4.5))
-                .addEntity(new Hole(2.2d, 4.5))
-                .addEntity(new FinishHole(1.5, LABYRINTH_LENGTH - 1.5))
+                .addEntity(new Wall(1d, LABYRINTH_LENGTH * 3d / 4d, LABYRINTH_WIDTH / 4d,
+                        LABYRINTH_LENGTH * 3d / 8d))
+                .addEntity(new Wall(1d, LABYRINTH_LENGTH / 2d, LABYRINTH_WIDTH / 2d,
+                        LABYRINTH_LENGTH * 3d / 4d))
+                .addEntity(new Wall(1d, LABYRINTH_LENGTH * 3d / 4d, LABYRINTH_WIDTH * 3d / 4d,
+                        LABYRINTH_LENGTH * 3d / 8d))
+                .addEntity(new Magnet(LABYRINTH_WIDTH / 2d, 2d))
                 .addEntity(new Ball(2.5, 2.5))
                 .setListener(this);
     }
