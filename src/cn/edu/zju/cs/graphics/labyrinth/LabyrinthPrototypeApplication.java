@@ -93,19 +93,19 @@ public class LabyrinthPrototypeApplication {
                         break;
                     case GLFW_KEY_LEFT:
                     case GLFW_KEY_A:
-                        mLabyrinth.getGravity().add(-1, 0);
+                        mLabyrinth.addRotationX(-1);
                         break;
                     case GLFW_KEY_RIGHT:
                     case GLFW_KEY_F:
-                        mLabyrinth.getGravity().add(1, 0);
+                        mLabyrinth.addRotationX(1);
                         break;
                     case GLFW_KEY_DOWN:
                     case GLFW_KEY_D:
-                        mLabyrinth.getGravity().add(0, -1);
+                        mLabyrinth.addRotationY(-1);
                         break;
                     case GLFW_KEY_UP:
                     case GLFW_KEY_W:
-                        mLabyrinth.getGravity().add(0, 1);
+                        mLabyrinth.addRotationY(1);
                         break;
                 }
             }

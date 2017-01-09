@@ -18,6 +18,8 @@ public class Labyrinth {
             return 0;
         }
     };
+    private static final double ROTATION_MAX = 45;
+    private static final double GRAVITY = 10;
 
     private SortedSet<Entity<?>> mEntities = new TreeSet<>(ENTITY_COMPARATOR);
     private World mWorld;
@@ -31,6 +33,9 @@ public class Labyrinth {
         settings.setRestitutionVelocity(0);
     }
     private double mWorldTimeSeconds;
+
+    private double mRotationX;
+    private double mRotationY;
 
     public void addEntity(Entity<?> entity) {
         mEntities.add(entity);
@@ -46,8 +51,42 @@ public class Labyrinth {
         return Collections.unmodifiableSortedSet(mEntities);
     }
 
-    public Vector2 getGravity() {
-        return mWorld.getGravity();
+    public double getRotationX() {
+        return mRotationX;
+    }
+
+    public void setRotationX(double rotationX) {
+        if (rotationX > ROTATION_MAX) {
+            return;
+        }
+        mRotationX = rotationX;
+        updateGravity();
+    }
+
+    public void addRotationX(double amount) {
+        setRotationX(mRotationX + amount);
+    }
+
+    public double getRotationY() {
+        return mRotationY;
+    }
+
+    public void setRotationY(double rotationY) {
+        if (rotationY > ROTATION_MAX) {
+            return;
+        }
+        mRotationY = rotationY;
+        updateGravity();
+    }
+
+    public void addRotationY(double amount) {
+        setRotationY(mRotationY + amount);
+    }
+
+    private void updateGravity() {
+        mWorld.getGravity().set(GRAVITY * Math.sin(Math.toRadians(mRotationX)),
+                GRAVITY * Math.sin(Math.toRadians(mRotationY)));
+        System.out.println("Gravity: " + mWorld.getGravity());
     }
 
     public void update() {
