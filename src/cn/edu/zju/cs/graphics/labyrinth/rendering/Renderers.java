@@ -14,7 +14,7 @@ public interface Renderers {
     Renderer<Hole> HOLE = null;
 
     // TODO
-    Renderer<Wall> WALL = null;
+    Renderer<Wall> WALL = PrototypeRenders.WALL;
 
     // TODO
     Renderer<ConvexWall> CONVEX_WALL = null;

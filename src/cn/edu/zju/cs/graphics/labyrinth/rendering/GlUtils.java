@@ -6,6 +6,7 @@ import org.lwjgl.opengles.GLES20;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import static cn.edu.zju.cs.graphics.labyrinth.DemoUtils.ioResourceToByteBuffer;
@@ -14,6 +15,17 @@ import static org.lwjgl.opengles.GLES20.*;
 public class GlUtils {
 
     private GlUtils() {}
+
+    public static int createVertexArrayBuffer(FloatBuffer data, int usage) {
+        return updateVertexArrayBuffer(glGenBuffers(), data, usage);
+    }
+
+    public static int updateVertexArrayBuffer(int buffer, FloatBuffer data, int usage) {
+        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+        glBufferData(GL_ARRAY_BUFFER, data, usage);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        return buffer;
+    }
 
     public static int createProgram(String vertexShaderResource, String fragmentShaderResource)
             throws IOException {

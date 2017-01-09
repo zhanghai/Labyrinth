@@ -5,7 +5,7 @@ import cn.edu.zju.cs.graphics.labyrinth.rendering.Renderers;
 
 public class Ball extends Entity<Ball> {
 
-    public Ball() {
-        super(Bodies.newBall(), Renderers.BALL);
+    public Ball(double positionX, double positionY) {
+        super(Bodies.newBall(positionX, positionY), Renderers.BALL);
     }
 }

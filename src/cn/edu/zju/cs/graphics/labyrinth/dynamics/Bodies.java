@@ -7,17 +7,18 @@ import org.dyn4j.geometry.MassType;
 
 public class Bodies {
 
-    private static final float BALL_RADIUS = 1;
-    private static final float HOLE_RADIUS = BALL_RADIUS;
+    private static final double BALL_RADIUS = 0.5;
+    private static final double HOLE_RADIUS = BALL_RADIUS;
 
     private Bodies() {}
 
-    public static Body newBall() {
+    public static Body newBall(double positionX, double positionY) {
         BodyFixture fixture = new BodyFixture(Geometry.createCircle(BALL_RADIUS));
         fixture.setRestitution(0.5);
-        return new Body()
+        Body body = new Body()
                 .addFixture(fixture)
                 .setMass(MassType.NORMAL);
+        return setBodyPosition(body, positionX, positionY);
     }
 
     public static Body newHole() {
@@ -27,13 +28,14 @@ public class Bodies {
                 .addFixture(fixture);
     }
 
-    public static Body newWall(double width, double height) {
+    public static Body newWall(double width, double height, double positionX, double positionY) {
         BodyFixture fixture = new BodyFixture(Geometry.createRectangle(width, height));
         fixture.setRestitution(0.5);
-        return new Body()
+        Body body = new Body()
                 .addFixture(fixture)
                 .setMass(MassType.INFINITE);
         // TODO: Avoid collision with a ignore-same-type filter?
+        return setBodyPosition(body, positionX, positionY);
     }
 
     public static Body newConvexWall(double radius) {
@@ -46,5 +48,10 @@ public class Bodies {
 
     public static Body newFinishHole() {
         return newHole();
+    }
+
+    private static Body setBodyPosition(Body body, double x, double y) {
+        body.getTransform().setTranslation(x, y);
+        return body;
     }
 }
