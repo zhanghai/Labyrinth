@@ -5,7 +5,7 @@ import cn.edu.zju.cs.graphics.labyrinth.rendering.Renderers;
 
 public class FinishHole extends Entity<FinishHole> {
 
-    public FinishHole() {
-        super(Bodies.newFinishHole(), Renderers.FINISH_HOLE);
+    public FinishHole(double positionX, double positionY) {
+        super(Bodies.newFinishHole(positionX, positionY), Renderers.FINISH_HOLE);
     }
 }
