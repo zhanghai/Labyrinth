@@ -10,11 +10,9 @@ public interface Renderers {
 
     Renderer<Ball> BALL = PrototypeRenders.BALL;
 
-    // TODO
-    Renderer<Hole> HOLE = null;
-
-    // TODO
     Renderer<Wall> WALL = PrototypeRenders.WALL;
+
+    Renderer<Hole> HOLE = PrototypeRenders.HOLE;
 
     // TODO
     Renderer<ConvexWall> CONVEX_WALL = null;

@@ -8,29 +8,24 @@ import org.dyn4j.geometry.MassType;
 public class Bodies {
 
     private static final double BALL_RADIUS = 0.5;
+    private static final double BALL_RESTITUTION = 0.2;
+    private static final double WALL_RESTITUTION = BALL_RESTITUTION;
     private static final double HOLE_RADIUS = BALL_RADIUS;
 
     private Bodies() {}
 
     public static Body newBall(double positionX, double positionY) {
         BodyFixture fixture = new BodyFixture(Geometry.createCircle(BALL_RADIUS));
-        fixture.setRestitution(0.5);
+        fixture.setRestitution(BALL_RESTITUTION);
         Body body = new Body()
                 .addFixture(fixture)
                 .setMass(MassType.NORMAL);
         return setBodyPosition(body, positionX, positionY);
     }
 
-    public static Body newHole() {
-        BodyFixture fixture = new BodyFixture(Geometry.createCircle(HOLE_RADIUS));
-        fixture.setSensor(true);
-        return new Body()
-                .addFixture(fixture);
-    }
-
-    public static Body newWall(double width, double height, double positionX, double positionY) {
-        BodyFixture fixture = new BodyFixture(Geometry.createRectangle(width, height));
-        fixture.setRestitution(0.5);
+    public static Body newWall(double width, double length, double positionX, double positionY) {
+        BodyFixture fixture = new BodyFixture(Geometry.createRectangle(width, length));
+        fixture.setRestitution(WALL_RESTITUTION);
         Body body = new Body()
                 .addFixture(fixture)
                 .setMass(MassType.INFINITE);
@@ -46,8 +41,16 @@ public class Bodies {
                 .setMass(MassType.INFINITE);
     }
 
-    public static Body newFinishHole() {
-        return newHole();
+    public static Body newHole(double positionX, double positionY) {
+        BodyFixture fixture = new BodyFixture(Geometry.createCircle(HOLE_RADIUS));
+        fixture.setSensor(true);
+        Body body = new Body()
+                .addFixture(fixture);
+        return setBodyPosition(body, positionX, positionY);
+    }
+
+    public static Body newFinishHole(double positionX, double positionY) {
+        return newHole(positionX, positionY);
     }
 
     private static Body setBodyPosition(Body body, double x, double y) {

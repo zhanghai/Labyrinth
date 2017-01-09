@@ -1,6 +1,7 @@
 package cn.edu.zju.cs.graphics.labyrinth;
 
 import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
+import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Labyrinth;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.PrototypeRenders;
@@ -26,7 +27,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class LabyrinthPrototypeApplication {
 
     private static final float LABYRINTH_WIDTH = 30;
-    private static final float LABYRINTH_HEIGHT = 20;
+    private static final float LABYRINTH_LENGTH = 20;
 
     private long mWindow;
     private int mWidth = 640;
@@ -162,19 +163,20 @@ public class LabyrinthPrototypeApplication {
         PrototypeRenders.initialize();
 
         mLabyrinth = new Labyrinth()
-                .addEntity(new Ball(4d, 4d))
                 .addEntity(new Wall(LABYRINTH_WIDTH, 1d, LABYRINTH_WIDTH / 2d, 0.5))
-                .addEntity(new Wall(1d, LABYRINTH_HEIGHT, LABYRINTH_WIDTH - 0.5,
-                        LABYRINTH_HEIGHT / 2d))
+                .addEntity(new Wall(1d, LABYRINTH_LENGTH, LABYRINTH_WIDTH - 0.5,
+                        LABYRINTH_LENGTH / 2d))
                 .addEntity(new Wall(LABYRINTH_WIDTH, 1d, LABYRINTH_WIDTH / 2d,
-                        LABYRINTH_HEIGHT - 0.5))
-                .addEntity(new Wall(1d, LABYRINTH_HEIGHT, 0.5, LABYRINTH_HEIGHT / 2d));
+                        LABYRINTH_LENGTH - 0.5))
+                .addEntity(new Wall(1d, LABYRINTH_LENGTH, 0.5, LABYRINTH_LENGTH / 2d))
+                .addEntity(new Hole(LABYRINTH_WIDTH - 2.5, LABYRINTH_LENGTH - 2.5))
+                .addEntity(new Ball(2.5, 2.5));
     }
 
     private void update() {
 
         mViewMatrix.identity();
-        mProjectionMatrix.setOrtho2D(0, LABYRINTH_WIDTH, 0, LABYRINTH_HEIGHT);
+        mProjectionMatrix.setOrtho2D(0, LABYRINTH_WIDTH, 0, LABYRINTH_LENGTH);
         mProjectionMatrix.mul(mViewMatrix, mViewProjectionMatrix);
         PrototypeRenders.setViewProjectionMatrix(mViewProjectionMatrix);
 

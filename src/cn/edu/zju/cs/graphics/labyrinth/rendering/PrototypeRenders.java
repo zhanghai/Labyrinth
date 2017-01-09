@@ -2,6 +2,7 @@ package cn.edu.zju.cs.graphics.labyrinth.rendering;
 
 import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
 import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
+import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 import org.dyn4j.geometry.Rectangle;
 import org.joml.Matrix4f;
@@ -65,6 +66,27 @@ public class PrototypeRenders {
                 .flip();
     }
 
+    private static int sHoleVertexBuffer;
+    private static FloatBuffer sHoleVertexBufferData;
+    static {
+        sHoleVertexBufferData = BufferUtils.createFloatBuffer(6 * 2);
+        sHoleVertexBufferData
+                .put(0f).put(0.5f)
+                .put(0.5f).put(0f)
+                .put(0f).put(-0.5f)
+                .put(0f).put(0.5f)
+                .put(-0.5f).put(0f)
+                .put(0f).put(-0.5f)
+                .flip();
+    }
+    private static FloatBuffer sHoleColorBuffer;
+    static {
+        sHoleColorBuffer = BufferUtils.createFloatBuffer(4);
+        sHoleColorBuffer
+                .put(1f).put(0f).put(0f).put(1f)
+                .flip();
+    }
+
     public static void initialize() throws IOException {
 
         sPrototypeProgram = GlUtils.createProgram(makeShaderResource("prototype.vs"),
@@ -77,6 +99,7 @@ public class PrototypeRenders {
 
         sBallVertexBuffer = GlUtils.createVertexArrayBuffer(sBallVertexBufferData, GL_STATIC_DRAW);
         sWallVertexBuffer = GlUtils.createVertexArrayBuffer(sWallVertexBufferData, GL_STATIC_DRAW);
+        sHoleVertexBuffer = GlUtils.createVertexArrayBuffer(sHoleVertexBufferData, GL_STATIC_DRAW);
     }
 
     private static String makeShaderResource(String name) {
@@ -103,9 +126,8 @@ public class PrototypeRenders {
     }
 
     private static Matrix4f getModelMatrixForWall(Wall wall) {
-        Rectangle rectangle = (Rectangle) wall.getBody().getFixture(0).getShape();
-        return getModelMatrix(wall).scale((float) rectangle.getWidth(),
-                (float) rectangle.getHeight(), 1f);
+        return getModelMatrix(wall).scale((float) wall.getWidth(),
+                (float) wall.getLength(), 1f);
     }
 
     private static FloatBuffer getModelMatrixBufferForWall(Wall wall) {
@@ -137,6 +159,13 @@ public class PrototypeRenders {
         @Override
         public void render(Wall wall) {
             renderPrototype(sWallVertexBuffer, getModelMatrixBufferForWall(wall), sWallColorBuffer);
+        }
+    };
+
+    public static final Renderer<Hole> HOLE = new Renderer<Hole>() {
+        @Override
+        public void render(Hole hole) {
+            renderPrototype(sHoleVertexBuffer, getModelMatrixBuffer(hole), sHoleColorBuffer);
         }
     };
 }

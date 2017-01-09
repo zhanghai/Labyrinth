@@ -5,7 +5,7 @@ import cn.edu.zju.cs.graphics.labyrinth.rendering.Renderers;
 
 public class Hole extends Entity<Hole> {
 
-    public Hole() {
-        super(Bodies.newHole(), Renderers.HOLE);
+    public Hole(double positionX, double positionY) {
+        super(Bodies.newHole(positionX, positionY), Renderers.HOLE);
     }
 }
