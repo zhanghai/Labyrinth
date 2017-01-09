@@ -24,7 +24,7 @@ public class Labyrinth {
         // TODO
         mWorld.getSettings().setRestitutionVelocity(0);
     }
-    private boolean mWorldStarted;
+    private double mWorldTimeSeconds;
 
     public void addEntity(Entity<?> entity) {
         mEntities.add(entity);
@@ -40,13 +40,20 @@ public class Labyrinth {
         return Collections.unmodifiableSortedSet(mEntities);
     }
 
-    public void update(double elapsedTime) {
-        if (!mWorldStarted) {
-            mWorld.setAccumulatedTime(elapsedTime);
-            mWorldStarted = true;
+    public void update() {
+        double currentTimeSeconds = System.currentTimeMillis() / 1000d;
+        if (mWorldTimeSeconds == 0) {
+            mWorldTimeSeconds = currentTimeSeconds;
             return;
         }
-        mWorld.update(elapsedTime, Integer.MAX_VALUE);
+        mWorld.update(currentTimeSeconds - mWorldTimeSeconds, Integer.MAX_VALUE);
+        mWorldTimeSeconds = currentTimeSeconds;
+    }
+
+    public void render() {
+        for (Entity<?> entity : mEntities) {
+            entity.render();
+        }
     }
 
     public World getWorld() {

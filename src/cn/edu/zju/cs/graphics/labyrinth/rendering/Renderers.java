@@ -8,8 +8,7 @@ import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 
 public interface Renderers {
 
-    // TODO
-    Renderer<Ball> BALL = null;
+    Renderer<Ball> BALL = PrototypeRenders.BALL;
 
     // TODO
     Renderer<Hole> HOLE = null;

@@ -1,9 +1,11 @@
 package cn.edu.zju.cs.graphics.labyrinth;
 
+import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
+import cn.edu.zju.cs.graphics.labyrinth.model.Labyrinth;
+import cn.edu.zju.cs.graphics.labyrinth.rendering.PrototypeRenders;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
@@ -11,15 +13,11 @@ import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengles.GLES;
-import org.lwjgl.opengles.GLES20;
 import org.lwjgl.system.Configuration;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import static cn.edu.zju.cs.graphics.labyrinth.DemoUtils.ioResourceToByteBuffer;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengles.GLES20.*;
 import static org.lwjgl.system.MemoryUtil.*;
@@ -33,17 +31,12 @@ public class LabyrinthPrototypeApplication {
     private int mFrameBufferHeight = 768;
     private float mFov = 60, mRotationX, mRotationY;
 
-    private int mPrototypeProgram;
-    private int mPositionAttribute;
-    private int mViewProjectionUniform;
-    private int mColorUniform;
-
     private Matrix4f mProjectionMatrix = new Matrix4f();
     private Matrix4f mViewMatrix = new Matrix4f();
     private Matrix4f mViewProjectionMatrix = new Matrix4f();
     private Vector3f mCameraPosition = new Vector3f();
-    private FloatBuffer mMatrixBuffer = BufferUtils.createFloatBuffer(16);
-    private int mFullscreenVbo;
+
+    private Labyrinth mLabyrinth;
 
     private GLFWFramebufferSizeCallback mFramebufferSizeCallback;
     private GLFWWindowSizeCallback mWindowSizeCallback;
@@ -148,96 +141,29 @@ public class LabyrinthPrototypeApplication {
         Configuration.DEBUG_LOADER.set(true);
         //debugProc = glDebugMessageCallback();
 
-        /* Create all needed GL resources */
-        createFullScreenQuad();
-        createPrototypeProgram();
-    }
+        glClearColor(1f, 1f, 1f, 1f);
+        PrototypeRenders.initialize();
 
-    private void createFullScreenQuad() {
-        ByteBuffer byteBuffer = BufferUtils.createByteBuffer(4 * 2 * 6);
-        byteBuffer.asFloatBuffer()
-                .put(-1f).put(-1f)
-                .put(1f).put(-1f)
-                .put(1f).put(1f)
-                .put(1f).put(1f)
-                .put(-1f).put(1f)
-                .put(-1f).put(-1f);
-        mFullscreenVbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, mFullscreenVbo);
-        glBufferData(GL_ARRAY_BUFFER, byteBuffer, GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-
-    private static int createShader(String resource, int type) throws IOException {
-        int shader = glCreateShader(type);
-        ByteBuffer source = ioResourceToByteBuffer(resource, 1024);
-        PointerBuffer strings = BufferUtils.createPointerBuffer(1);
-        IntBuffer lengths = BufferUtils.createIntBuffer(1);
-        strings.put(0, source);
-        lengths.put(0, source.remaining());
-        glShaderSource(shader, strings, lengths);
-        glCompileShader(shader);
-        int compiled = glGetShaderi(shader, GL_COMPILE_STATUS);
-        String shaderLog = glGetShaderInfoLog(shader);
-        if (shaderLog.trim().length() > 0) {
-            System.err.println(shaderLog);
-        }
-        if (compiled == 0) {
-            throw new AssertionError("Could not compile shader");
-        }
-        return shader;
-    }
-
-    private static int createProgram(String vertexShaderResource, String fragmentShaderResource)
-            throws IOException {
-        int program = glCreateProgram();
-        int vertexShader = createShader(vertexShaderResource, GL_VERTEX_SHADER);
-        glAttachShader(program, vertexShader);
-        int fragmentShader = createShader(fragmentShaderResource, GL_FRAGMENT_SHADER);
-        glAttachShader(program, fragmentShader);
-        glLinkProgram(program);
-        int linked = glGetProgrami(program, GL_LINK_STATUS);
-        String programInfoLog = glGetProgramInfoLog(program);
-        if (programInfoLog.trim().length() > 0) {
-            System.err.println(programInfoLog);
-        }
-        if (linked == 0) {
-            throw new AssertionError("Could not link program");
-        }
-        return program;
-    }
-
-    private void createPrototypeProgram() throws IOException {
-        mPrototypeProgram = createProgram("cn/edu/zju/cs/graphics/labyrinth/shader/prototype.vs",
-                "cn/edu/zju/cs/graphics/labyrinth/shader/prototype.fs");
-        mPositionAttribute = glGetAttribLocation(mPrototypeProgram, "aPosition");
-        mViewProjectionUniform = glGetUniformLocation(mPrototypeProgram, "uViewProjection");
-        mColorUniform = glGetUniformLocation(mPrototypeProgram, "uColor");
+        mLabyrinth = new Labyrinth();
+        mLabyrinth.addEntity(new Ball());
     }
 
     private void update() {
-        mProjectionMatrix.setPerspective((float) Math.toRadians(mFov), (float) mWidth / mHeight,
-                0.01f, 100f);
-        mViewMatrix.translation(0, 0, -10f)
-                .rotateX(mRotationX)
-                .rotateY(mRotationY);
-        mViewMatrix.originAffine(mCameraPosition);
+
+        mViewMatrix.identity();
+        mProjectionMatrix.setOrtho2D(0, mWidth, 0, mHeight);
         mProjectionMatrix.mulPerspectiveAffine(mViewMatrix, mViewProjectionMatrix);
-        glUseProgram(mPrototypeProgram);
-        glUniformMatrix4fv(mViewProjectionUniform, false, mViewProjectionMatrix.get(mMatrixBuffer));
+        PrototypeRenders.setViewProjectionMatrix(mViewProjectionMatrix);
+
+        mLabyrinth.update();
     }
 
     private void render() {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         glDisable(GL_DEPTH_TEST);
-        glUseProgram(mPrototypeProgram);
-        glBindBuffer(GL_ARRAY_BUFFER, mFullscreenVbo);
-        glEnableVertexAttribArray(mPositionAttribute);
-        glVertexAttribPointer(mPositionAttribute, 2, GL_FLOAT, false, 0, 0L);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        glDisableVertexAttribArray(mPositionAttribute);
+
+        mLabyrinth.render();
     }
 
     private void loop() {
@@ -252,10 +178,8 @@ public class LabyrinthPrototypeApplication {
 
     public void run() {
         try {
-
             init();
             loop();
-
             mFramebufferSizeCallback.free();
             mWindowSizeCallback.free();
             mKeyCallback.free();
@@ -269,19 +193,4 @@ public class LabyrinthPrototypeApplication {
         }
     }
 
-    private static int glGetUniformLocation(int program, CharSequence name) {
-        int location = GLES20.glGetUniformLocation(program, name);
-        if (location < 0) {
-            throw new AssertionError("Uniform not found: " + name);
-        }
-        return location;
-    }
-
-    private static int glGetAttribLocation(int program, CharSequence name) {
-        int location = GLES20.glGetAttribLocation(program, name);
-        if (location < 0) {
-            throw new AssertionError("Uniform not found: " + name);
-        }
-        return location;
-    }
 }

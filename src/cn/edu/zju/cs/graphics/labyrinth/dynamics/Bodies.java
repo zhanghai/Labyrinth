@@ -3,6 +3,7 @@ package cn.edu.zju.cs.graphics.labyrinth.dynamics;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Geometry;
+import org.dyn4j.geometry.MassType;
 
 public class Bodies {
 
@@ -15,7 +16,8 @@ public class Bodies {
         BodyFixture fixture = new BodyFixture(Geometry.createCircle(BALL_RADIUS));
         fixture.setRestitution(0.5);
         return new Body()
-                .addFixture(fixture);
+                .addFixture(fixture)
+                .setMass(MassType.NORMAL);
     }
 
     public static Body newHole() {
@@ -29,14 +31,17 @@ public class Bodies {
         BodyFixture fixture = new BodyFixture(Geometry.createRectangle(width, height));
         fixture.setRestitution(0.5);
         return new Body()
-                .addFixture(fixture);
+                .addFixture(fixture)
+                .setMass(MassType.INFINITE);
+        // TODO: Avoid collision with a ignore-same-type filter?
     }
 
     public static Body newConvexWall(double radius) {
         BodyFixture fixture = new BodyFixture(Geometry.createSlice(radius, Math.toRadians(90)));
         fixture.setRestitution(0.5);
         return new Body()
-                .addFixture(fixture);
+                .addFixture(fixture)
+                .setMass(MassType.INFINITE);
     }
 
     public static Body newFinishHole() {
