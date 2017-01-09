@@ -11,12 +11,9 @@ import cn.edu.zju.cs.graphics.labyrinth.rendering.PrototypeRenderers;
 import org.dyn4j.dynamics.contact.ContactPoint;
 import org.dyn4j.geometry.Vector2;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
-import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengles.GLES;
@@ -39,20 +36,16 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
     private int mHeight = 480;
     private int mFrameBufferWidth = 640;
     private int mFrameBufferHeight = 480;
-    private float mFov = 60, mRotationX, mRotationY;
 
     private Matrix4f mProjectionMatrix = new Matrix4f();
     private Matrix4f mViewMatrix = new Matrix4f();
     private Matrix4f mViewProjectionMatrix = new Matrix4f();
-    private Vector3f mCameraPosition = new Vector3f();
 
     private Labyrinth mLabyrinth;
 
     private GLFWFramebufferSizeCallback mFramebufferSizeCallback;
     private GLFWWindowSizeCallback mWindowSizeCallback;
     private GLFWKeyCallback mKeyCallback;
-    private GLFWCursorPosCallback mCursorPositionCallback;
-    private GLFWScrollCallback mScrollCallback;
 
     private void init() throws IOException {
 
@@ -117,30 +110,9 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
                     case GLFW_KEY_W:
                         mLabyrinth.addRotationY(1);
                         break;
-                }
-            }
-        });
-        glfwSetCursorPosCallback(mWindow, mCursorPositionCallback = new GLFWCursorPosCallback() {
-            @Override
-            public void invoke(long window, double x, double y) {
-                float nx = (float) x / mWidth * 2f - 1f;
-                float ny = (float) y / mHeight * 2f - 1f;
-                mRotationX = ny * (float) Math.PI * 0.5f;
-                mRotationY = nx * (float) Math.PI;
-            }
-        });
-        glfwSetScrollCallback(mWindow, mScrollCallback = new GLFWScrollCallback() {
-            @Override
-            public void invoke(long window, double xoffset, double yoffset) {
-                if (yoffset < 0) {
-                    mFov *= 1.05f;
-                } else {
-                    mFov *= 1f / 1.05f;
-                }
-                if (mFov < 10f) {
-                    mFov = 10f;
-                } else if (mFov > 120f) {
-                    mFov = 120f;
+                    case GLFW_KEY_0:
+                        mLabyrinth.setRotationX(0).setRotationY(0);
+                        break;
                 }
             }
         });
@@ -174,15 +146,18 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
                 .addEntity(new Wall(LABYRINTH_WIDTH, 1d, LABYRINTH_WIDTH / 2d,
                         LABYRINTH_LENGTH - 0.5))
                 .addEntity(new Wall(1d, LABYRINTH_LENGTH, 0.5, LABYRINTH_LENGTH / 2d))
+                .addEntity(new Wall(LABYRINTH_WIDTH / 2, 1d, LABYRINTH_WIDTH / 4,
+                        LABYRINTH_LENGTH / 2d))
                 .addEntity(new Hole(LABYRINTH_WIDTH - 2.5, LABYRINTH_LENGTH - 2.5))
                 .addEntity(new Hole(4.5, 4.5))
                 .addEntity(new Hole(2.2d, 4.5))
+                .addEntity(new FinishHole(1.5, LABYRINTH_LENGTH - 1.5))
                 .addEntity(new Ball(2.5, 2.5))
-                .addListener(this);
+                .setListener(this);
     }
 
     @Override
-    public void onBallFallingIntoHole(Ball ball, BaseHole hole, ContactPoint point) {
+    public void onBallFallingTowardsHole(Ball ball, BaseHole hole) {
         Vector2 distance = new Vector2(hole.getPositionX(), hole.getPositionY())
                 .subtract(ball.getPositionX(), ball.getPositionY());
         ball.applyForce(Vector2.create(1d / distance.getMagnitude(), distance.getDirection()));
@@ -194,12 +169,15 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
     }
 
     @Override
-    public void onBallFallenIntoHole(Ball ball, BaseHole hole, ContactPoint point) {
-        ball.stopMotion();
+    public void onBallFallenIntoHole(Ball ball, BaseHole hole) {
+        ball.stopMovement();
         if (hole instanceof Hole) {
             // TODO: Die.
+            ball.setPositionX(2.5).setPositionY(2.5);
+            mLabyrinth.setRotationX(0).setRotationY(0);
         } else if (hole instanceof FinishHole) {
             // TODO: Victory.
+            glfwSetWindowShouldClose(mWindow, true);
         } else {
             throw new IllegalStateException("Unknown type of hole: " + hole);
         }
@@ -207,6 +185,11 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
 
     @Override
     public void onBallHitEntity(Ball ball, Entity<?> entity, ContactPoint point) {
+        // TODO: Audio.
+    }
+
+    @Override
+    public void onBallRolled(Ball ball, Vector2 movement) {
         // TODO: Audio.
     }
 
@@ -245,8 +228,6 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
             mFramebufferSizeCallback.free();
             mWindowSizeCallback.free();
             mKeyCallback.free();
-            mCursorPositionCallback.free();
-            mScrollCallback.free();
             glfwDestroyWindow(mWindow);
         } catch (Throwable t) {
             t.printStackTrace();
@@ -254,5 +235,4 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
             glfwTerminate();
         }
     }
-
 }

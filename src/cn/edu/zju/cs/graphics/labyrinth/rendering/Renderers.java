@@ -12,11 +12,10 @@ public interface Renderers {
 
     Renderer<Wall> WALL = PrototypeRenderers.WALL;
 
-    Renderer<Hole> HOLE = PrototypeRenderers.HOLE;
-
     // TODO
     Renderer<ConvexWall> CONVEX_WALL = null;
 
-    // TODO
-    Renderer<FinishHole> FINISH_HOLE = null;
+    Renderer<Hole> HOLE = PrototypeRenderers.HOLE;
+
+    Renderer<FinishHole> FINISH_HOLE = PrototypeRenderers.FINISH_HOLE;
 }

@@ -19,7 +19,7 @@ public class Ball extends Entity<Ball> {
         getBody().applyForce(force);
     }
 
-    public void stopMotion() {
+    public void stopMovement() {
         Body body = getBody();
         body.setLinearVelocity(0, 0);
         body.clearAccumulatedForce();

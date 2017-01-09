@@ -18,10 +18,11 @@ import java.util.List;
 
 public class Labyrinth {
 
-    private static final double ROTATION_MAX = 45;
+    private static final double ROTATION_MAX = 30;
     private static final double GRAVITY = 20;
 
     private List<Entity<?>> mEntities = new ArrayList<>();
+    private Listener mListener;
     private List<Runnable> mPostOnStepEndList = new ArrayList<>();
     private World mWorld;
     {
@@ -40,6 +41,44 @@ public class Labyrinth {
                     iterator.next().run();
                     iterator.remove();
                 }
+            }
+        });
+        mWorld.addListener(new ContactAdapter() {
+            @Override
+            public void sensed(ContactPoint point) {
+                Entity<?> entity1 = Entity.ofBody(point.getBody1());
+                Entity<?> entity2 = Entity.ofBody(point.getBody2());
+                Ball ball;
+                Entity<?> sensor;
+                if (entity1 instanceof Ball) {
+                    ball = (Ball) entity1;
+                    sensor = entity2;
+                } else {
+                    ball = (Ball) entity2;
+                    sensor = entity1;
+                }
+                BaseHole<?> hole = (BaseHole<?>) sensor;
+                if (MathUtils.distance(ball, hole) < Bodies.HOLE_RADIUS) {
+                    mListener.onBallFallenIntoHole(ball, hole);
+                } else {
+                    mListener.onBallFallingTowardsHole(ball, hole);
+                }
+            }
+            @Override
+            public boolean begin(ContactPoint point) {
+                Entity<?> entity1 = Entity.ofBody(point.getBody1());
+                Entity<?> entity2 = Entity.ofBody(point.getBody2());
+                Ball ball;
+                Entity<?> other;
+                if (entity1 instanceof Ball) {
+                    ball = (Ball) entity1;
+                    other = entity2;
+                } else {
+                    ball = (Ball) entity2;
+                    other = entity1;
+                }
+                mListener.onBallHitEntity(ball, other, point);
+                return true;
             }
         });
     }
@@ -68,32 +107,36 @@ public class Labyrinth {
         return mRotationX;
     }
 
-    public void setRotationX(double rotationX) {
+    public Labyrinth setRotationX(double rotationX) {
         if (rotationX > ROTATION_MAX) {
-            return;
+            return this;
         }
         mRotationX = rotationX;
         updateGravity();
+        return this;
     }
 
-    public void addRotationX(double amount) {
+    public Labyrinth addRotationX(double amount) {
         setRotationX(mRotationX + amount);
+        return this;
     }
 
     public double getRotationY() {
         return mRotationY;
     }
 
-    public void setRotationY(double rotationY) {
+    public Labyrinth setRotationY(double rotationY) {
         if (rotationY > ROTATION_MAX) {
-            return;
+            return this;
         }
         mRotationY = rotationY;
         updateGravity();
+        return this;
     }
 
-    public void addRotationY(double amount) {
+    public Labyrinth addRotationY(double amount) {
         setRotationY(mRotationY + amount);
+        return this;
     }
 
     private void updateGravity() {
@@ -103,45 +146,8 @@ public class Labyrinth {
                 mRotationY, mWorld.getGravity()));
     }
 
-    public Labyrinth addListener(final Listener listener) {
-        mWorld.addListener(new ContactAdapter() {
-            @Override
-            public void sensed(ContactPoint point) {
-                Entity<?> entity1 = Entity.ofBody(point.getBody1());
-                Entity<?> entity2 = Entity.ofBody(point.getBody2());
-                Ball ball;
-                Entity<?> sensor;
-                if (entity1 instanceof Ball) {
-                    ball = (Ball) entity1;
-                    sensor = entity2;
-                } else {
-                    ball = (Ball) entity2;
-                    sensor = entity1;
-                }
-                BaseHole<?> hole = (BaseHole<?>) sensor;
-                if (MathUtils.distance(ball, hole) < Bodies.HOLE_RADIUS) {
-                    listener.onBallFallenIntoHole(ball, hole, point);
-                } else {
-                    listener.onBallFallingIntoHole(ball, hole, point);
-                }
-            }
-            @Override
-            public boolean begin(ContactPoint point) {
-                Entity<?> entity1 = Entity.ofBody(point.getBody1());
-                Entity<?> entity2 = Entity.ofBody(point.getBody2());
-                Ball ball;
-                Entity<?> other;
-                if (entity1 instanceof Ball) {
-                    ball = (Ball) entity1;
-                    other = entity2;
-                } else {
-                    ball = (Ball) entity2;
-                    other = entity1;
-                }
-                listener.onBallHitEntity(ball, other, point);
-                return true;
-            }
-        });
+    public Labyrinth setListener(final Listener listener) {
+        mListener = listener;
         return this;
     }
 
@@ -150,6 +156,7 @@ public class Labyrinth {
     }
 
     public void update() {
+
         double currentTimeSeconds = System.currentTimeMillis() / 1000d;
         if (mWorldTimeSeconds == 0) {
             mWorldTimeSeconds = currentTimeSeconds;
@@ -157,6 +164,17 @@ public class Labyrinth {
         }
         mWorld.update(currentTimeSeconds - mWorldTimeSeconds, Integer.MAX_VALUE);
         mWorldTimeSeconds = currentTimeSeconds;
+
+        for (Entity<?> entity : mEntities) {
+            if (!(entity instanceof Ball)) {
+                continue;
+            }
+            Ball ball = (Ball) entity;
+            Vector2 movement = ball.getBody().getChangeInPosition();
+            if (!movement.isZero()) {
+                mListener.onBallRolled(ball, movement);
+            }
+        }
     }
 
     public void render() {
@@ -175,7 +193,7 @@ public class Labyrinth {
          * false from the those methods as well.
          * </p>
          */
-        void onBallFallingIntoHole(Ball ball, BaseHole hole, ContactPoint point);
+        void onBallFallingTowardsHole(Ball ball, BaseHole hole);
         /**
          * Modification of the {@link World} is permitted from this methods.
          * <p>
@@ -185,7 +203,7 @@ public class Labyrinth {
          * false from the those methods as well.
          * </p>
          */
-        void onBallFallenIntoHole(Ball ball, BaseHole hole, ContactPoint point);
+        void onBallFallenIntoHole(Ball ball, BaseHole hole);
         /**
          * Modification of the {@link World} is permitted from this methods.
          * <p>
@@ -196,5 +214,7 @@ public class Labyrinth {
          * </p>
          */
         void onBallHitEntity(Ball ball, Entity<?> entity, ContactPoint point);
+
+        void onBallRolled(Ball ball, Vector2 movement);
     }
 }

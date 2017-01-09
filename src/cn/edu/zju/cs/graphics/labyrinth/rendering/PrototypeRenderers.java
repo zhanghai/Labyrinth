@@ -2,6 +2,7 @@ package cn.edu.zju.cs.graphics.labyrinth.rendering;
 
 import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
 import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
+import cn.edu.zju.cs.graphics.labyrinth.model.FinishHole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
@@ -87,6 +88,15 @@ public class PrototypeRenderers {
                 .flip();
     }
 
+    private static FloatBuffer sFinishHoleColorBuffer;
+    static {
+        sFinishHoleColorBuffer = BufferUtils.createFloatBuffer(4);
+        sFinishHoleColorBuffer
+                .put(0f).put(1f).put(0f).put(1f)
+                .flip();
+    }
+
+
     public static void initialize() throws IOException {
 
         sPrototypeProgram = GlUtils.createProgram(makeShaderResource("prototype.vs"),
@@ -166,6 +176,14 @@ public class PrototypeRenderers {
         @Override
         public void render(Hole hole) {
             renderPrototype(sHoleVertexBuffer, getModelMatrixBuffer(hole), sHoleColorBuffer);
+        }
+    };
+
+    public static final Renderer<FinishHole> FINISH_HOLE = new Renderer<FinishHole>() {
+        @Override
+        public void render(FinishHole finishHole) {
+            renderPrototype(sHoleVertexBuffer, getModelMatrixBuffer(finishHole),
+                    sFinishHoleColorBuffer);
         }
     };
 }
