@@ -4,6 +4,6 @@ uniform mat4 uModelMatrix;
 varying vec2 vTexCoordinate;
 
 void main() {
-    gl_Position =  uModelMatrix * aPosition;
+    gl_Position =  uModelMatrix * aPosition ;
     vTexCoordinate = aPosition.xy;
 }

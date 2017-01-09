@@ -9,24 +9,23 @@ import org.lwjgl.BufferUtils;
 import static org.lwjgl.stb.STBImage.*;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import java.nio.*;
+
 import static cn.edu.zju.cs.graphics.labyrinth.DemoUtils.*;
 
 import static org.lwjgl.opengles.GLES20.*;
 
 public class PrototypeRenders {
 
-    private static int sPrototypeProgram;
-    private static int sPositionAttribute;
+    private static int sPrototypeProgram1, sPrototypeProgram2;
+    private static int sPositionAttribute, sPositionAttribute2;
     private static Matrix4f sModelMatrix = new Matrix4f();
-    private static int sModelMatrixUniform;
+    private static int sModelMatrixUniform, sModelMatrixUniform2;
     private static FloatBuffer sModelMatrixBuffer = BufferUtils.createFloatBuffer(16);
     private static int sViewProjectionMatrixUniform;
     private static FloatBuffer sViewProjectionMatrixBuffer = BufferUtils.createFloatBuffer(16);
     private static int sColorUniform;
-    private static int sTex;
+    private static int sTex1, sTex2, sTex;
     private static int sBallVertexBuffer;
 
 
@@ -78,36 +77,90 @@ public class PrototypeRenders {
                 .flip();
     }
 
-    private static int sWallVertexBuffer;
+    //wall
+//    private static float sWallVertices[] = {
+//  0          -1.0f, -1.0f, -1.0f,
+//  1          1.0f, -1.0f, -1.0f,
+//  2          1.0f,  1.0f, -1.0f,
+//  3          -1.0f, 1.0f, -1.0f,
+//  4          -1.0f, -1.0f,  1.0f,
+//  5          1.0f, -1.0f,  1.0f,
+//  6          1.0f,  1.0f,  1.0f,
+//  7          -1.0f,  1.0f,  1.0f
+//    };
+    private static float sWallVertices[] = {
+            -1.0f, -1.0f, -1.0f, -1.0f, -1.0f,  1.0f, 1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f, -1.0f, 1.0f, -1.0f,  1.0f, 1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,1.0f, -1.0f,  1.0f,1.0f,  1.0f,  1.0f,
+            1.0f, -1.0f, -1.0f,1.0f,  1.0f,  1.0f,1.0f,  1.0f, -1.0f,
+            1.0f,  1.0f, -1.0f,1.0f,  1.0f,  1.0f,-1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f, -1.0f,-1.0f,  1.0f,  1.0f,-1.0f, 1.0f, -1.0f,
+            -1.0f, 1.0f, -1.0f,-1.0f,  1.0f,  1.0f,-1.0f, -1.0f,  1.0f,
+            -1.0f, 1.0f, -1.0f,-1.0f, -1.0f,  1.0f,-1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f,  1.0f,-1.0f,  1.0f,  1.0f,1.0f,  1.0f,  1.0f,
+            -1.0f, -1.0f,  1.0f,1.0f,  1.0f,  1.0f,1.0f, -1.0f,  1.0f,
+            -1.0f, 1.0f, -1.0f,-1.0f, -1.0f, -1.0f,1.0f, -1.0f, -1.0f,
+            -1.0f, 1.0f, -1.0f,1.0f, -1.0f, -1.0f,1.0f,  1.0f, -1.0f
+    };
+
+    private static byte sWallIndices[] = {
+            0, 4, 5, 0, 5, 1,
+            1, 5, 6, 1, 6, 2,
+            2, 6, 7, 2, 7, 3,
+            3, 7, 4, 3, 4, 0,
+            4, 7, 6, 4, 6, 5,
+            3, 0, 1, 3, 1, 2
+    };
+
+    private static ByteBuffer sWallIndexBuffer;
     private static FloatBuffer sWallVertexBufferData;
+    private static int sWallVertexBuffer;
     static {
-        sWallVertexBufferData = BufferUtils.createFloatBuffer(6 * 2);
-        sWallVertexBufferData
-                .put(0.5f).put(0.5f)
-                .put(-0.5f).put(0.5f)
-                .put(-0.5f).put(-0.5f)
-                .put(0.5f).put(0.5f)
-                .put(0.5f).put(-0.5f)
-                .put(-0.5f).put(-0.5f)
-                .flip();
-    }
-    private static FloatBuffer sWallColorBuffer;
-    static {
-        sWallColorBuffer = BufferUtils.createFloatBuffer(4);
-        sWallColorBuffer
-                .put(1f).put(1f).put(0f).put(1f)
-                .flip();
+        for (int i = 0; i<sWallVertices.length; ++i)
+            sWallVertices[i] /=10;
+        sCircleBallVertexBufferIndex = glGenBuffers();
+        System.out.println(" " + sCircleBallVertexBufferIndex + sWallVertexBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER,sCircleBallVertexBufferIndex);
+        sCircleBallVertexBuffer = BufferUtils.createFloatBuffer(sPoints * 4);
+        sCircleBallVertexBuffer.put(genCircle2d(0.5f,sPoints,0,0));
+        sCircleBallVertexBuffer.position(0);
+        glBufferData(GL_ARRAY_BUFFER,sCircleBallVertexBuffer,GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER,0);
+
+        sWallVertexBuffer = glGenBuffers();
+        sWallVertexBufferData = BufferUtils.createFloatBuffer(sWallVertices.length * 4);
+        sWallVertexBufferData.put(sWallVertices);
+        sWallVertexBufferData.position(0);
+        glBindBuffer(GL_ARRAY_BUFFER,sWallVertexBuffer);
+        glBufferData(GL_ARRAY_BUFFER,sWallVertexBufferData,GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER,0);
+        sWallIndexBuffer = ByteBuffer.allocate(sWallIndices.length);
+        sWallIndexBuffer.put(sWallIndices);
+        sWallIndexBuffer.position(0);
+
+
     }
 
     public static void initialize() throws IOException {
 
-        sPrototypeProgram = GlUtils.createProgram(makeShaderResource("prototype.vs"),
+        sPrototypeProgram1 = GlUtils.createProgram(makeShaderResource("prototype.vs"),
                 makeShaderResource("prototype.fs"));
-        int tex = genTexture();
-        sTex = GlUtils.getUniformLocation(sPrototypeProgram,"uTexture");
-        glUniform1i(sTex,tex);
-        sPositionAttribute = GlUtils.getAttribLocation(sPrototypeProgram, "aPosition");
-        sModelMatrixUniform = GlUtils.getUniformLocation(sPrototypeProgram, "uModelMatrix");
+        sPrototypeProgram2 = GlUtils.createProgram(makeShaderResource("prototype.vs"),
+                makeShaderResource("prototype.fs"));
+        sTex1 = GlUtils.getUniformLocation(sPrototypeProgram1,"uTexture");
+        sTex2 = GlUtils.getUniformLocation(sPrototypeProgram2,"uTexture");
+        genTexture(); genTexture2();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D,1);
+
+        glUniform1i(sTex1,1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D,2);
+        glUniform1i(sTex2,2);
+        sPositionAttribute = GlUtils.getAttribLocation(sPrototypeProgram1, "aPosition");
+        sModelMatrixUniform = GlUtils.getUniformLocation(sPrototypeProgram1, "uModelMatrix");
+        sPositionAttribute2 = GlUtils.getAttribLocation(sPrototypeProgram2, "aPosition");
+        sModelMatrixUniform2 = GlUtils.getUniformLocation(sPrototypeProgram2, "uModelMatrix");
         //sViewProjectionMatrixUniform = GlUtils.getUniformLocation(sPrototypeProgram,
         //        "uViewProjectionMatrix");
         //sColorUniform = GlUtils.getUniformLocation(sPrototypeProgram, "uColor");
@@ -118,17 +171,11 @@ public class PrototypeRenders {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         //new circle-based ball
-        sCircleBallVertexBufferIndex = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER,sCircleBallVertexBufferIndex);
-        sCircleBallVertexBuffer = BufferUtils.createFloatBuffer(sPoints * 4);
-        sCircleBallVertexBuffer.put(genCircle2d(0.5f,sPoints,0,0));
-        sCircleBallVertexBuffer.position(0);
-        glBufferData(GL_ARRAY_BUFFER,sCircleBallVertexBuffer,GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER,0);
+
 
 
         sBallVertexBuffer = GlUtils.createVertexArrayBuffer(sBallVertexBufferData, GL_STATIC_DRAW);
-        sWallVertexBuffer = GlUtils.createVertexArrayBuffer(sWallVertexBufferData, GL_STATIC_DRAW);
+        //sWallVertexBuffer = GlUtils.createVertexArrayBuffer(sWallVertexBufferData, GL_STATIC_DRAW);
     }
 
     private static String makeShaderResource(String name) {
@@ -136,7 +183,7 @@ public class PrototypeRenders {
     }
 
     public static void setViewProjectionMatrix(Matrix4f viewProjectionMatrix) {
-        glUseProgram(sPrototypeProgram);
+        glUseProgram(sPrototypeProgram1);
 
         glUniformMatrix4fv(sViewProjectionMatrixUniform, false,
                 viewProjectionMatrix.get(sViewProjectionMatrixBuffer));
@@ -166,9 +213,11 @@ public class PrototypeRenders {
         return getModelMatrixForWall(wall).get(sModelMatrixBuffer);
     }
 
-    private static void renderPrototype(int vertexBuffer, FloatBuffer modelMatrixBuffer,
-                                        FloatBuffer colorBuffer, int points,int way) {
-        glUseProgram(sPrototypeProgram);
+    private static void renderPrototype(int vertexBuffer, FloatBuffer modelMatrixBuffer, int points,int way) {
+        glUseProgram(sPrototypeProgram1);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D,1);
+        glUniform1i(sTex1,0);
         glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
         glEnableVertexAttribArray(sPositionAttribute);
         glVertexAttribPointer(sPositionAttribute, 2, GL_FLOAT, false, 0, 0L);
@@ -183,20 +232,35 @@ public class PrototypeRenders {
         @Override
         public void render(Ball ball) {
 
-            renderPrototype(sBallVertexBuffer, getModelMatrixBuffer(ball), sBallColorBuffer,sPoints,GL_TRIANGLE_FAN);
+            renderPrototype(sCircleBallVertexBufferIndex, getModelMatrixBuffer(ball),sPoints,GL_TRIANGLE_FAN);
         }
     };
 
     public static final Renderer<Wall> WALL = new Renderer<Wall>() {
         @Override
         public void render(Wall wall) {
-            renderPrototype(sWallVertexBuffer, getModelMatrixBufferForWall(wall), sWallColorBuffer,sPoints,GL_TRIANGLE_FAN);
+
+//            //renderPrototype(sWallVertexBuffer, getModelMatrixBufferForWall(wall),sPoints,GL_TRIANGLE_FAN);
+            glUseProgram(sPrototypeProgram2);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D,2);
+            glUniform1i(sTex2,1);
+            glBindBuffer(GL_ARRAY_BUFFER,sWallVertexBuffer);
+            glEnableVertexAttribArray(sPositionAttribute2);
+            glVertexAttribPointer(sPositionAttribute,3,GL_FLOAT,false,0,0L);
+            glUniformMatrix4fv(sModelMatrixUniform2,false,sModelMatrix.identity().get(sModelMatrixBuffer));
+            glDrawArrays(GL_TRIANGLES,0,12*9);
+            //glDrawElements(GL_TRIANGLES,sWallIndexBuffer);
+            glDisableVertexAttribArray(sPositionAttribute2);
+            glBindBuffer(GL_ARRAY_BUFFER,0);
+            glUseProgram(0);
         }
     };
 
-    private static int genTexture() throws IOException {
+    private static void genTexture() throws IOException {
         int tex = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, tex);
+        System.out.println(tex);
+        glBindTexture(GL_TEXTURE_2D, 1);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         ByteBuffer imageBuffer;
@@ -208,6 +272,25 @@ public class PrototypeRenders {
         image = stbi_load_from_memory(imageBuffer,w,h,comp,3);
         glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,w.get(0),h.get(0),0,GL_RGB,GL_UNSIGNED_BYTE,image);
         stbi_image_free(image);
-        return tex;
     }
+    private static void genTexture2() throws IOException {
+        int tex = glGenTextures();
+        System.out.println(tex);
+        glBindTexture(GL_TEXTURE_2D, 2);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        ByteBuffer imageBuffer;
+        IntBuffer w = BufferUtils.createIntBuffer(1);
+        IntBuffer h = BufferUtils.createIntBuffer(1);
+        IntBuffer comp = BufferUtils.createIntBuffer(1);
+        ByteBuffer image;
+        imageBuffer = ioResourceToByteBuffer("cn/edu/zju/cs/graphics/labyrinth/texture/ball_tmp.jpg", 1024 * 8);
+        image = stbi_load_from_memory(imageBuffer,w,h,comp,3);
+        glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,w.get(0),h.get(0),0,GL_RGB,GL_UNSIGNED_BYTE,image);
+        stbi_image_free(image);
+
+    }
+
+
+
 }

@@ -162,7 +162,7 @@ public class LabyrinthPrototypeApplication {
         PrototypeRenders.initialize();
 
         mLabyrinth = new Labyrinth()
-                .addEntity(new Ball(4d, 4d))
+                .addEntity(new Ball(0d, 0d))
                 .addEntity(new Wall(LABYRINTH_WIDTH, 1d, LABYRINTH_WIDTH / 2d, 0.5))
                 .addEntity(new Wall(1d, LABYRINTH_HEIGHT, LABYRINTH_WIDTH - 0.5,
                         LABYRINTH_HEIGHT / 2d))
