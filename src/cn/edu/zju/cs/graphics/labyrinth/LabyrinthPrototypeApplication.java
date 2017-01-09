@@ -25,10 +25,10 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class LabyrinthPrototypeApplication {
 
     private long mWindow;
-    private int mWidth = 1024;
-    private int mHeight = 768;
-    private int mFrameBufferWidth = 1024;
-    private int mFrameBufferHeight = 768;
+    private int mWidth = 640;
+    private int mHeight = 480;
+    private int mFrameBufferWidth = 640;
+    private int mFrameBufferHeight = 480;
     private float mFov = 60, mRotationX, mRotationY;
 
     private Matrix4f mProjectionMatrix = new Matrix4f();
@@ -88,11 +88,24 @@ public class LabyrinthPrototypeApplication {
                     return;
                 }
                 switch (key) {
-                    case GLFW_KEY_W:
-                        // TODO
-                        break;
                     case GLFW_KEY_ESCAPE:
                         glfwSetWindowShouldClose(window, true);
+                        break;
+                    case GLFW_KEY_LEFT:
+                    case GLFW_KEY_A:
+                        mLabyrinth.getGravity().add(-1, 0);
+                        break;
+                    case GLFW_KEY_RIGHT:
+                    case GLFW_KEY_F:
+                        mLabyrinth.getGravity().add(1, 0);
+                        break;
+                    case GLFW_KEY_DOWN:
+                    case GLFW_KEY_D:
+                        mLabyrinth.getGravity().add(0, -1);
+                        break;
+                    case GLFW_KEY_UP:
+                    case GLFW_KEY_W:
+                        mLabyrinth.getGravity().add(0, 1);
                         break;
                 }
             }
@@ -151,8 +164,8 @@ public class LabyrinthPrototypeApplication {
     private void update() {
 
         mViewMatrix.identity();
-        mProjectionMatrix.setOrtho2D(0, mWidth, 0, mHeight);
-        mProjectionMatrix.mulPerspectiveAffine(mViewMatrix, mViewProjectionMatrix);
+        mProjectionMatrix.setOrtho2D(-15, 15, -10, 10);
+        mProjectionMatrix.mul(mViewMatrix, mViewProjectionMatrix);
         PrototypeRenders.setViewProjectionMatrix(mViewProjectionMatrix);
 
         mLabyrinth.update();
