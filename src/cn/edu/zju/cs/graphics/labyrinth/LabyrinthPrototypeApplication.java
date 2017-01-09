@@ -25,10 +25,10 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class LabyrinthPrototypeApplication {
 
     private long mWindow;
-    private int mWidth = 1024;
-    private int mHeight = 768;
-    private int mFrameBufferWidth = 1024;
-    private int mFrameBufferHeight = 768;
+    private int mWidth = 640;
+    private int mHeight = 480;
+    private int mFrameBufferWidth = 640;
+    private int mFrameBufferHeight = 480;
     private float mFov = 60, mRotationX, mRotationY;
 
     private Matrix4f mProjectionMatrix = new Matrix4f();
@@ -151,8 +151,8 @@ public class LabyrinthPrototypeApplication {
     private void update() {
 
         mViewMatrix.identity();
-        mProjectionMatrix.setOrtho2D(0, mWidth, 0, mHeight);
-        mProjectionMatrix.mulPerspectiveAffine(mViewMatrix, mViewProjectionMatrix);
+        mProjectionMatrix.setOrtho2D(-15, 15, -10, 10);
+        mProjectionMatrix.mul(mViewMatrix, mViewProjectionMatrix);
         PrototypeRenders.setViewProjectionMatrix(mViewProjectionMatrix);
 
         mLabyrinth.update();

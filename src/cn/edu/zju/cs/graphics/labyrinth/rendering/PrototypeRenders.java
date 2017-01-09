@@ -23,13 +23,14 @@ public class PrototypeRenders {
     private static FloatBuffer sBallVertexBufferData;
     static {
         sBallVertexBufferData = BufferUtils.createFloatBuffer(6 * 2);
+        float inverseSqrt2 = 1f / (float) Math.sqrt(2);
         sBallVertexBufferData
-                .put(0f).put(1f)
-                .put(1f).put(0f)
-                .put(0f).put(-1f)
-                .put(0f).put(1f)
-                .put(-1f).put(0f)
-                .put(0f).put(-1f)
+                .put(0f).put(inverseSqrt2)
+                .put(inverseSqrt2).put(0f)
+                .put(0f).put(-inverseSqrt2)
+                .put(0f).put(inverseSqrt2)
+                .put(-inverseSqrt2).put(0f)
+                .put(0f).put(-inverseSqrt2)
                 .flip();
     }
     private static FloatBuffer sBallColorBuffer;
@@ -46,8 +47,8 @@ public class PrototypeRenders {
                 makeShaderResource("prototype.fs"));
         sPositionAttribute = GlUtils.getAttribLocation(sPrototypeProgram, "aPosition");
         sModelMatrixUniform = GlUtils.getUniformLocation(sPrototypeProgram, "uModelMatrix");
-        //sViewProjectionMatrixUniform = GlUtils.getUniformLocation(sPrototypeProgram,
-        //        "uViewProjectionMatrix");
+        sViewProjectionMatrixUniform = GlUtils.getUniformLocation(sPrototypeProgram,
+                "uViewProjectionMatrix");
         sColorUniform = GlUtils.getUniformLocation(sPrototypeProgram, "uColor");
 
         sBallVertexBuffer = glGenBuffers();
@@ -62,8 +63,7 @@ public class PrototypeRenders {
 
     public static void setViewProjectionMatrix(Matrix4f viewProjectionMatrix) {
         glUseProgram(sPrototypeProgram);
-        //glUniformMatrix4fv(sViewProjectionMatrixUniform, false,
-        //        viewProjectionMatrix.get(sViewProjectionMatrixBuffer));
+        glUniformMatrix4fv(sViewProjectionMatrixUniform, false, viewProjectionMatrix.get(sViewProjectionMatrixBuffer));
         glUseProgram(0);
     }
 
