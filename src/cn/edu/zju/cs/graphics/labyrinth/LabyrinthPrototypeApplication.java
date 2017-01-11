@@ -29,8 +29,10 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
 
-    private static final float LABYRINTH_WIDTH = 18;
-    private static final float LABYRINTH_LENGTH = 12;
+    private static final float LABYRINTH_WIDTH = 480;
+    private static final float LABYRINTH_LENGTH = 320;
+
+    private static final double KEY_ROTATE_DEGREES = 3;
 
     private long mWindow;
     private int mWidth = 720;
@@ -97,19 +99,19 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
                         break;
                     case GLFW_KEY_LEFT:
                     case GLFW_KEY_A:
-                        mLabyrinth.addRotationX(-1);
+                        mLabyrinth.addRotationX(-KEY_ROTATE_DEGREES);
                         break;
                     case GLFW_KEY_RIGHT:
                     case GLFW_KEY_F:
-                        mLabyrinth.addRotationX(1);
+                        mLabyrinth.addRotationX(KEY_ROTATE_DEGREES);
                         break;
                     case GLFW_KEY_DOWN:
                     case GLFW_KEY_D:
-                        mLabyrinth.addRotationY(-1);
+                        mLabyrinth.addRotationY(-KEY_ROTATE_DEGREES);
                         break;
                     case GLFW_KEY_UP:
                     case GLFW_KEY_W:
-                        mLabyrinth.addRotationY(1);
+                        mLabyrinth.addRotationY(KEY_ROTATE_DEGREES);
                         break;
                     case GLFW_KEY_0:
                         mLabyrinth.setRotationX(0).setRotationY(0);
@@ -141,47 +143,42 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
         PrototypeRenderers.initialize();
 
         mLabyrinth = new Labyrinth()
-                .addEntity(new Hole(1.5, LABYRINTH_LENGTH - 1.5))
-                .addEntity(new Hole(LABYRINTH_WIDTH / 4d + 1d, 1.5))
-                .addEntity(new Hole(LABYRINTH_WIDTH / 2d - 1d, LABYRINTH_LENGTH - 1.5))
-                .addEntity(new Hole(LABYRINTH_WIDTH / 2d - 0.5, 3.5))
-                .addEntity(new Hole(LABYRINTH_WIDTH / 2d + 0.5, 3.5))
-                .addEntity(new Hole(LABYRINTH_WIDTH / 2d + 1d, LABYRINTH_LENGTH - 1.5))
-                .addEntity(new Hole(LABYRINTH_WIDTH * 3d / 4d - 1, 1.5))
-                .addEntity(new Hole(LABYRINTH_WIDTH - 1.5, LABYRINTH_LENGTH - 1.5))
-                .addEntity(new FinishHole(LABYRINTH_WIDTH - 2.5, 1.5))
-                .addEntity(new Wall(LABYRINTH_WIDTH, 1d, LABYRINTH_WIDTH / 2d, 0.5))
-                .addEntity(new Wall(1d, LABYRINTH_LENGTH, LABYRINTH_WIDTH - 0.5,
-                        LABYRINTH_LENGTH / 2d))
-                .addEntity(new Wall(LABYRINTH_WIDTH, 1d, LABYRINTH_WIDTH / 2d,
-                        LABYRINTH_LENGTH - 0.5))
-                .addEntity(new Wall(1d, LABYRINTH_LENGTH, 0.5, LABYRINTH_LENGTH / 2d))
-                .addEntity(new Wall(1d, LABYRINTH_LENGTH * 3d / 4d, LABYRINTH_WIDTH / 4d,
-                        LABYRINTH_LENGTH * 3d / 8d))
-                .addEntity(new Wall(1d, LABYRINTH_LENGTH / 2d, LABYRINTH_WIDTH / 2d,
-                        LABYRINTH_LENGTH * 3d / 4d))
-                .addEntity(new Wall(1d, LABYRINTH_LENGTH * 3d / 4d, LABYRINTH_WIDTH * 3d / 4d,
-                        LABYRINTH_LENGTH * 3d / 8d))
-                .addEntity(new Magnet(LABYRINTH_WIDTH / 2d, 2d))
-                .addEntity(new Ball(2.5, 2.5))
+                .addEntity(new Hole(Wall.DEFAULT_THICKNESS + Hole.RADIUS,
+                        LABYRINTH_LENGTH - (Wall.DEFAULT_THICKNESS + Hole.RADIUS)))
+                .addEntity(new FinishHole(LABYRINTH_WIDTH - (Wall.DEFAULT_THICKNESS + Hole.RADIUS),
+                        Wall.DEFAULT_THICKNESS + Hole.RADIUS))
+                .addEntity(new Wall(LABYRINTH_WIDTH, Wall.DEFAULT_THICKNESS, LABYRINTH_WIDTH / 2d,
+                        Wall.DEFAULT_THICKNESS / 2))
+                .addEntity(new Wall(Wall.DEFAULT_THICKNESS, LABYRINTH_LENGTH,
+                        LABYRINTH_WIDTH - Wall.DEFAULT_THICKNESS / 2, LABYRINTH_LENGTH / 2d))
+                .addEntity(new Wall(LABYRINTH_WIDTH, Wall.DEFAULT_THICKNESS, LABYRINTH_WIDTH / 2d,
+                        LABYRINTH_LENGTH - Wall.DEFAULT_THICKNESS / 2))
+                .addEntity(new Wall(Wall.DEFAULT_THICKNESS, LABYRINTH_LENGTH,
+                        Wall.DEFAULT_THICKNESS / 2, LABYRINTH_LENGTH / 2d))
+                //.addEntity(new Magnet(LABYRINTH_WIDTH / 2d, Wall.DEFAULT_THICKNESS))
+                .addEntity(new Ball(Wall.DEFAULT_THICKNESS + Ball.RADIUS, Wall.DEFAULT_THICKNESS
+                        + Ball.RADIUS))
                 .setListener(this);
     }
 
     @Override
-    public void onBallFallingTowardsMagnet(Ball ball, Magnet magnet) {
+    public void onBallAttractedByMagnet(Ball ball, Magnet magnet) {
         // TODO
     }
 
     @Override
     public void onBallFallingTowardsHole(Ball ball, BaseHole hole) {
-        Vector2 distance = new Vector2(hole.getPositionX(), hole.getPositionY())
+        Vector2 displacement = new Vector2(hole.getPositionX(), hole.getPositionY())
                 .subtract(ball.getPositionX(), ball.getPositionY());
-        ball.applyForce(Vector2.create(1d / distance.getMagnitude(), distance.getDirection()));
+        double angle = Math.acos((BaseHole.RADIUS - displacement.getMagnitude()) / Ball.RADIUS);
+        Vector2 gravity = Vector2.create(
+                10 * ball.getMass() * mLabyrinth.getGravity() * Math.cos(angle) * Math.sin(angle),
+                displacement.getDirection());
+        ball.setForce(gravity);
         Vector2 velocity = ball.getVelocity();
-        Vector2 tangentVelocity = new Vector2(velocity).subtract(distance.multiply(
-                distance.dot(velocity) / distance.getMagnitudeSquared()));
-        ball.applyForce(Vector2.create(10d * tangentVelocity.getMagnitude(),
-                tangentVelocity.getDirection() + Math.PI));
+        velocity
+                .setMagnitude(velocity.dot(displacement) / displacement.getMagnitude())
+                .setDirection(displacement.getDirection());
     }
 
     @Override
@@ -189,7 +186,9 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
         ball.stopMovement();
         if (hole instanceof Hole) {
             // TODO: Die.
-            ball.setPositionX(2.5).setPositionY(2.5);
+            ball
+                    .setPositionX(Wall.DEFAULT_THICKNESS + Ball.RADIUS)
+                    .setPositionY(Wall.DEFAULT_THICKNESS + Ball.RADIUS);
             mLabyrinth.setRotationX(0).setRotationY(0);
         } else if (hole instanceof FinishHole) {
             // TODO: Victory.
@@ -205,14 +204,21 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
     }
 
     @Override
-    public void onBallRolled(Ball ball, Vector2 movement) {
+    public void onBallRolling(Ball ball, Vector2 movement) {
         // TODO: Audio.
     }
 
     private void update() {
 
-        mViewMatrix.identity();
-        mProjectionMatrix.setOrtho2D(0, LABYRINTH_WIDTH, 0, LABYRINTH_LENGTH);
+        //mViewMatrix.identity();
+        //mProjectionMatrix.setOrtho2D(0, LABYRINTH_WIDTH, 0, LABYRINTH_LENGTH);
+        mViewMatrix.setLookAt(
+                LABYRINTH_WIDTH / 2, LABYRINTH_LENGTH / 2, 1f,
+                LABYRINTH_WIDTH / 2, LABYRINTH_LENGTH / 2, 0f,
+                0f, 1f, 0f
+        );
+        mProjectionMatrix.setOrtho(-LABYRINTH_WIDTH / 2f, LABYRINTH_WIDTH / 2f,
+                -LABYRINTH_LENGTH / 2f, LABYRINTH_LENGTH / 2f, -1f, 1f);
         mProjectionMatrix.mul(mViewMatrix, mViewProjectionMatrix);
         PrototypeRenderers.setViewProjectionMatrix(mViewProjectionMatrix);
 

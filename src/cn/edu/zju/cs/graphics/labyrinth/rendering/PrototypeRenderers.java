@@ -31,12 +31,12 @@ public class PrototypeRenderers {
     static {
         sBallVertexBufferData = BufferUtils.createFloatBuffer(6 * 2);
         sBallVertexBufferData
-                .put(0f).put(0.45f)
-                .put(0.45f).put(0f)
-                .put(0f).put(-0.45f)
-                .put(0f).put(0.45f)
-                .put(-0.45f).put(0f)
-                .put(0f).put(-0.45f)
+                .put(0f).put(12f)
+                .put(12f).put(0f)
+                .put(0f).put(-12f)
+                .put(0f).put(12f)
+                .put(-12f).put(0f)
+                .put(0f).put(-12f)
                 .flip();
     }
     private static FloatBuffer sBallColorBuffer;
@@ -73,12 +73,12 @@ public class PrototypeRenderers {
     static {
         sBaseHoleVertexBufferData = BufferUtils.createFloatBuffer(6 * 2);
         sBaseHoleVertexBufferData
-                .put(0f).put(0.5f)
-                .put(0.5f).put(0f)
-                .put(0f).put(-0.5f)
-                .put(0f).put(0.5f)
-                .put(-0.5f).put(0f)
-                .put(0f).put(-0.5f)
+                .put(0f).put(13f)
+                .put(13f).put(0f)
+                .put(0f).put(-13f)
+                .put(0f).put(13f)
+                .put(-13f).put(0f)
+                .put(0f).put(-13f)
                 .flip();
     }
     private static FloatBuffer sHoleColorBuffer;

@@ -1,10 +1,7 @@
 package cn.edu.zju.cs.graphics.labyrinth.model;
 
-import cn.edu.zju.cs.graphics.labyrinth.dynamics.Bodies;
 import cn.edu.zju.cs.graphics.labyrinth.util.MathUtils;
 import org.dyn4j.dynamics.Settings;
-import org.dyn4j.dynamics.Step;
-import org.dyn4j.dynamics.StepAdapter;
 import org.dyn4j.dynamics.World;
 import org.dyn4j.dynamics.contact.ContactAdapter;
 import org.dyn4j.dynamics.contact.ContactPoint;
@@ -13,13 +10,12 @@ import org.joml.Math;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 public class Labyrinth {
 
     private static final double ROTATION_MAX = 30;
-    private static final double GRAVITY = 20;
+    private static final double GRAVITY = World.EARTH_GRAVITY.getMagnitude() * (24d / 0.005) / 100;
 
     private List<Entity<?>> mEntities = new ArrayList<>();
     private Listener mListener;
@@ -48,7 +44,7 @@ public class Labyrinth {
                 }
                 if (sensor instanceof BaseHole<?>) {
                     BaseHole<?> hole = (BaseHole<?>) sensor;
-                    if (MathUtils.distance(ball, hole) < Bodies.HOLE_RADIUS) {
+                    if (MathUtils.distance(ball, hole) < BaseHole.RADIUS - Ball.RADIUS) {
                         mListener.onBallFallenIntoHole(ball, hole);
                     } else {
                         mListener.onBallFallingTowardsHole(ball, hole);
@@ -139,9 +135,17 @@ public class Labyrinth {
                 mRotationY, mWorld.getGravity()));
     }
 
+    public double getGravity() {
+        return GRAVITY;
+    }
+
     public Labyrinth setListener(final Listener listener) {
         mListener = listener;
         return this;
+    }
+
+    public double getStepFrequency() {
+        return mWorld.getSettings().getStepFrequency();
     }
 
     public void update() {
@@ -161,7 +165,7 @@ public class Labyrinth {
             Ball ball = (Ball) entity;
             Vector2 movement = ball.getBody().getChangeInPosition();
             if (!movement.isZero()) {
-                mListener.onBallRolled(ball, movement);
+                mListener.onBallRolling(ball, movement);
             }
         }
     }
@@ -183,7 +187,7 @@ public class Labyrinth {
          * false from the those methods as well.
          * </p>
          */
-        void onBallFallingTowardsMagnet(Ball ball, Magnet magnet);
+        void onBallAttractedByMagnet(Ball ball, Magnet magnet);
 
         /**
          * Modification of the {@link World} is permitted from this methods.
@@ -218,6 +222,6 @@ public class Labyrinth {
          */
         void onBallHitEntity(Ball ball, Entity<?> entity, ContactPoint point);
 
-        void onBallRolled(Ball ball, Vector2 movement);
+        void onBallRolling(Ball ball, Vector2 movement);
     }
 }
