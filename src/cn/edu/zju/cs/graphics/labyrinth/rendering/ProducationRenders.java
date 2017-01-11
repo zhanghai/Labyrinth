@@ -5,6 +5,7 @@ import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
 import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
+import cn.edu.zju.cs.graphics.labyrinth.util.IoUtils;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import static org.lwjgl.stb.STBImage.*;
@@ -298,7 +299,7 @@ public class ProducationRenders {
         IntBuffer h = BufferUtils.createIntBuffer(1);
         IntBuffer comp = BufferUtils.createIntBuffer(1);
         ByteBuffer image;
-        imageBuffer = ioResourceToByteBuffer("cn/edu/zju/cs/graphics/labyrinth/texture/ball.png", 1024 * 8);
+        imageBuffer = IoUtils.getResourceAsByteBuffer("cn/edu/zju/cs/graphics/labyrinth/texture/ball.png", 1024 * 8);
         image = stbi_load_from_memory(imageBuffer,w,h,comp,3);
         glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,w.get(0),h.get(0),0,GL_RGB,GL_UNSIGNED_BYTE,image);
         stbi_image_free(image);
@@ -314,7 +315,7 @@ public class ProducationRenders {
         IntBuffer h = BufferUtils.createIntBuffer(1);
         IntBuffer comp = BufferUtils.createIntBuffer(1);
         ByteBuffer image;
-        imageBuffer = ioResourceToByteBuffer("cn/edu/zju/cs/graphics/labyrinth/texture/ball_tmp.jpg", 1024 * 8);
+        imageBuffer = IoUtils.getResourceAsByteBuffer("cn/edu/zju/cs/graphics/labyrinth/texture/ball_tmp.jpg", 1024 * 8);
         image = stbi_load_from_memory(imageBuffer,w,h,comp,3);
         glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,w.get(0),h.get(0),0,GL_RGB,GL_UNSIGNED_BYTE,image);
         stbi_image_free(image);

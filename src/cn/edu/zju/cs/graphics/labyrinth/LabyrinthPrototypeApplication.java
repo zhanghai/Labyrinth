@@ -155,7 +155,7 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
                         LABYRINTH_LENGTH - Wall.DEFAULT_THICKNESS / 2))
                 .addEntity(new Wall(Wall.DEFAULT_THICKNESS, LABYRINTH_LENGTH,
                         Wall.DEFAULT_THICKNESS / 2, LABYRINTH_LENGTH / 2d))
-                //.addEntity(new Magnet(LABYRINTH_WIDTH / 2d, Wall.DEFAULT_THICKNESS))
+                //.addEntity(new Magnet(WIDTH / 2d, Wall.DEFAULT_THICKNESS))
                 .addEntity(new Ball(Wall.DEFAULT_THICKNESS + Ball.RADIUS, Wall.DEFAULT_THICKNESS
                         + Ball.RADIUS))
                 .setListener(this);
@@ -211,7 +211,7 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
     private void update() {
 
         //mViewMatrix.identity();
-        //mProjectionMatrix.setOrtho2D(0, LABYRINTH_WIDTH, 0, LABYRINTH_LENGTH);
+        //mProjectionMatrix.setOrtho2D(0, WIDTH, 0, LENGTH);
         mViewMatrix.setLookAt(
                 LABYRINTH_WIDTH / 2, LABYRINTH_LENGTH / 2, 1f,
                 LABYRINTH_WIDTH / 2, LABYRINTH_LENGTH / 2, 0f,

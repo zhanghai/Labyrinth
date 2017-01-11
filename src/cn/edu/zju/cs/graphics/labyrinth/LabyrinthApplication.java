@@ -1,17 +1,21 @@
 package cn.edu.zju.cs.graphics.labyrinth;
 
 import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
+import cn.edu.zju.cs.graphics.labyrinth.model.BaseHole;
+import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
+import cn.edu.zju.cs.graphics.labyrinth.model.FinishHole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Labyrinth;
+import cn.edu.zju.cs.graphics.labyrinth.model.Magnet;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
+import cn.edu.zju.cs.graphics.labyrinth.rendering.FloorRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.PrototypeRenderers;
+import org.dyn4j.dynamics.contact.ContactPoint;
+import org.dyn4j.geometry.Vector2;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
-import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengles.GLES;
@@ -24,30 +28,26 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengles.GLES20.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-public class LabyrinthApplication {
+public class LabyrinthApplication implements Labyrinth.Listener {
 
-    private static final float LABYRINTH_WIDTH = 30;
-    private static final float LABYRINTH_LENGTH = 20;
+    private static final double KEY_ROTATE_DEGREES = 3;
 
     private long mWindow;
-    private int mWidth = 640;
+    private int mWidth = 720;
     private int mHeight = 480;
-    private int mFrameBufferWidth = 640;
+    private int mFrameBufferWidth = 720;
     private int mFrameBufferHeight = 480;
-    private float mFov = 60, mRotationX, mRotationY;
 
     private Matrix4f mProjectionMatrix = new Matrix4f();
     private Matrix4f mViewMatrix = new Matrix4f();
     private Matrix4f mViewProjectionMatrix = new Matrix4f();
-    private Vector3f mCameraPosition = new Vector3f();
 
+    private FloorRenderer mFloorRenderer;
     private Labyrinth mLabyrinth;
 
     private GLFWFramebufferSizeCallback mFramebufferSizeCallback;
     private GLFWWindowSizeCallback mWindowSizeCallback;
     private GLFWKeyCallback mKeyCallback;
-    private GLFWCursorPosCallback mCursorPositionCallback;
-    private GLFWScrollCallback mScrollCallback;
 
     private void init() throws IOException {
 
@@ -65,7 +65,7 @@ public class LabyrinthApplication {
             throw new AssertionError("Failed to create the GLFW window");
         }
 
-        System.out.println("Play with W/A/S/D");
+        System.out.println("Change gravity with W/A/S/D, reset gravity with 0");
         glfwSetFramebufferSizeCallback(mWindow, mFramebufferSizeCallback =
                 new GLFWFramebufferSizeCallback() {
                     @Override
@@ -98,44 +98,23 @@ public class LabyrinthApplication {
                         break;
                     case GLFW_KEY_LEFT:
                     case GLFW_KEY_A:
-                        mLabyrinth.addRotationX(-1);
+                        mLabyrinth.addRotationX(-KEY_ROTATE_DEGREES);
                         break;
                     case GLFW_KEY_RIGHT:
                     case GLFW_KEY_F:
-                        mLabyrinth.addRotationX(1);
+                        mLabyrinth.addRotationX(KEY_ROTATE_DEGREES);
                         break;
                     case GLFW_KEY_DOWN:
                     case GLFW_KEY_D:
-                        mLabyrinth.addRotationY(-1);
+                        mLabyrinth.addRotationY(-KEY_ROTATE_DEGREES);
                         break;
                     case GLFW_KEY_UP:
                     case GLFW_KEY_W:
-                        mLabyrinth.addRotationY(1);
+                        mLabyrinth.addRotationY(KEY_ROTATE_DEGREES);
                         break;
-                }
-            }
-        });
-        glfwSetCursorPosCallback(mWindow, mCursorPositionCallback = new GLFWCursorPosCallback() {
-            @Override
-            public void invoke(long window, double x, double y) {
-                float nx = (float) x / mWidth * 2f - 1f;
-                float ny = (float) y / mHeight * 2f - 1f;
-                mRotationX = ny * (float) Math.PI * 0.5f;
-                mRotationY = nx * (float) Math.PI;
-            }
-        });
-        glfwSetScrollCallback(mWindow, mScrollCallback = new GLFWScrollCallback() {
-            @Override
-            public void invoke(long window, double xoffset, double yoffset) {
-                if (yoffset < 0) {
-                    mFov *= 1.05f;
-                } else {
-                    mFov *= 1f / 1.05f;
-                }
-                if (mFov < 10f) {
-                    mFov = 10f;
-                } else if (mFov > 120f) {
-                    mFov = 120f;
+                    case GLFW_KEY_0:
+                        mLabyrinth.setRotationX(0).setRotationY(0);
+                        break;
                 }
             }
         });
@@ -160,24 +139,91 @@ public class LabyrinthApplication {
         //debugProc = glDebugMessageCallback();
 
         glClearColor(1f, 1f, 1f, 1f);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         PrototypeRenderers.initialize();
 
-        mLabyrinth = new Labyrinth()
+        System.out.println("GL_VERSION: " + glGetString(GL_VERSION));
+        System.out.println("GL_MAX_TEXTURE_SIZE: " + glGetInteger(GL_MAX_TEXTURE_SIZE));
 
-                .addEntity(new Wall(LABYRINTH_WIDTH, 1d, LABYRINTH_WIDTH / 2d, 0.5))
-                .addEntity(new Wall(1d, LABYRINTH_LENGTH, LABYRINTH_WIDTH - 0.5,
-                        LABYRINTH_LENGTH / 2d))
-                .addEntity(new Wall(LABYRINTH_WIDTH, 1d, LABYRINTH_WIDTH / 2d,
-                        LABYRINTH_LENGTH - 0.5))
-                .addEntity(new Wall(1d, LABYRINTH_LENGTH, 0.5, LABYRINTH_LENGTH / 2d))
-                .addEntity(new Hole(LABYRINTH_WIDTH - 2.5, LABYRINTH_LENGTH - 2.5))
-                .addEntity(new Ball(0, 0));
+        mFloorRenderer = FloorRenderer.getInstance();
+        mLabyrinth = new Labyrinth()
+                .addEntity(new Hole(Wall.DEFAULT_THICKNESS + Hole.RADIUS,
+                        Labyrinth.LENGTH - (Wall.DEFAULT_THICKNESS + Hole.RADIUS)))
+                .addEntity(new FinishHole(Labyrinth.WIDTH - (Wall.DEFAULT_THICKNESS + Hole.RADIUS),
+                        Wall.DEFAULT_THICKNESS + Hole.RADIUS))
+                .addEntity(new Wall(Labyrinth.WIDTH, Wall.DEFAULT_THICKNESS, Labyrinth.WIDTH / 2d,
+                        Wall.DEFAULT_THICKNESS / 2))
+                .addEntity(new Wall(Wall.DEFAULT_THICKNESS, Labyrinth.LENGTH,
+                        Labyrinth.WIDTH - Wall.DEFAULT_THICKNESS / 2, Labyrinth.LENGTH / 2d))
+                .addEntity(new Wall(Labyrinth.WIDTH, Wall.DEFAULT_THICKNESS, Labyrinth.WIDTH / 2d,
+                        Labyrinth.LENGTH - Wall.DEFAULT_THICKNESS / 2))
+                .addEntity(new Wall(Wall.DEFAULT_THICKNESS, Labyrinth.LENGTH,
+                        Wall.DEFAULT_THICKNESS / 2, Labyrinth.LENGTH / 2d))
+                //.addEntity(new Magnet(WIDTH / 2d, Wall.DEFAULT_THICKNESS))
+                .addEntity(new Ball(Wall.DEFAULT_THICKNESS + Ball.RADIUS, Wall.DEFAULT_THICKNESS
+                        + Ball.RADIUS))
+                .setListener(this);
+    }
+
+    @Override
+    public void onBallAttractedByMagnet(Ball ball, Magnet magnet) {
+        // TODO
+    }
+
+    @Override
+    public void onBallFallingTowardsHole(Ball ball, BaseHole hole) {
+        Vector2 displacement = new Vector2(hole.getPositionX(), hole.getPositionY())
+                .subtract(ball.getPositionX(), ball.getPositionY());
+        double angle = Math.acos((BaseHole.RADIUS - displacement.getMagnitude()) / Ball.RADIUS);
+        Vector2 gravity = Vector2.create(
+                10 * ball.getMass() * mLabyrinth.getGravity() * Math.cos(angle) * Math.sin(angle),
+                displacement.getDirection());
+        ball.setForce(gravity);
+        Vector2 velocity = ball.getVelocity();
+        velocity
+                .setMagnitude(velocity.dot(displacement) / displacement.getMagnitude())
+                .setDirection(displacement.getDirection());
+    }
+
+    @Override
+    public void onBallFallenIntoHole(Ball ball, BaseHole hole) {
+        ball.stopMovement();
+        if (hole instanceof Hole) {
+            // TODO: Die.
+            ball
+                    .setPositionX(Wall.DEFAULT_THICKNESS + Ball.RADIUS)
+                    .setPositionY(Wall.DEFAULT_THICKNESS + Ball.RADIUS);
+            mLabyrinth.setRotationX(0).setRotationY(0);
+        } else if (hole instanceof FinishHole) {
+            // TODO: Victory.
+            glfwSetWindowShouldClose(mWindow, true);
+        } else {
+            throw new IllegalStateException("Unknown type of hole: " + hole);
+        }
+    }
+
+    @Override
+    public void onBallHitEntity(Ball ball, Entity<?> entity, ContactPoint point) {
+        // TODO: Audio.
+    }
+
+    @Override
+    public void onBallRolling(Ball ball, Vector2 movement) {
+        // TODO: Audio.
     }
 
     private void update() {
 
-        mViewMatrix.identity();
-        mProjectionMatrix.setOrtho2D(0, LABYRINTH_WIDTH, 0, LABYRINTH_LENGTH);
+        //mViewMatrix.identity();
+        //mProjectionMatrix.setOrtho2D(0, WIDTH, 0, LENGTH);
+        mViewMatrix.setLookAt(
+                Labyrinth.WIDTH / 2, Labyrinth.LENGTH / 2, 1f,
+                Labyrinth.WIDTH / 2, Labyrinth.LENGTH / 2, 0f,
+                0f, 1f, 0f
+        );
+        mProjectionMatrix.setOrtho(-Labyrinth.WIDTH / 2f, Labyrinth.WIDTH / 2f,
+                -Labyrinth.LENGTH / 2f, Labyrinth.LENGTH / 2f, -1f, 1f);
         mProjectionMatrix.mul(mViewMatrix, mViewProjectionMatrix);
         PrototypeRenderers.setViewProjectionMatrix(mViewProjectionMatrix);
 
@@ -189,7 +235,13 @@ public class LabyrinthApplication {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
 
-        mLabyrinth.render();
+        mFloorRenderer.render(mViewProjectionMatrix);
+        //mLabyrinth.render();
+
+        int error = glGetError();
+        if (error != GL_NO_ERROR) {
+            throw new IllegalStateException("glGetError(): " + error);
+        }
     }
 
     private void loop() {
@@ -209,8 +261,6 @@ public class LabyrinthApplication {
             mFramebufferSizeCallback.free();
             mWindowSizeCallback.free();
             mKeyCallback.free();
-            mCursorPositionCallback.free();
-            mScrollCallback.free();
             glfwDestroyWindow(mWindow);
         } catch (Throwable t) {
             t.printStackTrace();

@@ -7,6 +7,7 @@ import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Magnet;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
+import cn.edu.zju.cs.graphics.labyrinth.util.ResourceUtils;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 
@@ -121,8 +122,8 @@ public class PrototypeRenderers {
 
     public static void initialize() throws IOException {
 
-        sPrototypeProgram = GlUtils.createProgram(makeShaderResource("prototype.vs"),
-                makeShaderResource("prototype.fs"));
+        sPrototypeProgram = GlUtils.createProgram(ResourceUtils.makeShaderResource("prototype.vs"),
+                ResourceUtils.makeShaderResource("prototype.fs"));
         sPositionAttribute = GlUtils.getAttribLocation(sPrototypeProgram, "aPosition");
         sModelMatrixUniform = GlUtils.getUniformLocation(sPrototypeProgram, "uModelMatrix");
         sViewProjectionMatrixUniform = GlUtils.getUniformLocation(sPrototypeProgram,
@@ -135,10 +136,6 @@ public class PrototypeRenderers {
                 GL_STATIC_DRAW);
         sMagnetVertexBuffer = GlUtils.createVertexArrayBuffer(sMagnetVertexBufferData,
                 GL_STATIC_DRAW);
-    }
-
-    private static String makeShaderResource(String name) {
-        return "cn/edu/zju/cs/graphics/labyrinth/shader/" + name;
     }
 
     public static void setViewProjectionMatrix(Matrix4f viewProjectionMatrix) {

@@ -14,7 +14,9 @@ import java.util.List;
 
 public class Labyrinth {
 
-    private static final double ROTATION_MAX = 30;
+    public static final float WIDTH = 480;
+    public static final float LENGTH = 320;
+    private static final double ROTATION_MAX_DEGREES = 30;
     private static final double GRAVITY = World.EARTH_GRAVITY.getMagnitude() * (24d / 0.005) / 100;
 
     private List<Entity<?>> mEntities = new ArrayList<>();
@@ -97,7 +99,7 @@ public class Labyrinth {
     }
 
     public Labyrinth setRotationX(double rotationX) {
-        if (rotationX > ROTATION_MAX) {
+        if (rotationX > ROTATION_MAX_DEGREES) {
             return this;
         }
         mRotationX = rotationX;
@@ -115,7 +117,7 @@ public class Labyrinth {
     }
 
     public Labyrinth setRotationY(double rotationY) {
-        if (rotationY > ROTATION_MAX) {
+        if (rotationY > ROTATION_MAX_DEGREES) {
             return this;
         }
         mRotationY = rotationY;
