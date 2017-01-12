@@ -11,10 +11,38 @@ import java.nio.IntBuffer;
 
 import static cn.edu.zju.cs.graphics.labyrinth.DemoUtils.ioResourceToByteBuffer;
 import static org.lwjgl.opengles.GLES20.*;
+import static org.lwjgl.stb.STBImage.*;
 
 public class GlUtils {
 
     private GlUtils() {}
+
+
+    public static int createTexture(String TextureSource, int bufferSize) throws IOException {
+        int tex = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, tex);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        ByteBuffer imageBuffer;
+        IntBuffer w = BufferUtils.createIntBuffer(1);
+        IntBuffer h = BufferUtils.createIntBuffer(1);
+        IntBuffer comp = BufferUtils.createIntBuffer(1);
+        ByteBuffer image;
+        imageBuffer = ioResourceToByteBuffer(TextureSource,
+               bufferSize);
+        if (!stbi_info_from_memory(imageBuffer, w, h, comp)) {
+            throw new IOException("Failed to read image information: " + stbi_failure_reason());
+        }
+        image = stbi_load_from_memory(imageBuffer, w, h, comp, 3);
+        if (image == null) {
+            throw new IOException("Failed to load image: " + stbi_failure_reason());
+        }
+        glTexImage2D(GL_TEXTURE_2D, 0, /*GL_RGB8*/ GL_RGB, w.get(0), h.get(0), 0, GL_RGB,
+                GL_UNSIGNED_BYTE, image);
+        stbi_image_free(image);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        return tex;
+    }
 
     public static int createVertexArrayBuffer(FloatBuffer data, int usage) {
         return updateVertexArrayBuffer(glGenBuffers(), data, usage);
@@ -46,7 +74,7 @@ public class GlUtils {
         return program;
     }
 
-    private static int createShader(String resource, int type) throws IOException {
+    public static int createShader(String resource, int type) throws IOException {
         int shader = glCreateShader(type);
         ByteBuffer source = ioResourceToByteBuffer(resource, 1024);
         PointerBuffer strings = BufferUtils.createPointerBuffer(1);
