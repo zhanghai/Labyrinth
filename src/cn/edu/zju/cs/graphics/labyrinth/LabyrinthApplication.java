@@ -9,7 +9,9 @@ import cn.edu.zju.cs.graphics.labyrinth.model.Labyrinth;
 import cn.edu.zju.cs.graphics.labyrinth.model.Magnet;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.BallRenderer;
+import cn.edu.zju.cs.graphics.labyrinth.rendering.FinishHoleRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.FloorRenderer;
+import cn.edu.zju.cs.graphics.labyrinth.rendering.HoleRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.PrototypeRenderers;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.WallRenderer;
 import org.dyn4j.dynamics.contact.ContactPoint;
@@ -54,7 +56,7 @@ public class LabyrinthApplication implements Labyrinth.Listener {
     private void init() throws IOException {
 
         if (!glfwInit()) {
-            throw new IllegalStateException("Unable to initialize GLFW");
+            throw new IllegalStateException("Failed to initialize GLFW");
         }
 
         glfwDefaultWindowHints();
@@ -62,7 +64,7 @@ public class LabyrinthApplication implements Labyrinth.Listener {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         // Enable multi-sampling.
         glfwWindowHint(GLFW_SAMPLES, 8);
-        mWindow = glfwCreateWindow(mWidth, mHeight, "Labyrinth Prototype", NULL, NULL);
+        mWindow = glfwCreateWindow(mWidth, mHeight, "Labyrinth", NULL, NULL);
         if (mWindow == NULL) {
             throw new AssertionError("Failed to create the GLFW window");
         }
@@ -151,11 +153,13 @@ public class LabyrinthApplication implements Labyrinth.Listener {
         mFloorRenderer = FloorRenderer.getInstance();
         WallRenderer wallRenderer = WallRenderer.getInstance();
         BallRenderer ballRenderer = BallRenderer.getInstance();
+        HoleRenderer holeRenderer = HoleRenderer.getInstance();
+        FinishHoleRenderer finishHoleRenderer = FinishHoleRenderer.getInstance();
         mLabyrinth = new Labyrinth()
                 .addEntity(new Hole(Wall.THICKNESS_DEFAULT + Hole.RADIUS,
-                        Labyrinth.LENGTH - (Wall.THICKNESS_DEFAULT + Hole.RADIUS)))
+                        Labyrinth.LENGTH - (Wall.THICKNESS_DEFAULT + Hole.RADIUS), holeRenderer))
                 .addEntity(new FinishHole(Labyrinth.WIDTH - (Wall.THICKNESS_DEFAULT + Hole.RADIUS),
-                        Wall.THICKNESS_DEFAULT + Hole.RADIUS))
+                        Wall.THICKNESS_DEFAULT + Hole.RADIUS, finishHoleRenderer))
                 .addEntity(new Wall(Labyrinth.WIDTH, Wall.THICKNESS_DEFAULT, Labyrinth.WIDTH / 2d,
                         Wall.THICKNESS_DEFAULT / 2, wallRenderer))
                 .addEntity(new Wall(Wall.THICKNESS_DEFAULT, Labyrinth.LENGTH,
@@ -219,6 +223,8 @@ public class LabyrinthApplication implements Labyrinth.Listener {
 
     private void update() {
 
+        mLabyrinth.update();
+
         mViewMatrix
                 .setLookAt(
                         (float) Labyrinth.WIDTH / 2f, (float) Labyrinth.LENGTH / 2f, 30f,
@@ -232,9 +238,6 @@ public class LabyrinthApplication implements Labyrinth.Listener {
         mProjectionMatrix.setOrtho((float) -Labyrinth.WIDTH / 2f, (float) Labyrinth.WIDTH / 2f,
                 (float) -Labyrinth.LENGTH / 2f, (float) Labyrinth.LENGTH / 2f, -1000f, 1000f);
         mProjectionMatrix.mul(mViewMatrix, mViewProjectionMatrix);
-        PrototypeRenderers.setViewProjectionMatrix(mViewProjectionMatrix);
-
-        mLabyrinth.update();
     }
 
     private void render() {
@@ -243,12 +246,7 @@ public class LabyrinthApplication implements Labyrinth.Listener {
         glEnable(GL_DEPTH_TEST);
 
         mFloorRenderer.render(mViewProjectionMatrix);
-        //mLabyrinth.render();
-        mLabyrinth.getEntities().get(2).render(mViewProjectionMatrix);
-        mLabyrinth.getEntities().get(3).render(mViewProjectionMatrix);
-        mLabyrinth.getEntities().get(4).render(mViewProjectionMatrix);
-        mLabyrinth.getEntities().get(5).render(mViewProjectionMatrix);
-        mLabyrinth.getEntities().get(6).render(mViewProjectionMatrix);
+        mLabyrinth.render(mViewProjectionMatrix);
 
         int error = glGetError();
         if (error != GL_NO_ERROR) {

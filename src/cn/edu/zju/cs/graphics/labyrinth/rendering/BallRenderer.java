@@ -1,7 +1,6 @@
 package cn.edu.zju.cs.graphics.labyrinth.rendering;
 
 import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
-import cn.edu.zju.cs.graphics.labyrinth.model.Labyrinth;
 import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
 import cn.edu.zju.cs.graphics.labyrinth.util.ResourceUtils;
 import org.joml.Matrix3f;
@@ -11,7 +10,7 @@ import java.io.IOException;
 
 public class BallRenderer implements Renderer<Ball> {
 
-    private static final float TEXTURE_SCALE = 160f / 102f;
+    private static final float TEXTURE_SCALE = 120f / 102f;
 
     private static BallRenderer sInstance;
 
@@ -35,9 +34,10 @@ public class BallRenderer implements Renderer<Ball> {
     public void render(Ball ball, Matrix4f viewProjectionMatrix) {
         mModelMatrix
                 .identity()
-                .translate((float) ball.getPositionX(), (float) ball.getPositionY(), 0.01f)
-                .scale(2 * TEXTURE_SCALE, 2 * TEXTURE_SCALE, 1f)
-                .scale((float) Ball.RADIUS, (float) Ball.RADIUS, 1f);
+                .translate((float) ball.getPositionX(), (float) ball.getPositionY(),
+                        2 * GlUtils.BIAS)
+                .scale(TEXTURE_SCALE, TEXTURE_SCALE, 1f)
+                .scale(2f * (float) Ball.RADIUS, 2f * (float) Ball.RADIUS, 1f);
         mRectangleRenderer.render(mModelMatrix, viewProjectionMatrix, mTextureMatrix, mTexture);
     }
 }

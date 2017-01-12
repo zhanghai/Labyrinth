@@ -144,9 +144,9 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
 
         mLabyrinth = new Labyrinth()
                 .addEntity(new Hole(Wall.THICKNESS_DEFAULT + Hole.RADIUS,
-                        LABYRINTH_LENGTH - (Wall.THICKNESS_DEFAULT + Hole.RADIUS)))
+                        LABYRINTH_LENGTH - (Wall.THICKNESS_DEFAULT + Hole.RADIUS), null))
                 .addEntity(new FinishHole(LABYRINTH_WIDTH - (Wall.THICKNESS_DEFAULT + Hole.RADIUS),
-                        Wall.THICKNESS_DEFAULT + Hole.RADIUS))
+                        Wall.THICKNESS_DEFAULT + Hole.RADIUS, null))
                 .addEntity(new Wall(LABYRINTH_WIDTH, Wall.THICKNESS_DEFAULT, LABYRINTH_WIDTH / 2d,
                         Wall.THICKNESS_DEFAULT / 2, PrototypeRenderers.WALL))
                 .addEntity(new Wall(Wall.THICKNESS_DEFAULT, LABYRINTH_LENGTH,
@@ -231,7 +231,7 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
 
-        mLabyrinth.render();
+        mLabyrinth.render(null);
     }
 
     private void loop() {

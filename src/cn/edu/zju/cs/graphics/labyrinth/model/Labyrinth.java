@@ -7,6 +7,7 @@ import org.dyn4j.dynamics.contact.ContactAdapter;
 import org.dyn4j.dynamics.contact.ContactPoint;
 import org.dyn4j.geometry.Vector2;
 import org.joml.Math;
+import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -173,9 +174,9 @@ public class Labyrinth {
         }
     }
 
-    public void render() {
+    public void render(Matrix4f viewProjectionMatrix) {
         for (Entity<?> entity : mEntities) {
-            entity.render(null);
+            entity.render(viewProjectionMatrix);
         }
     }
 

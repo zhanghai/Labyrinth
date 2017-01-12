@@ -34,7 +34,7 @@ public class WallRenderer implements Renderer<Wall> {
         mModelMatrix
                 .identity()
                 .translate((float) wall.getPositionX(), (float) wall.getPositionY(),
-                        (float) Wall.HEIGHT / 2f)
+                        (float) Wall.HEIGHT / 2f - GlUtils.BIAS)
                 .scale((float) wall.getWidth(), (float) wall.getLength(), (float) Wall.HEIGHT);
         mRenderer.render(mModelMatrix, viewProjectionMatrix, mTopTexture, (float) Labyrinth.SIZE,
                 (float) Labyrinth.SIZE, mSideTexture, (float) Wall.HEIGHT);

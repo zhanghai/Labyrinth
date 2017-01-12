@@ -16,6 +16,8 @@ public class GlUtils {
 
     private GlUtils() {}
 
+    public static final float BIAS = 0.01f;
+
     /**
      * @deprecated Use {@link #createBuffer(int, float[])} for size check.
      */
