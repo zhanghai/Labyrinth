@@ -11,7 +11,7 @@ public class Ball extends Entity<Ball> {
     // Smaller to fall in the hole easier; holes have the diameter of 1.
     public static final double RADIUS = 12d;
     public static final double DENSITY = 0.5 / (Math.PI * RADIUS * RADIUS);
-    public static final double RESTITUTION = 0.2;
+    public static final double RESTITUTION = 0.5;
     public static final double LINEAR_DAMPING = 0.5;
 
     public Ball(double positionX, double positionY, Renderer<Ball> renderer) {

@@ -35,7 +35,7 @@ public class BallRenderer implements Renderer<Ball> {
         mModelMatrix
                 .identity()
                 .translate((float) ball.getPositionX(), (float) ball.getPositionY(),
-                        2 * GlUtils.BIAS)
+                        (float) Ball.RADIUS)
                 .scale(TEXTURE_SCALE, TEXTURE_SCALE, 1f)
                 .scale(2f * (float) Ball.RADIUS, 2f * (float) Ball.RADIUS, 1f);
         mRectangleRenderer.render(mModelMatrix, viewProjectionMatrix, mTextureMatrix, mTexture);

@@ -18,7 +18,7 @@ public class Labyrinth {
     public static final double WIDTH = 480d;
     public static final double LENGTH = 320d;
     public static final double SIZE = Math.max(WIDTH, LENGTH);
-    private static final double ROTATION_MAX_DEGREES = 30;
+    public static final double ROTATION_MAX_DEGREES = 30;
     private static final double GRAVITY = World.EARTH_GRAVITY.getMagnitude() * (24d / 0.005) / 100;
 
     private List<Entity<?>> mEntities = new ArrayList<>();
@@ -133,10 +133,10 @@ public class Labyrinth {
     }
 
     private void updateGravity() {
-        mWorld.getGravity().set(GRAVITY * Math.sin(Math.toRadians(mRotationX)),
-                GRAVITY * Math.sin(Math.toRadians(mRotationY)));
-        System.out.println(String.format("RotationX: %f, RotationY: %f, Gravity: %s", mRotationX,
-                mRotationY, mWorld.getGravity()));
+        double rotationXRadian = Math.toRadians(mRotationX);
+        double rotationYRadian = Math.toRadians(mRotationY);
+        mWorld.getGravity().set(GRAVITY * Math.sin(rotationXRadian) * Math.cos(rotationXRadian),
+                GRAVITY * Math.sin(rotationYRadian) * Math.cos(rotationYRadian));
     }
 
     public double getGravity() {

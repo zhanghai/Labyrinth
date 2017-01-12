@@ -2,6 +2,7 @@ package cn.edu.zju.cs.graphics.labyrinth;
 
 import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
 import cn.edu.zju.cs.graphics.labyrinth.model.BaseHole;
+import cn.edu.zju.cs.graphics.labyrinth.model.BaseWall;
 import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
 import cn.edu.zju.cs.graphics.labyrinth.model.FinishHole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
@@ -14,10 +15,12 @@ import cn.edu.zju.cs.graphics.labyrinth.rendering.FloorRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.HoleRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.PrototypeRenderers;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.WallRenderer;
+import cn.edu.zju.cs.graphics.labyrinth.util.MatrixUtils;
 import org.dyn4j.dynamics.contact.ContactPoint;
 import org.dyn4j.geometry.Vector2;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -34,7 +37,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class LabyrinthApplication implements Labyrinth.Listener {
 
-    private static final double KEY_ROTATE_DEGREES = 3;
+    private static final double KEY_ROTATION_STEP_DEGREES = 3;
 
     private long mWindow;
     private int mWidth = 480;
@@ -52,6 +55,7 @@ public class LabyrinthApplication implements Labyrinth.Listener {
     private GLFWFramebufferSizeCallback mFramebufferSizeCallback;
     private GLFWWindowSizeCallback mWindowSizeCallback;
     private GLFWKeyCallback mKeyCallback;
+    private GLFWCursorPosCallback mCursorPositionCallback;
 
     private void init() throws IOException {
 
@@ -102,24 +106,32 @@ public class LabyrinthApplication implements Labyrinth.Listener {
                         break;
                     case GLFW_KEY_LEFT:
                     case GLFW_KEY_A:
-                        mLabyrinth.addRotationX(-KEY_ROTATE_DEGREES);
+                        mLabyrinth.addRotationX(-KEY_ROTATION_STEP_DEGREES);
                         break;
                     case GLFW_KEY_RIGHT:
                     case GLFW_KEY_F:
-                        mLabyrinth.addRotationX(KEY_ROTATE_DEGREES);
+                        mLabyrinth.addRotationX(KEY_ROTATION_STEP_DEGREES);
                         break;
                     case GLFW_KEY_DOWN:
                     case GLFW_KEY_D:
-                        mLabyrinth.addRotationY(-KEY_ROTATE_DEGREES);
+                        mLabyrinth.addRotationY(-KEY_ROTATION_STEP_DEGREES);
                         break;
                     case GLFW_KEY_UP:
                     case GLFW_KEY_W:
-                        mLabyrinth.addRotationY(KEY_ROTATE_DEGREES);
+                        mLabyrinth.addRotationY(KEY_ROTATION_STEP_DEGREES);
                         break;
                     case GLFW_KEY_0:
                         mLabyrinth.setRotationX(0).setRotationY(0);
                         break;
                 }
+            }
+        });
+        glfwSetCursorPosCallback(mWindow, mCursorPositionCallback = new GLFWCursorPosCallback() {
+            @Override
+            public void invoke(long window, double x, double y) {
+                mLabyrinth
+                        .setRotationX((x / mWidth - 0.5d) * 4d * Labyrinth.ROTATION_MAX_DEGREES)
+                        .setRotationY(-(y / mHeight - 0.5d) * 4d * Labyrinth.ROTATION_MAX_DEGREES);
             }
         });
 
@@ -232,10 +244,13 @@ public class LabyrinthApplication implements Labyrinth.Listener {
                         (float) Labyrinth.WIDTH / 2f, (float) Labyrinth.LENGTH / 2f, 0f,
                         0f, 1f, 0f
                 )
-                .translate((float) Labyrinth.WIDTH / 2f, (float) Labyrinth.LENGTH / 2f, 0)
-                .rotateYXZ((float) Math.toRadians(mLabyrinth.getRotationX()),
-                        (float) Math.toRadians(-mLabyrinth.getRotationY()), 0)
-                .translate((float) -Labyrinth.WIDTH / 2f, (float) -Labyrinth.LENGTH / 2f, 0);
+                .translate((float) Labyrinth.WIDTH / 2f, (float) Labyrinth.LENGTH / 2f, 0);
+        MatrixUtils.skewXAroundY(mViewMatrix,
+                (float) Math.toRadians(mLabyrinth.getRotationX() / 2d));
+        MatrixUtils.skewYAroundX(mViewMatrix,
+                (float) Math.toRadians(mLabyrinth.getRotationY() / 2d));
+        mViewMatrix.translate((float) -Labyrinth.WIDTH / 2f, (float) -Labyrinth.LENGTH / 2f,
+                (float) -BaseWall.HEIGHT);
         mProjectionMatrix.setOrtho((float) -Labyrinth.WIDTH / 2f, (float) Labyrinth.WIDTH / 2f,
                 (float) -Labyrinth.LENGTH / 2f, (float) Labyrinth.LENGTH / 2f, -1000f, 1000f);
         mProjectionMatrix.mul(mViewMatrix, mViewProjectionMatrix);
@@ -272,6 +287,7 @@ public class LabyrinthApplication implements Labyrinth.Listener {
             mFramebufferSizeCallback.free();
             mWindowSizeCallback.free();
             mKeyCallback.free();
+            mCursorPositionCallback.free();
             glfwDestroyWindow(mWindow);
         } catch (Throwable t) {
             t.printStackTrace();
