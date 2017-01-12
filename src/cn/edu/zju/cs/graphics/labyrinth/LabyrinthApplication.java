@@ -8,6 +8,7 @@ import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Labyrinth;
 import cn.edu.zju.cs.graphics.labyrinth.model.Magnet;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
+import cn.edu.zju.cs.graphics.labyrinth.rendering.BallRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.FloorRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.PrototypeRenderers;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.WallRenderer;
@@ -34,10 +35,10 @@ public class LabyrinthApplication implements Labyrinth.Listener {
     private static final double KEY_ROTATE_DEGREES = 3;
 
     private long mWindow;
-    private int mWidth = 720;
-    private int mHeight = 480;
-    private int mFrameBufferWidth = 720;
-    private int mFrameBufferHeight = 480;
+    private int mWidth = 480;
+    private int mHeight = 320;
+    private int mFrameBufferWidth = mWidth;
+    private int mFrameBufferHeight = mHeight;
 
     private Matrix4f mProjectionMatrix = new Matrix4f();
     private Matrix4f mViewMatrix = new Matrix4f();
@@ -149,6 +150,7 @@ public class LabyrinthApplication implements Labyrinth.Listener {
 
         mFloorRenderer = FloorRenderer.getInstance();
         WallRenderer wallRenderer = WallRenderer.getInstance();
+        BallRenderer ballRenderer = BallRenderer.getInstance();
         mLabyrinth = new Labyrinth()
                 .addEntity(new Hole(Wall.THICKNESS_DEFAULT + Hole.RADIUS,
                         Labyrinth.LENGTH - (Wall.THICKNESS_DEFAULT + Hole.RADIUS)))
@@ -165,7 +167,7 @@ public class LabyrinthApplication implements Labyrinth.Listener {
                         Wall.THICKNESS_DEFAULT / 2, Labyrinth.LENGTH / 2d, wallRenderer))
                 //.addEntity(new Magnet(WIDTH / 2d, Wall.THICKNESS_DEFAULT))
                 .addEntity(new Ball(Wall.THICKNESS_DEFAULT + Ball.RADIUS, Wall.THICKNESS_DEFAULT
-                        + Ball.RADIUS))
+                        + Ball.RADIUS, ballRenderer))
                 .setListener(this);
     }
 
@@ -197,7 +199,6 @@ public class LabyrinthApplication implements Labyrinth.Listener {
             ball
                     .setPositionX(Wall.THICKNESS_DEFAULT + Ball.RADIUS)
                     .setPositionY(Wall.THICKNESS_DEFAULT + Ball.RADIUS);
-            mLabyrinth.setRotationX(0).setRotationY(0);
         } else if (hole instanceof FinishHole) {
             // TODO: Victory.
             glfwSetWindowShouldClose(mWindow, true);
@@ -226,7 +227,7 @@ public class LabyrinthApplication implements Labyrinth.Listener {
                 )
                 .translate((float) Labyrinth.WIDTH / 2f, (float) Labyrinth.LENGTH / 2f, 0)
                 .rotateYXZ((float) Math.toRadians(mLabyrinth.getRotationX()),
-                        (float) Math.toRadians(mLabyrinth.getRotationY()), 0)
+                        (float) Math.toRadians(-mLabyrinth.getRotationY()), 0)
                 .translate((float) -Labyrinth.WIDTH / 2f, (float) -Labyrinth.LENGTH / 2f, 0);
         mProjectionMatrix.setOrtho((float) -Labyrinth.WIDTH / 2f, (float) Labyrinth.WIDTH / 2f,
                 (float) -Labyrinth.LENGTH / 2f, (float) Labyrinth.LENGTH / 2f, -1000f, 1000f);
@@ -244,6 +245,10 @@ public class LabyrinthApplication implements Labyrinth.Listener {
         mFloorRenderer.render(mViewProjectionMatrix);
         //mLabyrinth.render();
         mLabyrinth.getEntities().get(2).render(mViewProjectionMatrix);
+        mLabyrinth.getEntities().get(3).render(mViewProjectionMatrix);
+        mLabyrinth.getEntities().get(4).render(mViewProjectionMatrix);
+        mLabyrinth.getEntities().get(5).render(mViewProjectionMatrix);
+        mLabyrinth.getEntities().get(6).render(mViewProjectionMatrix);
 
         int error = glGetError();
         if (error != GL_NO_ERROR) {

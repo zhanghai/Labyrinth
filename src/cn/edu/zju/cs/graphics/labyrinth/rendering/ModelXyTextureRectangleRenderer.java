@@ -26,7 +26,7 @@ public class ModelXyTextureRectangleRenderer {
 
     private static ModelXyTextureRectangleRenderer sInstance;
 
-    private GenericRenderer mGenericRenderer;
+    private ModelXyTextureRenderer mRenderer;
     private int mVertexArrayBuffer;
     private int mElementArrayBuffer;
 
@@ -38,17 +38,17 @@ public class ModelXyTextureRectangleRenderer {
     }
 
     private ModelXyTextureRectangleRenderer() throws IOException {
-        mGenericRenderer = GenericRenderer.getInstance();
+        mRenderer = ModelXyTextureRenderer.getInstance();
         mVertexArrayBuffer = GlUtils.createVertexArrayBuffer(mVertexArrayBufferData,
                 GL_STATIC_DRAW);
         mElementArrayBuffer = GlUtils.createVertexArrayIndexBuffer(mElementArrayBufferData,
                 GL_STATIC_DRAW);
     }
 
-    public void render(Matrix4f modelMatrix, Matrix4f viewProjectionMatrix, Matrix3f textureMatrix,
-                       int texture) {
-        mGenericRenderer.render(mVertexArrayBuffer, 2, mElementArrayBuffer,
+    public void render(Matrix4f modelMatrix, Matrix4f viewProjectionMatrix, int texture,
+                       float textureWidth, float textureHeight) {
+        mRenderer.render(mVertexArrayBuffer, 2, mElementArrayBuffer,
                 mElementArrayBufferData.remaining(), modelMatrix, viewProjectionMatrix,
-                textureMatrix, texture);
+                texture, textureWidth, textureHeight);
     }
 }

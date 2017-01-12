@@ -158,7 +158,7 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
                         Wall.THICKNESS_DEFAULT / 2, LABYRINTH_LENGTH / 2d, PrototypeRenderers.WALL))
                 //.addEntity(new Magnet(WIDTH / 2d, Wall.THICKNESS_DEFAULT))
                 .addEntity(new Ball(Wall.THICKNESS_DEFAULT + Ball.RADIUS, Wall.THICKNESS_DEFAULT
-                        + Ball.RADIUS))
+                        + Ball.RADIUS, null))
                 .setListener(this);
     }
 

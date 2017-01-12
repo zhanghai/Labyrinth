@@ -1,7 +1,6 @@
 package cn.edu.zju.cs.graphics.labyrinth.rendering;
 
 import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 import java.io.IOException;
@@ -68,7 +67,7 @@ public class CubeRenderer {
 
     private static CubeRenderer sInstance;
 
-    private GenericRenderer mGenericRenderer;
+    private GenericRenderer mRenderer;
     private int mVertexArrayBuffer;
     private int mElementArrayBuffer;
 
@@ -80,17 +79,15 @@ public class CubeRenderer {
     }
 
     private CubeRenderer() throws IOException {
-        mGenericRenderer = GenericRenderer.getInstance();
+        mRenderer = GenericRenderer.getInstance();
         mVertexArrayBuffer = GlUtils.createVertexArrayBuffer(mVertexArrayBufferData,
                 GL_STATIC_DRAW);
         mElementArrayBuffer = GlUtils.createVertexArrayIndexBuffer(mElementArrayBufferData,
                 GL_STATIC_DRAW);
     }
 
-    public void render(Matrix4f modelMatrix, Matrix4f viewProjectionMatrix, Matrix3f textureMatrix,
-                       int texture) {
-        mGenericRenderer.render(mVertexArrayBuffer, 3, mElementArrayBuffer,
-                mElementArrayBufferData.remaining(), modelMatrix, viewProjectionMatrix,
-                textureMatrix, texture);
+    public void render(Matrix4f modelMatrix, Matrix4f viewProjectionMatrix, int texture) {
+        mRenderer.render(mVertexArrayBuffer, 3, mElementArrayBuffer,
+                mElementArrayBufferData.remaining(), modelMatrix, viewProjectionMatrix, texture);
     }
 }

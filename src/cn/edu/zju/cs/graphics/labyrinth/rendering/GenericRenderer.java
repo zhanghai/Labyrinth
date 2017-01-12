@@ -20,12 +20,10 @@ public class GenericRenderer {
     private int mTextureCoordinateAttribute;
     private int mModelMatrixUniform;
     private int mViewProjectionMatrixUniform;
-    private int mTextureMatrixUniform;
     private int mTextureUniform;
 
     private FloatBuffer mModelMatrixBuffer = BufferUtils.createFloatBuffer(4 * 4);
     private FloatBuffer mViewProjectionMatrixBuffer = BufferUtils.createFloatBuffer(4 * 4);
-    private FloatBuffer mTextureMatrixBuffer = BufferUtils.createFloatBuffer(3 * 3);
 
     public static GenericRenderer getInstance() throws IOException {
         if (sInstance == null) {
@@ -45,13 +43,12 @@ public class GenericRenderer {
         mModelMatrixUniform = GlUtils.getUniformLocation(mProgram, "uModelMatrix");
         mViewProjectionMatrixUniform = GlUtils.getUniformLocation(mProgram,
                 "uViewProjectionMatrix");
-        mTextureMatrixUniform = GlUtils.getUniformLocation(mProgram, "uTextureMatrix");
         mTextureUniform = GlUtils.getUniformLocation(mProgram, "uTexture");
     }
 
     public void render(int vertexArrayBuffer, int positionSize, int elementArrayBuffer,
                        int elementCount, Matrix4f modelMatrix, Matrix4f viewProjectionMatrix,
-                       Matrix3f textureMatrix, int texture) {
+                       int texture) {
         glUseProgram(mProgram);
         glBindBuffer(GL_ARRAY_BUFFER, vertexArrayBuffer);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer);
@@ -63,7 +60,6 @@ public class GenericRenderer {
         glUniformMatrix4fv(mModelMatrixUniform, false, modelMatrix.get(mModelMatrixBuffer));
         glUniformMatrix4fv(mViewProjectionMatrixUniform, false,
                 viewProjectionMatrix.get(mViewProjectionMatrixBuffer));
-        glUniformMatrix3fv(mTextureMatrixUniform, false, textureMatrix.get(mTextureMatrixBuffer));
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
         glUniform1i(mTextureUniform, 0);

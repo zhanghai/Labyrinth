@@ -26,7 +26,7 @@ public class RectangleRenderer {
 
     private static RectangleRenderer sInstance;
 
-    private GenericRenderer mGenericRenderer;
+    private GenericRenderer mRenderer;
     private int mVertexArrayBuffer;
     private int mElementArrayBuffer;
 
@@ -38,7 +38,7 @@ public class RectangleRenderer {
     }
 
     private RectangleRenderer() throws IOException {
-        mGenericRenderer = GenericRenderer.getInstance();
+        mRenderer = GenericRenderer.getInstance();
         mVertexArrayBuffer = GlUtils.createVertexArrayBuffer(mVertexArrayBufferData,
                 GL_STATIC_DRAW);
         mElementArrayBuffer = GlUtils.createVertexArrayIndexBuffer(mElementArrayBufferData,
@@ -47,8 +47,7 @@ public class RectangleRenderer {
 
     public void render(Matrix4f modelMatrix, Matrix4f viewProjectionMatrix, Matrix3f textureMatrix,
                        int texture) {
-        mGenericRenderer.render(mVertexArrayBuffer, 2, mElementArrayBuffer,
-                mElementArrayBufferData.remaining(), modelMatrix, viewProjectionMatrix,
-                textureMatrix, texture);
+        mRenderer.render(mVertexArrayBuffer, 2, mElementArrayBuffer,
+                mElementArrayBufferData.remaining(), modelMatrix, viewProjectionMatrix, texture);
     }
 }

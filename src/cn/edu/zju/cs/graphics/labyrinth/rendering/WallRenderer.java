@@ -14,7 +14,8 @@ public class WallRenderer implements Renderer<Wall> {
 
     private ModelSpaceTextureCubeRenderer mRenderer;
     private Matrix4f mModelMatrix = new Matrix4f();
-    private int mTexture;
+    private int mTopTexture;
+    private int mSideTexture;
 
     public static WallRenderer getInstance() throws IOException {
         if (sInstance == null) {
@@ -25,7 +26,8 @@ public class WallRenderer implements Renderer<Wall> {
 
     private WallRenderer() throws IOException {
         mRenderer = ModelSpaceTextureCubeRenderer.getInstance();
-        mTexture = GlUtils.createTexture(ResourceUtils.makeTextureResource("wall.jpg"));
+        mTopTexture = GlUtils.createTexture(ResourceUtils.makeTextureResource("wall-top.jpg"));
+        mSideTexture = GlUtils.createTexture(ResourceUtils.makeTextureResource("wall-side.jpg"));
     }
 
     public void render(Wall wall, Matrix4f viewProjectionMatrix) {
@@ -34,7 +36,7 @@ public class WallRenderer implements Renderer<Wall> {
                 .translate((float) wall.getPositionX(), (float) wall.getPositionY(),
                         (float) Wall.HEIGHT / 2f)
                 .scale((float) wall.getWidth(), (float) wall.getLength(), (float) Wall.HEIGHT);
-        mRenderer.render(mModelMatrix, viewProjectionMatrix, mTexture,
-                (float) Labyrinth.SIZE / 0.8f, (float) Labyrinth.SIZE, 0.2f * (float) Labyrinth.SIZE);
+        mRenderer.render(mModelMatrix, viewProjectionMatrix, mTopTexture, (float) Labyrinth.SIZE,
+                (float) Labyrinth.SIZE, mSideTexture, (float) Wall.HEIGHT);
     }
 }

@@ -45,6 +45,7 @@ public class GlUtils {
         if (data.length != size) {
             throw new IllegalArgumentException();
         }
+        //noinspection deprecation
         return createBuffer(data);
     }
 
@@ -62,7 +63,7 @@ public class GlUtils {
             System.err.println(programInfoLog);
         }
         if (linked == 0) {
-            throw new AssertionError("Could not link program");
+            throw new AssertionError("Failed to link program");
         }
         return program;
     }
@@ -82,7 +83,7 @@ public class GlUtils {
             System.err.println(shaderLog);
         }
         if (compiled == 0) {
-            throw new AssertionError("Could not compile shader");
+            throw new AssertionError("Failed to compile shader");
         }
         return shader;
     }

@@ -1,6 +1,7 @@
 package cn.edu.zju.cs.graphics.labyrinth.model;
 
 import cn.edu.zju.cs.graphics.labyrinth.dynamics.Bodies;
+import cn.edu.zju.cs.graphics.labyrinth.rendering.Renderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.Renderers;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.geometry.Vector2;
@@ -11,9 +12,10 @@ public class Ball extends Entity<Ball> {
     public static final double RADIUS = 12d;
     public static final double DENSITY = 0.5 / (Math.PI * RADIUS * RADIUS);
     public static final double RESTITUTION = 0.2;
+    public static final double LINEAR_DAMPING = 0.5;
 
-    public Ball(double positionX, double positionY) {
-        super(Bodies.newBall(positionX, positionY), Renderers.BALL);
+    public Ball(double positionX, double positionY, Renderer<Ball> renderer) {
+        super(Bodies.newBall(positionX, positionY), renderer);
     }
 
     public double getMass() {

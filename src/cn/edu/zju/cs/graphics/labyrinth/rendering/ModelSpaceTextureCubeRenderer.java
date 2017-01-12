@@ -97,14 +97,15 @@ public class ModelSpaceTextureCubeRenderer {
                 mCylindricalElementArrayBufferData, GL_STATIC_DRAW);
     }
 
-    public void render(Matrix4f modelMatrix, Matrix4f viewProjectionMatrix, int texture,
-                       float textureWidth, float textureLength, float textureHeight) {
+    public void render(Matrix4f modelMatrix, Matrix4f viewProjectionMatrix, int topBottomTexture,
+                       float textureWidth, float textureLength, int sideTexture,
+                       float textureHeight) {
         mXyRenderer.render(mVertexArrayBuffer, 3, mXyElementArrayBuffer,
                 mXyElementArrayBufferData.remaining(), modelMatrix, viewProjectionMatrix,
-                texture, textureWidth, textureLength);
+                topBottomTexture, textureWidth, textureLength);
         float textureDiameter = (float) Math.hypot(textureWidth, textureLength);
         mCylindricalRenderer.render(mVertexArrayBuffer, 3, mCylindricalElementArrayBuffer,
                 mCylindricalElementArrayBufferData.remaining(), modelMatrix, viewProjectionMatrix,
-                texture, textureDiameter, textureHeight);
+                sideTexture, textureDiameter, textureHeight);
     }
 }

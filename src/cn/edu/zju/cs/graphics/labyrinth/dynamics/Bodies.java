@@ -22,6 +22,7 @@ public class Bodies {
         Body body = new Body()
                 .addFixture(fixture)
                 .setMass(MassType.NORMAL);
+        body.setLinearDamping(Ball.LINEAR_DAMPING);
         return setBodyPosition(body, positionX, positionY);
     }
 
