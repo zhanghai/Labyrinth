@@ -246,9 +246,9 @@ public class LabyrinthApplication implements Labyrinth.Listener {
                 )
                 .translate((float) Labyrinth.WIDTH / 2f, (float) Labyrinth.LENGTH / 2f, 0);
         MatrixUtils.skewXAroundY(mViewMatrix,
-                (float) Math.toRadians(mLabyrinth.getRotationX() / 2d));
+                (float) Math.toRadians(mLabyrinth.getRotationX() * 0.75d));
         MatrixUtils.skewYAroundX(mViewMatrix,
-                (float) Math.toRadians(mLabyrinth.getRotationY() / 2d));
+                (float) Math.toRadians(mLabyrinth.getRotationY() * 0.75d));
         mViewMatrix.translate((float) -Labyrinth.WIDTH / 2f, (float) -Labyrinth.LENGTH / 2f,
                 (float) -BaseWall.HEIGHT);
         mProjectionMatrix.setOrtho((float) -Labyrinth.WIDTH / 2f, (float) Labyrinth.WIDTH / 2f,
