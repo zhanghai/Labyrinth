@@ -57,6 +57,9 @@ public class LabyrinthApplication implements Labyrinth.Listener {
     private GLFWKeyCallback mKeyCallback;
     private GLFWCursorPosCallback mCursorPositionCallback;
 
+    private Ball mBall;
+    private boolean mNavi = false;
+
     private void init() throws IOException {
 
         if (!glfwInit()) {
@@ -111,6 +114,9 @@ public class LabyrinthApplication implements Labyrinth.Listener {
                     case GLFW_KEY_RIGHT:
                     case GLFW_KEY_F:
                         mLabyrinth.addRotationX(KEY_ROTATION_STEP_DEGREES);
+                        break;
+                    case GLFW_KEY_N:
+                        mNavi = !mNavi;
                         break;
                     case GLFW_KEY_DOWN:
                     case GLFW_KEY_D:
@@ -168,6 +174,8 @@ public class LabyrinthApplication implements Labyrinth.Listener {
         HoleRenderer holeRenderer = HoleRenderer.getInstance();
         FinishHoleRenderer finishHoleRenderer = FinishHoleRenderer.getInstance();
         double wallThickness = Wall.THICKNESS_DEFAULT / 2;
+        mBall = new Ball(wallThickness + Ball.RADIUS, wallThickness
+                + Ball.RADIUS, ballRenderer);
         mLabyrinth = new Labyrinth()
                 .addEntity(new Hole(wallThickness + Hole.RADIUS,
                         Labyrinth.LENGTH - (wallThickness + Hole.RADIUS), holeRenderer))
@@ -183,8 +191,7 @@ public class LabyrinthApplication implements Labyrinth.Listener {
                 .addEntity(new Wall(wallThickness, Labyrinth.LENGTH,
                         wallThickness / 2, Labyrinth.LENGTH / 2d, wallRenderer))
                 //.addEntity(new Magnet(WIDTH / 2d, wallThickness))
-                .addEntity(new Ball(wallThickness + Ball.RADIUS, wallThickness
-                        + Ball.RADIUS, ballRenderer))
+                .addEntity(mBall)
                 .setListener(this);
     }
 
@@ -249,7 +256,11 @@ public class LabyrinthApplication implements Labyrinth.Listener {
                 (float) Math.toRadians(mLabyrinth.getRotationX() * 0.75d));
         MatrixUtils.skewYAroundX(mViewMatrix,
                 (float) Math.toRadians(mLabyrinth.getRotationY() * 0.75d));
-        mViewMatrix.translate((float) -Labyrinth.WIDTH / 2f, (float) -Labyrinth.LENGTH / 2f,
+        if (!mNavi)
+            mViewMatrix.translate((float) -Labyrinth.WIDTH / 2f, (float) -Labyrinth.LENGTH / 2f,
+                (float) -BaseWall.HEIGHT);
+        else
+            mViewMatrix.rotateX((float)Math.toRadians(-30)).translate(-(float) mBall.getPositionX(), -(float) mBall.getPositionY(),
                 (float) -BaseWall.HEIGHT);
         mProjectionMatrix.setOrtho((float) -Labyrinth.WIDTH / 2f, (float) Labyrinth.WIDTH / 2f,
                 (float) -Labyrinth.LENGTH / 2f, (float) Labyrinth.LENGTH / 2f, -1000f, 1000f);
