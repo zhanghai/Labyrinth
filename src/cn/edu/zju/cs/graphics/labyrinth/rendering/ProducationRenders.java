@@ -5,14 +5,13 @@ import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
 import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
+import cn.edu.zju.cs.graphics.labyrinth.util.IoUtils;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import static org.lwjgl.stb.STBImage.*;
 
 import java.io.IOException;
 import java.nio.*;
-
-import static cn.edu.zju.cs.graphics.labyrinth.DemoUtils.*;
 
 import static org.lwjgl.opengles.GLES20.*;
 
@@ -259,7 +258,7 @@ public class ProducationRenders {
 
     public static final Renderer<Ball> BALL = new Renderer<Ball>() {
         @Override
-        public void render(Ball ball) {
+        public void render(Ball ball, Matrix4f ViewProjectionMatrix) {
             sBallX = (float)ball.getPositionX();
             sBallY = (float)ball.getPositionY();
             renderPrototype(sCircleBallVertexBufferIndex, getModelMatrixBuffer(ball),sPoints,GL_TRIANGLE_FAN);
@@ -268,7 +267,7 @@ public class ProducationRenders {
 
     public static final Renderer<Wall> WALL = new Renderer<Wall>() {
         @Override
-        public void render(Wall wall) {
+        public void render(Wall wall, Matrix4f ViewProjectionMatrix) {
 
 //            //renderPrototype(sWallVertexBuffer, getModelMatrixBufferForWall(wall),sPoints,GL_TRIANGLE_FAN);
             glUseProgram(sPrototypeProgram2);
@@ -298,7 +297,7 @@ public class ProducationRenders {
         IntBuffer h = BufferUtils.createIntBuffer(1);
         IntBuffer comp = BufferUtils.createIntBuffer(1);
         ByteBuffer image;
-        imageBuffer = ioResourceToByteBuffer("cn/edu/zju/cs/graphics/labyrinth/texture/ball.png", 1024 * 8);
+        imageBuffer = IoUtils.getResourceAsByteBuffer("cn/edu/zju/cs/graphics/labyrinth/texture/ball.png", 1024 * 8);
         image = stbi_load_from_memory(imageBuffer,w,h,comp,3);
         glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,w.get(0),h.get(0),0,GL_RGB,GL_UNSIGNED_BYTE,image);
         stbi_image_free(image);
@@ -314,7 +313,7 @@ public class ProducationRenders {
         IntBuffer h = BufferUtils.createIntBuffer(1);
         IntBuffer comp = BufferUtils.createIntBuffer(1);
         ByteBuffer image;
-        imageBuffer = ioResourceToByteBuffer("cn/edu/zju/cs/graphics/labyrinth/texture/ball_tmp.jpg", 1024 * 8);
+        imageBuffer = IoUtils.getResourceAsByteBuffer("cn/edu/zju/cs/graphics/labyrinth/texture/ball_tmp.jpg", 1024 * 8);
         image = stbi_load_from_memory(imageBuffer,w,h,comp,3);
         glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,w.get(0),h.get(0),0,GL_RGB,GL_UNSIGNED_BYTE,image);
         stbi_image_free(image);
@@ -326,7 +325,7 @@ public class ProducationRenders {
 
     public static final Renderer<Hole> HOLE = new Renderer<Hole>() {
         @Override
-        public void render(Hole hole) {
+        public void render(Hole hole, Matrix4f ViewProjectionMatrix) {
             //renderPrototype(sHoleVertexBuffer, getModelMatrixBuffer(hole), sHoleColorBuffer);
         }
     };

@@ -7,6 +7,7 @@ import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Magnet;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
+import cn.edu.zju.cs.graphics.labyrinth.util.ResourceUtils;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 
@@ -31,12 +32,12 @@ public class PrototypeRenderers {
     static {
         sBallVertexBufferData = BufferUtils.createFloatBuffer(6 * 2);
         sBallVertexBufferData
-                .put(0f).put(0.45f)
-                .put(0.45f).put(0f)
-                .put(0f).put(-0.45f)
-                .put(0f).put(0.45f)
-                .put(-0.45f).put(0f)
-                .put(0f).put(-0.45f)
+                .put(0f).put(12f)
+                .put(12f).put(0f)
+                .put(0f).put(-12f)
+                .put(0f).put(12f)
+                .put(-12f).put(0f)
+                .put(0f).put(-12f)
                 .flip();
     }
     private static FloatBuffer sBallColorBuffer;
@@ -73,12 +74,12 @@ public class PrototypeRenderers {
     static {
         sBaseHoleVertexBufferData = BufferUtils.createFloatBuffer(6 * 2);
         sBaseHoleVertexBufferData
-                .put(0f).put(0.5f)
-                .put(0.5f).put(0f)
-                .put(0f).put(-0.5f)
-                .put(0f).put(0.5f)
-                .put(-0.5f).put(0f)
-                .put(0f).put(-0.5f)
+                .put(0f).put(13f)
+                .put(13f).put(0f)
+                .put(0f).put(-13f)
+                .put(0f).put(13f)
+                .put(-13f).put(0f)
+                .put(0f).put(-13f)
                 .flip();
     }
     private static FloatBuffer sHoleColorBuffer;
@@ -121,8 +122,8 @@ public class PrototypeRenderers {
 
     public static void initialize() throws IOException {
 
-        sPrototypeProgram = GlUtils.createProgram(makeShaderResource("prototype.vs"),
-                makeShaderResource("prototype.fs"));
+        sPrototypeProgram = GlUtils.createProgram(ResourceUtils.makeShaderResource("prototype.vs"),
+                ResourceUtils.makeShaderResource("prototype.fs"));
         sPositionAttribute = GlUtils.getAttribLocation(sPrototypeProgram, "aPosition");
         sModelMatrixUniform = GlUtils.getUniformLocation(sPrototypeProgram, "uModelMatrix");
         sViewProjectionMatrixUniform = GlUtils.getUniformLocation(sPrototypeProgram,
@@ -135,10 +136,6 @@ public class PrototypeRenderers {
                 GL_STATIC_DRAW);
         sMagnetVertexBuffer = GlUtils.createVertexArrayBuffer(sMagnetVertexBufferData,
                 GL_STATIC_DRAW);
-    }
-
-    private static String makeShaderResource(String name) {
-        return "cn/edu/zju/cs/graphics/labyrinth/shader/" + name;
     }
 
     public static void setViewProjectionMatrix(Matrix4f viewProjectionMatrix) {
@@ -185,28 +182,28 @@ public class PrototypeRenderers {
 
     public static final Renderer<Ball> BALL = new Renderer<Ball>() {
         @Override
-        public void render(Ball ball) {
+        public void render(Ball ball, Matrix4f ViewProjectionMatrix) {
             renderPrototype(sBallVertexBuffer, getModelMatrixBuffer(ball), sBallColorBuffer);
         }
     };
 
     public static final Renderer<Wall> WALL = new Renderer<Wall>() {
         @Override
-        public void render(Wall wall) {
+        public void render(Wall wall, Matrix4f ViewProjectionMatrix) {
             renderPrototype(sWallVertexBuffer, getModelMatrixBufferForWall(wall), sWallColorBuffer);
         }
     };
 
     public static final Renderer<Hole> HOLE = new Renderer<Hole>() {
         @Override
-        public void render(Hole hole) {
+        public void render(Hole hole, Matrix4f ViewProjectionMatrix) {
             renderPrototype(sBaseHoleVertexBuffer, getModelMatrixBuffer(hole), sHoleColorBuffer);
         }
     };
 
     public static final Renderer<FinishHole> FINISH_HOLE = new Renderer<FinishHole>() {
         @Override
-        public void render(FinishHole finishHole) {
+        public void render(FinishHole finishHole, Matrix4f ViewProjectionMatrix) {
             renderPrototype(sBaseHoleVertexBuffer, getModelMatrixBuffer(finishHole),
                     sFinishHoleColorBuffer);
         }
@@ -214,7 +211,7 @@ public class PrototypeRenderers {
 
     public static final Renderer<Magnet> MAGNET = new Renderer<Magnet>() {
         @Override
-        public void render(Magnet magnet) {
+        public void render(Magnet magnet, Matrix4f ViewProjectionMatrix) {
             renderPrototype(sMagnetVertexBuffer, getModelMatrixBuffer(magnet), sMagnetColorBuffer);
         }
     };

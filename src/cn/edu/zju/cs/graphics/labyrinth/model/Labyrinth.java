@@ -1,25 +1,25 @@
 package cn.edu.zju.cs.graphics.labyrinth.model;
 
-import cn.edu.zju.cs.graphics.labyrinth.dynamics.Bodies;
 import cn.edu.zju.cs.graphics.labyrinth.util.MathUtils;
 import org.dyn4j.dynamics.Settings;
-import org.dyn4j.dynamics.Step;
-import org.dyn4j.dynamics.StepAdapter;
 import org.dyn4j.dynamics.World;
 import org.dyn4j.dynamics.contact.ContactAdapter;
 import org.dyn4j.dynamics.contact.ContactPoint;
 import org.dyn4j.geometry.Vector2;
 import org.joml.Math;
+import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 public class Labyrinth {
 
-    private static final double ROTATION_MAX = 30;
-    private static final double GRAVITY = 20;
+    public static final double WIDTH = 480d;
+    public static final double LENGTH = 320d;
+    public static final double SIZE = Math.max(WIDTH, LENGTH);
+    private static final double ROTATION_MAX_DEGREES = 30;
+    private static final double GRAVITY = World.EARTH_GRAVITY.getMagnitude() * (24d / 0.005) / 100;
 
     private List<Entity<?>> mEntities = new ArrayList<>();
     private Listener mListener;
@@ -48,7 +48,7 @@ public class Labyrinth {
                 }
                 if (sensor instanceof BaseHole<?>) {
                     BaseHole<?> hole = (BaseHole<?>) sensor;
-                    if (MathUtils.distance(ball, hole) < Bodies.HOLE_RADIUS) {
+                    if (MathUtils.distance(ball, hole) < BaseHole.RADIUS - Ball.RADIUS) {
                         mListener.onBallFallenIntoHole(ball, hole);
                     } else {
                         mListener.onBallFallingTowardsHole(ball, hole);
@@ -101,7 +101,7 @@ public class Labyrinth {
     }
 
     public Labyrinth setRotationX(double rotationX) {
-        if (rotationX > ROTATION_MAX) {
+        if (Math.abs(rotationX) > ROTATION_MAX_DEGREES) {
             return this;
         }
         mRotationX = rotationX;
@@ -119,7 +119,7 @@ public class Labyrinth {
     }
 
     public Labyrinth setRotationY(double rotationY) {
-        if (rotationY > ROTATION_MAX) {
+        if (Math.abs(rotationY) > ROTATION_MAX_DEGREES) {
             return this;
         }
         mRotationY = rotationY;
@@ -139,9 +139,17 @@ public class Labyrinth {
                 mRotationY, mWorld.getGravity()));
     }
 
+    public double getGravity() {
+        return GRAVITY;
+    }
+
     public Labyrinth setListener(final Listener listener) {
         mListener = listener;
         return this;
+    }
+
+    public double getStepFrequency() {
+        return mWorld.getSettings().getStepFrequency();
     }
 
     public void update() {
@@ -161,14 +169,14 @@ public class Labyrinth {
             Ball ball = (Ball) entity;
             Vector2 movement = ball.getBody().getChangeInPosition();
             if (!movement.isZero()) {
-                mListener.onBallRolled(ball, movement);
+                mListener.onBallRolling(ball, movement);
             }
         }
     }
 
-    public void render() {
+    public void render(Matrix4f viewProjectionMatrix) {
         for (Entity<?> entity : mEntities) {
-            entity.render();
+            entity.render(viewProjectionMatrix);
         }
     }
 
@@ -183,7 +191,7 @@ public class Labyrinth {
          * false from the those methods as well.
          * </p>
          */
-        void onBallFallingTowardsMagnet(Ball ball, Magnet magnet);
+        void onBallAttractedByMagnet(Ball ball, Magnet magnet);
 
         /**
          * Modification of the {@link World} is permitted from this methods.
@@ -218,6 +226,6 @@ public class Labyrinth {
          */
         void onBallHitEntity(Ball ball, Entity<?> entity, ContactPoint point);
 
-        void onBallRolled(Ball ball, Vector2 movement);
+        void onBallRolling(Ball ball, Vector2 movement);
     }
 }

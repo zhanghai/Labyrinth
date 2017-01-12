@@ -1,5 +1,6 @@
 package cn.edu.zju.cs.graphics.labyrinth;
 
+import cn.edu.zju.cs.graphics.labyrinth.util.IoUtils;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.*;
@@ -187,7 +188,7 @@ public class EnvironmentTeapotDemo {
 
     private static int createShader(String resource, int type) throws IOException {
         int shader = glCreateShader(type);
-        ByteBuffer source = ioResourceToByteBuffer(resource, 1024);
+        ByteBuffer source = IoUtils.getResourceAsByteBuffer(resource, 1024);
         PointerBuffer strings = BufferUtils.createPointerBuffer(1);
         IntBuffer lengths = BufferUtils.createIntBuffer(1);
         strings.put(0, source);
@@ -262,8 +263,8 @@ public class EnvironmentTeapotDemo {
         IntBuffer h = BufferUtils.createIntBuffer(1);
         IntBuffer comp = BufferUtils.createIntBuffer(1);
         ByteBuffer image;
-        imageBuffer = ioResourceToByteBuffer("cn/edu/zju/cs/graphics/labyrinth/environment.jpg",
-                8 * 1024);
+        imageBuffer = IoUtils.getResourceAsByteBuffer(
+                "cn/edu/zju/cs/graphics/labyrinth/environment.jpg", 8 * 1024);
         if (!stbi_info_from_memory(imageBuffer, w, h, comp)) {
             throw new IOException("Failed to read image information: " + stbi_failure_reason());
         }

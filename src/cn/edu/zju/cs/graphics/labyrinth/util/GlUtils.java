@@ -9,7 +9,6 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import static cn.edu.zju.cs.graphics.labyrinth.DemoUtils.ioResourceToByteBuffer;
 import static org.lwjgl.opengles.GLES20.*;
 import static org.lwjgl.stb.STBImage.*;
 
@@ -17,42 +16,39 @@ public class GlUtils {
 
     private GlUtils() {}
 
+    public static final float BIAS = 0.01f;
 
-    public static int createTexture(String TextureSource, int bufferSize) throws IOException {
-        int tex = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, tex);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        ByteBuffer imageBuffer;
-        IntBuffer w = BufferUtils.createIntBuffer(1);
-        IntBuffer h = BufferUtils.createIntBuffer(1);
-        IntBuffer comp = BufferUtils.createIntBuffer(1);
-        ByteBuffer image;
-        imageBuffer = ioResourceToByteBuffer(TextureSource,
-               bufferSize);
-        if (!stbi_info_from_memory(imageBuffer, w, h, comp)) {
-            throw new IOException("Failed to read image information: " + stbi_failure_reason());
-        }
-        image = stbi_load_from_memory(imageBuffer, w, h, comp, 3);
-        if (image == null) {
-            throw new IOException("Failed to load image: " + stbi_failure_reason());
-        }
-        glTexImage2D(GL_TEXTURE_2D, 0, /*GL_RGB8*/ GL_RGB, w.get(0), h.get(0), 0, GL_RGB,
-                GL_UNSIGNED_BYTE, image);
-        stbi_image_free(image);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        return tex;
+    /**
+     * @deprecated Use {@link #createBuffer(int, float[])} for size check.
+     */
+    public static FloatBuffer createBuffer(float[] data) {
+        return (FloatBuffer) BufferUtils.createFloatBuffer(data.length)
+                .put(data)
+                .flip();
     }
 
-    public static int createVertexArrayBuffer(FloatBuffer data, int usage) {
-        return updateVertexArrayBuffer(glGenBuffers(), data, usage);
+    public static FloatBuffer createBuffer(int size, float[] data) {
+        if (data.length != size) {
+            throw new IllegalArgumentException();
+        }
+        return createBuffer(data);
     }
 
-    public static int updateVertexArrayBuffer(int buffer, FloatBuffer data, int usage) {
-        glBindBuffer(GL_ARRAY_BUFFER, buffer);
-        glBufferData(GL_ARRAY_BUFFER, data, usage);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        return buffer;
+    /**
+     * @deprecated Use {@link #createBuffer(int, int[])} for size check.
+     */
+    public static IntBuffer createBuffer(int[] data) {
+        return (IntBuffer) BufferUtils.createIntBuffer(data.length)
+                .put(data)
+                .flip();
+    }
+
+    public static IntBuffer createBuffer(int size, int[] data) {
+        if (data.length != size) {
+            throw new IllegalArgumentException();
+        }
+        //noinspection deprecation
+        return createBuffer(data);
     }
 
     public static int createProgram(String vertexShaderResource, String fragmentShaderResource)
@@ -69,14 +65,14 @@ public class GlUtils {
             System.err.println(programInfoLog);
         }
         if (linked == 0) {
-            throw new AssertionError("Could not link program");
+            throw new AssertionError("Failed to link program");
         }
         return program;
     }
 
-    public static int createShader(String resource, int type) throws IOException {
+    private static int createShader(String resource, int type) throws IOException {
         int shader = glCreateShader(type);
-        ByteBuffer source = ioResourceToByteBuffer(resource, 1024);
+        ByteBuffer source = IoUtils.getResourceAsByteBuffer(resource, 1024);
         PointerBuffer strings = BufferUtils.createPointerBuffer(1);
         IntBuffer lengths = BufferUtils.createIntBuffer(1);
         strings.put(0, source);
@@ -89,9 +85,59 @@ public class GlUtils {
             System.err.println(shaderLog);
         }
         if (compiled == 0) {
-            throw new AssertionError("Could not compile shader");
+            throw new AssertionError("Failed to compile shader");
         }
         return shader;
+    }
+
+    public static int createTexture(String resource) throws IOException {
+        int texture = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        ByteBuffer imageBuffer;
+        IntBuffer widthBuffer = BufferUtils.createIntBuffer(1);
+        IntBuffer heightBuffer = BufferUtils.createIntBuffer(1);
+        IntBuffer componentCountBuffer = BufferUtils.createIntBuffer(1);
+        imageBuffer = IoUtils.getResourceAsByteBuffer(resource, 16 * 1024);
+        if (!stbi_info_from_memory(imageBuffer, widthBuffer, heightBuffer, componentCountBuffer)) {
+            throw new IOException("Failed to read image information: " + stbi_failure_reason());
+        }
+        ByteBuffer pixelBuffer = stbi_load_from_memory(imageBuffer, widthBuffer, heightBuffer,
+                componentCountBuffer, 4);
+        if (pixelBuffer == null) {
+            throw new IOException("Failed to load image: " + stbi_failure_reason());
+        }
+        try {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, widthBuffer.get(0), heightBuffer.get(0), 0,
+                    GL_RGBA, GL_UNSIGNED_BYTE, pixelBuffer);
+        } finally {
+            stbi_image_free(pixelBuffer);
+        }
+        glBindTexture(GL_TEXTURE_2D, 0);
+        return texture;
+    }
+
+    public static int createVertexArrayBuffer(FloatBuffer data, int usage) {
+        return updateVertexArrayBuffer(glGenBuffers(), data, usage);
+    }
+
+    public static int updateVertexArrayBuffer(int buffer, FloatBuffer data, int usage) {
+        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+        glBufferData(GL_ARRAY_BUFFER, data, usage);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        return buffer;
+    }
+
+    public static int createVertexArrayIndexBuffer(IntBuffer data, int usage) {
+        return updateVertexArrayIndexBuffer(glGenBuffers(), data, usage);
+    }
+
+    public static int updateVertexArrayIndexBuffer(int buffer, IntBuffer data, int usage) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, data, usage);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        return buffer;
     }
 
     public static int getUniformLocation(int program, CharSequence name) {
@@ -108,5 +154,14 @@ public class GlUtils {
             throw new AssertionError("Uniform not found: " + name);
         }
         return location;
+    }
+
+    public static void vertexAttribPointer(int index, int size, int stride, int offset) {
+        glVertexAttribPointer(index, size, GL_FLOAT, false, stride * Float.BYTES,
+                offset * Float.BYTES);
+    }
+
+    public static void vertexAttribPointer(int index, int size) {
+        vertexAttribPointer(index, size, 0, 0);
     }
 }

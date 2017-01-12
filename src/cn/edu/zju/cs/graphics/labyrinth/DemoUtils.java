@@ -20,6 +20,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 
+import cn.edu.zju.cs.graphics.labyrinth.util.IoUtils;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.joml.Vector3f;
@@ -119,59 +120,6 @@ public class DemoUtils {
 		return createShader(resource, type, null);
 	}
 
-	private static ByteBuffer resizeBuffer(ByteBuffer buffer, int newCapacity) {
-		ByteBuffer newBuffer = BufferUtils.createByteBuffer(newCapacity);
-		buffer.flip();
-		newBuffer.put(buffer);
-		return newBuffer;
-	}
-
-	/**
-	 * Reads the specified resource and returns the raw data as a ByteBuffer.
-	 *
-	 * @param resource   the resource to read
-	 * @param bufferSize the initial buffer size
-	 *
-	 * @return the resource data
-	 *
-	 * @throws IOException if an IO error occurs
-	 */
-    public static ByteBuffer ioResourceToByteBuffer(String resource, int bufferSize) throws IOException {
-        ByteBuffer buffer;
-        URL url = Thread.currentThread().getContextClassLoader().getResource(resource);
-        File file = new File(url.getFile());
-        if (file.isFile()) {
-            FileInputStream fis = new FileInputStream(file);
-            FileChannel fc = fis.getChannel();
-            buffer = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
-            fc.close();
-            fis.close();
-        } else {
-            buffer = BufferUtils.createByteBuffer(bufferSize);
-            InputStream source = url.openStream();
-            if (source == null)
-                throw new FileNotFoundException(resource);
-            try {
-                ReadableByteChannel rbc = Channels.newChannel(source);
-                try {
-                    while (true) {
-                        int bytes = rbc.read(buffer);
-                        if (bytes == -1)
-                            break;
-                        if (buffer.remaining() == 0)
-                            buffer = resizeBuffer(buffer, buffer.capacity() * 2);
-                    }
-                    buffer.flip();
-                } finally {
-                    rbc.close();
-                }
-            } finally {
-                source.close();
-            }
-        }
-        return buffer;
-    }
-
 	/**
 	 * Create a shader object from the given classpath resource.
 	 *
@@ -189,7 +137,7 @@ public class DemoUtils {
 	public static int createShader(String resource, int type, String version) throws IOException {
 		int shader = glCreateShader(type);
 
-		ByteBuffer source = ioResourceToByteBuffer(resource, 8192);
+		ByteBuffer source = IoUtils.getResourceAsByteBuffer(resource, 8192);
 
 		if ( version == null ) {
 			PointerBuffer strings = BufferUtils.createPointerBuffer(1);
