@@ -12,12 +12,13 @@ import static org.lwjgl.opengles.GLES20.*;
 
 public class RectangleRenderer {
 
-    private final FloatBuffer mVertexArrayBufferData = GlUtils.createBuffer(4 * 4, new float[] {
-            0.5f, 0.5f, 1f, 1f,
-            -0.5f, 0.5f, 0f, 1f,
-            -0.5f, -0.5f, 0f, 0f,
-            0.5f, -0.5f, 1f, 0f
-    });
+    private final FloatBuffer mVertexArrayBufferData = GlUtils.createBuffer(4 * (2 + 2),
+            new float[] {
+                    0.5f, 0.5f, 1f, 1f,
+                    -0.5f, 0.5f, 0f, 1f,
+                    -0.5f, -0.5f, 0f, 0f,
+                    0.5f, -0.5f, 1f, 0f
+            });
     private final IntBuffer mElementArrayBufferData = GlUtils.createBuffer(2 * 3, new int[] {
             0, 1, 2,
             0, 2, 3
@@ -44,10 +45,10 @@ public class RectangleRenderer {
                 GL_STATIC_DRAW);
     }
 
-    public void render(Matrix4f viewProjectionMatrix, Matrix4f modelMatrix, Matrix3f textureMatrix,
+    public void render(Matrix4f modelMatrix, Matrix4f viewProjectionMatrix, Matrix3f textureMatrix,
                        int texture) {
         mGenericRenderer.render(mVertexArrayBuffer, 2, mElementArrayBuffer,
-                mElementArrayBufferData.remaining(), viewProjectionMatrix, modelMatrix,
+                mElementArrayBufferData.remaining(), modelMatrix, viewProjectionMatrix,
                 textureMatrix, texture);
     }
 }

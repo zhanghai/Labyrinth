@@ -143,20 +143,21 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
         PrototypeRenderers.initialize();
 
         mLabyrinth = new Labyrinth()
-                .addEntity(new Hole(Wall.DEFAULT_THICKNESS + Hole.RADIUS,
-                        LABYRINTH_LENGTH - (Wall.DEFAULT_THICKNESS + Hole.RADIUS)))
-                .addEntity(new FinishHole(LABYRINTH_WIDTH - (Wall.DEFAULT_THICKNESS + Hole.RADIUS),
-                        Wall.DEFAULT_THICKNESS + Hole.RADIUS))
-                .addEntity(new Wall(LABYRINTH_WIDTH, Wall.DEFAULT_THICKNESS, LABYRINTH_WIDTH / 2d,
-                        Wall.DEFAULT_THICKNESS / 2))
-                .addEntity(new Wall(Wall.DEFAULT_THICKNESS, LABYRINTH_LENGTH,
-                        LABYRINTH_WIDTH - Wall.DEFAULT_THICKNESS / 2, LABYRINTH_LENGTH / 2d))
-                .addEntity(new Wall(LABYRINTH_WIDTH, Wall.DEFAULT_THICKNESS, LABYRINTH_WIDTH / 2d,
-                        LABYRINTH_LENGTH - Wall.DEFAULT_THICKNESS / 2))
-                .addEntity(new Wall(Wall.DEFAULT_THICKNESS, LABYRINTH_LENGTH,
-                        Wall.DEFAULT_THICKNESS / 2, LABYRINTH_LENGTH / 2d))
-                //.addEntity(new Magnet(WIDTH / 2d, Wall.DEFAULT_THICKNESS))
-                .addEntity(new Ball(Wall.DEFAULT_THICKNESS + Ball.RADIUS, Wall.DEFAULT_THICKNESS
+                .addEntity(new Hole(Wall.THICKNESS_DEFAULT + Hole.RADIUS,
+                        LABYRINTH_LENGTH - (Wall.THICKNESS_DEFAULT + Hole.RADIUS)))
+                .addEntity(new FinishHole(LABYRINTH_WIDTH - (Wall.THICKNESS_DEFAULT + Hole.RADIUS),
+                        Wall.THICKNESS_DEFAULT + Hole.RADIUS))
+                .addEntity(new Wall(LABYRINTH_WIDTH, Wall.THICKNESS_DEFAULT, LABYRINTH_WIDTH / 2d,
+                        Wall.THICKNESS_DEFAULT / 2, PrototypeRenderers.WALL))
+                .addEntity(new Wall(Wall.THICKNESS_DEFAULT, LABYRINTH_LENGTH,
+                        LABYRINTH_WIDTH - Wall.THICKNESS_DEFAULT / 2, LABYRINTH_LENGTH / 2d,
+                        PrototypeRenderers.WALL))
+                .addEntity(new Wall(LABYRINTH_WIDTH, Wall.THICKNESS_DEFAULT, LABYRINTH_WIDTH / 2d,
+                        LABYRINTH_LENGTH - Wall.THICKNESS_DEFAULT / 2, PrototypeRenderers.WALL))
+                .addEntity(new Wall(Wall.THICKNESS_DEFAULT, LABYRINTH_LENGTH,
+                        Wall.THICKNESS_DEFAULT / 2, LABYRINTH_LENGTH / 2d, PrototypeRenderers.WALL))
+                //.addEntity(new Magnet(WIDTH / 2d, Wall.THICKNESS_DEFAULT))
+                .addEntity(new Ball(Wall.THICKNESS_DEFAULT + Ball.RADIUS, Wall.THICKNESS_DEFAULT
                         + Ball.RADIUS))
                 .setListener(this);
     }
@@ -187,8 +188,8 @@ public class LabyrinthPrototypeApplication implements Labyrinth.Listener {
         if (hole instanceof Hole) {
             // TODO: Die.
             ball
-                    .setPositionX(Wall.DEFAULT_THICKNESS + Ball.RADIUS)
-                    .setPositionY(Wall.DEFAULT_THICKNESS + Ball.RADIUS);
+                    .setPositionX(Wall.THICKNESS_DEFAULT + Ball.RADIUS)
+                    .setPositionY(Wall.THICKNESS_DEFAULT + Ball.RADIUS);
             mLabyrinth.setRotationX(0).setRotationY(0);
         } else if (hole instanceof FinishHole) {
             // TODO: Victory.

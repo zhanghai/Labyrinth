@@ -182,28 +182,28 @@ public class PrototypeRenderers {
 
     public static final Renderer<Ball> BALL = new Renderer<Ball>() {
         @Override
-        public void render(Ball ball) {
+        public void render(Ball ball, Matrix4f ViewProjectionMatrix) {
             renderPrototype(sBallVertexBuffer, getModelMatrixBuffer(ball), sBallColorBuffer);
         }
     };
 
     public static final Renderer<Wall> WALL = new Renderer<Wall>() {
         @Override
-        public void render(Wall wall) {
+        public void render(Wall wall, Matrix4f ViewProjectionMatrix) {
             renderPrototype(sWallVertexBuffer, getModelMatrixBufferForWall(wall), sWallColorBuffer);
         }
     };
 
     public static final Renderer<Hole> HOLE = new Renderer<Hole>() {
         @Override
-        public void render(Hole hole) {
+        public void render(Hole hole, Matrix4f ViewProjectionMatrix) {
             renderPrototype(sBaseHoleVertexBuffer, getModelMatrixBuffer(hole), sHoleColorBuffer);
         }
     };
 
     public static final Renderer<FinishHole> FINISH_HOLE = new Renderer<FinishHole>() {
         @Override
-        public void render(FinishHole finishHole) {
+        public void render(FinishHole finishHole, Matrix4f ViewProjectionMatrix) {
             renderPrototype(sBaseHoleVertexBuffer, getModelMatrixBuffer(finishHole),
                     sFinishHoleColorBuffer);
         }
@@ -211,7 +211,7 @@ public class PrototypeRenderers {
 
     public static final Renderer<Magnet> MAGNET = new Renderer<Magnet>() {
         @Override
-        public void render(Magnet magnet) {
+        public void render(Magnet magnet, Matrix4f ViewProjectionMatrix) {
             renderPrototype(sMagnetVertexBuffer, getModelMatrixBuffer(magnet), sMagnetColorBuffer);
         }
     };

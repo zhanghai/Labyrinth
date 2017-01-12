@@ -3,8 +3,7 @@ package cn.edu.zju.cs.graphics.labyrinth.model;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.Renderable;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.Renderer;
 import org.dyn4j.dynamics.Body;
-import org.dyn4j.dynamics.Force;
-import org.dyn4j.geometry.Vector2;
+import org.joml.Matrix4f;
 
 public abstract class Entity<EntityType extends Entity<EntityType>> implements Renderable {
 
@@ -61,8 +60,8 @@ public abstract class Entity<EntityType extends Entity<EntityType>> implements R
     }
 
     @Override
-    public void render() {
+    public void render(Matrix4f viewProjectionMatrix) {
         //noinspection unchecked
-        mRenderer.render((EntityType) this);
+        mRenderer.render((EntityType) this, viewProjectionMatrix);
     }
 }

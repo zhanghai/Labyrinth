@@ -2,8 +2,8 @@ package cn.edu.zju.cs.graphics.labyrinth.rendering;
 
 import cn.edu.zju.cs.graphics.labyrinth.model.Labyrinth;
 import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
-import cn.edu.zju.cs.graphics.labyrinth.util.Matrices;
 import cn.edu.zju.cs.graphics.labyrinth.util.ResourceUtils;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 import java.io.IOException;
@@ -14,8 +14,12 @@ public class FloorRenderer {
 
     private RectangleRenderer mRectangleRenderer;
     private Matrix4f mModelMatrix = new Matrix4f()
-            .translate(Labyrinth.WIDTH / 2f, Labyrinth.LENGTH / 2f, 0f)
-            .scale(Labyrinth.WIDTH, Labyrinth.LENGTH, 1f);
+            .translate((float) Labyrinth.WIDTH / 2f, (float) Labyrinth.LENGTH / 2f, 0f)
+            .scale((float) Labyrinth.WIDTH, (float) Labyrinth.LENGTH, 1f);
+    private Matrix3f mTextureMatrix = new Matrix3f()
+            // TODO: Correct?
+            .scale((float) Labyrinth.WIDTH / (float) Labyrinth.SIZE,
+                    (float) Labyrinth.LENGTH / (float) Labyrinth.SIZE, 1f);
     private int mTexture;
 
     public static FloorRenderer getInstance() throws IOException {
@@ -31,7 +35,6 @@ public class FloorRenderer {
     }
 
     public void render(Matrix4f viewProjectionMatrix) {
-        mRectangleRenderer.render(viewProjectionMatrix, mModelMatrix, Matrices.IDENTITY_3,
-                mTexture);
+        mRectangleRenderer.render(mModelMatrix, viewProjectionMatrix, mTextureMatrix, mTexture);
     }
 }

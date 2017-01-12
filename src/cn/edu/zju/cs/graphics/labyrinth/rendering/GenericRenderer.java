@@ -53,7 +53,7 @@ public class GenericRenderer {
     }
 
     public void render(int vertexArrayBuffer, int positionSize, int elementArrayBuffer,
-                       int elementCount, Matrix4f viewProjectionMatrix, Matrix4f modelMatrix,
+                       int elementCount, Matrix4f modelMatrix, Matrix4f viewProjectionMatrix,
                        Matrix3f textureMatrix, int texture) {
         glUseProgram(mGenericProgram);
         glBindBuffer(GL_ARRAY_BUFFER, vertexArrayBuffer);
