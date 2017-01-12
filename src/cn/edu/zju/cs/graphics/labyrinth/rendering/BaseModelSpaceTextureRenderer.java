@@ -2,7 +2,6 @@ package cn.edu.zju.cs.graphics.labyrinth.rendering;
 
 import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
 import cn.edu.zju.cs.graphics.labyrinth.util.ResourceUtils;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 
@@ -11,59 +10,43 @@ import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengles.GLES20.*;
 
-public class GenericRenderer {
-
-    private static GenericRenderer sInstance;
+public abstract class BaseModelSpaceTextureRenderer {
 
     private int mProgram;
     private int mPositionAttribute;
-    private int mTextureCoordinateAttribute;
+    private int mTextureSizeUniform;
     private int mModelMatrixUniform;
     private int mViewProjectionMatrixUniform;
-    private int mTextureMatrixUniform;
     private int mTextureUniform;
 
     private FloatBuffer mModelMatrixBuffer = BufferUtils.createFloatBuffer(4 * 4);
     private FloatBuffer mViewProjectionMatrixBuffer = BufferUtils.createFloatBuffer(4 * 4);
-    private FloatBuffer mTextureMatrixBuffer = BufferUtils.createFloatBuffer(3 * 3);
 
-    public static GenericRenderer getInstance() throws IOException {
-        if (sInstance == null) {
-            sInstance = new GenericRenderer();
-        }
-        return sInstance;
-    }
-
-    private GenericRenderer() throws IOException {
-        mProgram = GlUtils.createProgram(ResourceUtils.makeShaderResource("generic.vs"),
+    public BaseModelSpaceTextureRenderer() throws IOException {
+        mProgram = GlUtils.createProgram(ResourceUtils.makeShaderResource(getVertexShaderName()),
                 ResourceUtils.makeShaderResource("generic.fs"));
         mPositionAttribute = GlUtils.getAttribLocation(mProgram, "aPosition");
         glEnableVertexAttribArray(mPositionAttribute);
-        mTextureCoordinateAttribute = GlUtils.getAttribLocation(mProgram,
-                "aTextureCoordinate");
-        glEnableVertexAttribArray(mTextureCoordinateAttribute);
+        mTextureSizeUniform = GlUtils.getUniformLocation(mProgram, "uTextureSize");
         mModelMatrixUniform = GlUtils.getUniformLocation(mProgram, "uModelMatrix");
         mViewProjectionMatrixUniform = GlUtils.getUniformLocation(mProgram,
                 "uViewProjectionMatrix");
-        mTextureMatrixUniform = GlUtils.getUniformLocation(mProgram, "uTextureMatrix");
         mTextureUniform = GlUtils.getUniformLocation(mProgram, "uTexture");
     }
 
+    abstract protected String getVertexShaderName();
+
     public void render(int vertexArrayBuffer, int positionSize, int elementArrayBuffer,
                        int elementCount, Matrix4f modelMatrix, Matrix4f viewProjectionMatrix,
-                       Matrix3f textureMatrix, int texture) {
+                       int texture, float textureWidth, float textureLength) {
         glUseProgram(mProgram);
         glBindBuffer(GL_ARRAY_BUFFER, vertexArrayBuffer);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer);
-        final int TEXTURE_COORDINATE_SIZE = 2;
-        GlUtils.vertexAttribPointer(mPositionAttribute, positionSize,
-                positionSize + TEXTURE_COORDINATE_SIZE, 0);
-        GlUtils.vertexAttribPointer(mTextureCoordinateAttribute, TEXTURE_COORDINATE_SIZE,
-                positionSize + TEXTURE_COORDINATE_SIZE, positionSize);
+        GlUtils.vertexAttribPointer(mPositionAttribute, positionSize);
+        glUniform2f(mTextureSizeUniform, textureWidth, textureLength);
         glUniformMatrix4fv(mModelMatrixUniform, false, modelMatrix.get(mModelMatrixBuffer));
         glUniformMatrix4fv(mViewProjectionMatrixUniform, false,
                 viewProjectionMatrix.get(mViewProjectionMatrixBuffer));
-        glUniformMatrix3fv(mTextureMatrixUniform, false, textureMatrix.get(mTextureMatrixBuffer));
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
         glUniform1i(mTextureUniform, 0);

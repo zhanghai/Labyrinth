@@ -157,4 +157,8 @@ public class GlUtils {
         glVertexAttribPointer(index, size, GL_FLOAT, false, stride * Float.BYTES,
                 offset * Float.BYTES);
     }
+
+    public static void vertexAttribPointer(int index, int size) {
+        vertexAttribPointer(index, size, 0, 0);
+    }
 }
