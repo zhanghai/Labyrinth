@@ -78,7 +78,7 @@ public class Element {
 
     public void setTexture(String texSource, int tex)throws IOException
     {
-        mTexId=GlUtils.createTexture(texSource,8*1024);
+        mTexId=GlUtils.createTexture(texSource);
         int texLocation = glGetUniformLocation(mProgram, "uTex");
         glUniform1i(texLocation, tex);
     }
