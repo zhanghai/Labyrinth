@@ -155,22 +155,23 @@ public class LabyrinthApplication implements Labyrinth.Listener {
         BallRenderer ballRenderer = BallRenderer.getInstance();
         HoleRenderer holeRenderer = HoleRenderer.getInstance();
         FinishHoleRenderer finishHoleRenderer = FinishHoleRenderer.getInstance();
+        double wallThickness = Wall.THICKNESS_DEFAULT / 2;
         mLabyrinth = new Labyrinth()
-                .addEntity(new Hole(Wall.THICKNESS_DEFAULT + Hole.RADIUS,
-                        Labyrinth.LENGTH - (Wall.THICKNESS_DEFAULT + Hole.RADIUS), holeRenderer))
-                .addEntity(new FinishHole(Labyrinth.WIDTH - (Wall.THICKNESS_DEFAULT + Hole.RADIUS),
-                        Wall.THICKNESS_DEFAULT + Hole.RADIUS, finishHoleRenderer))
-                .addEntity(new Wall(Labyrinth.WIDTH, Wall.THICKNESS_DEFAULT, Labyrinth.WIDTH / 2d,
-                        Wall.THICKNESS_DEFAULT / 2, wallRenderer))
-                .addEntity(new Wall(Wall.THICKNESS_DEFAULT, Labyrinth.LENGTH,
-                        Labyrinth.WIDTH - Wall.THICKNESS_DEFAULT / 2, Labyrinth.LENGTH / 2d,
+                .addEntity(new Hole(wallThickness + Hole.RADIUS,
+                        Labyrinth.LENGTH - (wallThickness + Hole.RADIUS), holeRenderer))
+                .addEntity(new FinishHole(Labyrinth.WIDTH - (wallThickness + Hole.RADIUS),
+                        wallThickness + Hole.RADIUS, finishHoleRenderer))
+                .addEntity(new Wall(Labyrinth.WIDTH, wallThickness, Labyrinth.WIDTH / 2d,
+                        wallThickness / 2, wallRenderer))
+                .addEntity(new Wall(wallThickness, Labyrinth.LENGTH,
+                        Labyrinth.WIDTH - wallThickness / 2, Labyrinth.LENGTH / 2d,
                         wallRenderer))
-                .addEntity(new Wall(Labyrinth.WIDTH, Wall.THICKNESS_DEFAULT, Labyrinth.WIDTH / 2d,
-                        Labyrinth.LENGTH - Wall.THICKNESS_DEFAULT / 2, wallRenderer))
-                .addEntity(new Wall(Wall.THICKNESS_DEFAULT, Labyrinth.LENGTH,
-                        Wall.THICKNESS_DEFAULT / 2, Labyrinth.LENGTH / 2d, wallRenderer))
-                //.addEntity(new Magnet(WIDTH / 2d, Wall.THICKNESS_DEFAULT))
-                .addEntity(new Ball(Wall.THICKNESS_DEFAULT + Ball.RADIUS, Wall.THICKNESS_DEFAULT
+                .addEntity(new Wall(Labyrinth.WIDTH, wallThickness, Labyrinth.WIDTH / 2d,
+                        Labyrinth.LENGTH - wallThickness / 2, wallRenderer))
+                .addEntity(new Wall(wallThickness, Labyrinth.LENGTH,
+                        wallThickness / 2, Labyrinth.LENGTH / 2d, wallRenderer))
+                //.addEntity(new Magnet(WIDTH / 2d, wallThickness))
+                .addEntity(new Ball(wallThickness + Ball.RADIUS, wallThickness
                         + Ball.RADIUS, ballRenderer))
                 .setListener(this);
     }
@@ -227,7 +228,7 @@ public class LabyrinthApplication implements Labyrinth.Listener {
 
         mViewMatrix
                 .setLookAt(
-                        (float) Labyrinth.WIDTH / 2f, (float) Labyrinth.LENGTH / 2f, 30f,
+                        (float) Labyrinth.WIDTH / 2f, (float) Labyrinth.LENGTH / 2f, 1f,
                         (float) Labyrinth.WIDTH / 2f, (float) Labyrinth.LENGTH / 2f, 0f,
                         0f, 1f, 0f
                 )
