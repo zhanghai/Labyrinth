@@ -173,15 +173,6 @@ public class LabyrinthApplication implements Labyrinth.Listener {
                         Labyrinth.LENGTH - (wallThickness + Hole.RADIUS)))
                 .addEntity(new FinishHole(Labyrinth.WIDTH - (wallThickness + Hole.RADIUS),
                         wallThickness + Hole.RADIUS))
-                .addEntity(new Wall(Labyrinth.WIDTH, wallThickness, Labyrinth.WIDTH / 2d,
-                        wallThickness / 2))
-                .addEntity(new Wall(wallThickness, Labyrinth.LENGTH,
-                        Labyrinth.WIDTH - wallThickness / 2, Labyrinth.LENGTH / 2d
-                ))
-                .addEntity(new Wall(Labyrinth.WIDTH, wallThickness, Labyrinth.WIDTH / 2d,
-                        Labyrinth.LENGTH - wallThickness / 2))
-                .addEntity(new Wall(wallThickness, Labyrinth.LENGTH,
-                        wallThickness / 2, Labyrinth.LENGTH / 2d))
                 //.addEntity(new Magnet(WIDTH / 2d, wallThickness))
                 .addEntity(new Ball(wallThickness + Ball.RADIUS, wallThickness
                         + Ball.RADIUS))

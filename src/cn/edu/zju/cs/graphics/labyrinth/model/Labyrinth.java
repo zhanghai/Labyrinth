@@ -80,6 +80,17 @@ public class Labyrinth {
     private double mRotationX;
     private double mRotationY;
 
+    public Labyrinth() {
+        addEntity(new Wall(Labyrinth.WIDTH, BaseWall.THICKNESS_THIN, Labyrinth.WIDTH / 2d,
+                BaseWall.THICKNESS_THIN / 2));
+        addEntity(new Wall(BaseWall.THICKNESS_THIN, Labyrinth.LENGTH,
+                Labyrinth.WIDTH - BaseWall.THICKNESS_THIN / 2, Labyrinth.LENGTH / 2d));
+        addEntity(new Wall(Labyrinth.WIDTH, BaseWall.THICKNESS_THIN, Labyrinth.WIDTH / 2d,
+                Labyrinth.LENGTH - BaseWall.THICKNESS_THIN / 2));
+        addEntity(new Wall(BaseWall.THICKNESS_THIN, Labyrinth.LENGTH, BaseWall.THICKNESS_THIN / 2,
+                Labyrinth.LENGTH / 2d));
+    }
+
     public Labyrinth addEntity(Entity entity) {
         mEntities.add(entity);
         mWorld.addBody(entity.getBody());
