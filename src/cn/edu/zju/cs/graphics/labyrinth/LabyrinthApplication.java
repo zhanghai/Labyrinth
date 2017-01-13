@@ -12,6 +12,7 @@ import cn.edu.zju.cs.graphics.labyrinth.rendering.BallRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.FinishHoleRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.FloorRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.HoleRenderer;
+import cn.edu.zju.cs.graphics.labyrinth.rendering.MagnetRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.PrototypeRenderers;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.ShadowMapRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.WallRenderer;
@@ -270,6 +271,11 @@ public class LabyrinthApplication implements Labyrinth.Listener {
         mFloorRenderer.render(mViewProjectionMatrix, mShadowMapRenderer.getLightMatrix(),
                 mShadowMapRenderer.getShadowMap());
         mLabyrinth.render(mViewProjectionMatrix);
+        try {
+            MagnetRenderer.getInstance().render(mViewProjectionMatrix);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         int error = glGetError();
         if (error != GL_NO_ERROR) {

@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import static org.lwjgl.opengles.GLES20.GL_STATIC_DRAW;
-
 public class ModelSpaceTextureCubeRenderer {
 
     private final FloatBuffer mVertexArrayBufferData = GlUtils.createBuffer(6 * 4 * 3,
@@ -89,12 +87,12 @@ public class ModelSpaceTextureCubeRenderer {
         mXyRenderer = ModelXyTextureRenderer.getInstance();
         mCylindricalRenderer = ModelCylindricalTextureRenderer.getInstance();
 
-        mVertexArrayBuffer = GlUtils.createVertexArrayBuffer(mVertexArrayBufferData,
-                GL_STATIC_DRAW);
-        mXyElementArrayBuffer = GlUtils.createVertexArrayIndexBuffer(mXyElementArrayBufferData,
-                GL_STATIC_DRAW);
-        mCylindricalElementArrayBuffer = GlUtils.createVertexArrayIndexBuffer(
-                mCylindricalElementArrayBufferData, GL_STATIC_DRAW);
+        mVertexArrayBuffer = GlUtils.createVertexArrayBuffer(mVertexArrayBufferData
+        );
+        mXyElementArrayBuffer = GlUtils.createElementArrayBuffer(mXyElementArrayBufferData
+        );
+        mCylindricalElementArrayBuffer = GlUtils.createElementArrayBuffer(
+                mCylindricalElementArrayBufferData);
     }
 
     public void render(Matrix4f modelMatrix, Matrix4f viewProjectionMatrix, int topBottomTexture,

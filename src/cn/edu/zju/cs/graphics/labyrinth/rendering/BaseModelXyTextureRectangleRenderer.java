@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import static org.lwjgl.opengles.GLES20.*;
-
 public abstract class BaseModelXyTextureRectangleRenderer {
 
     private final FloatBuffer mVertexArrayBufferData = GlUtils.createBuffer(4 * 2,
@@ -26,10 +24,10 @@ public abstract class BaseModelXyTextureRectangleRenderer {
     private int mElementArrayBuffer;
 
     protected BaseModelXyTextureRectangleRenderer() throws IOException {
-        mVertexArrayBuffer = GlUtils.createVertexArrayBuffer(mVertexArrayBufferData,
-                GL_STATIC_DRAW);
-        mElementArrayBuffer = GlUtils.createVertexArrayIndexBuffer(mElementArrayBufferData,
-                GL_STATIC_DRAW);
+        mVertexArrayBuffer = GlUtils.createVertexArrayBuffer(mVertexArrayBufferData
+        );
+        mElementArrayBuffer = GlUtils.createElementArrayBuffer(mElementArrayBufferData
+        );
     }
 
     public int getVertexArrayBuffer() {

@@ -12,7 +12,6 @@ public abstract class BaseHoleRenderer<HoleType extends BaseHole> implements Ren
 
     private TextureRectangleRenderer mRenderer;
     private Matrix4f mModelMatrix = new Matrix4f();
-    private Matrix3f mTextureMatrix = new Matrix3f();
     private int mTexture;
 
     public BaseHoleRenderer() throws IOException {
@@ -32,6 +31,6 @@ public abstract class BaseHoleRenderer<HoleType extends BaseHole> implements Ren
                 .translate((float) hole.getPositionX(), (float) hole.getPositionY(), GlUtils.BIAS)
                 .scale(textureScale, textureScale, 1f)
                 .scale(2f * (float) BaseHole.RADIUS, 2f * (float) BaseHole.RADIUS, 1f);
-        mRenderer.render(mModelMatrix, viewProjectionMatrix, mTextureMatrix, mTexture);
+        mRenderer.render(mModelMatrix, viewProjectionMatrix, mTexture);
     }
 }

@@ -46,7 +46,7 @@ public class Element {
         mHeight=height;
         mPosX=PosX;
         mPosY=PosY;
-        mButtonVertexBuffer = GlUtils.createVertexArrayBuffer(mButtonVertexBufferData, GL_STATIC_DRAW);
+        mButtonVertexBuffer = GlUtils.createVertexArrayBuffer(mButtonVertexBufferData);
         mProgram=program;
         mPositionAttribute = GlUtils.getAttribLocation(mProgram, "aPosition");
         mModelMatrixUniform = GlUtils.getUniformLocation(mProgram, "uModelMatrix");

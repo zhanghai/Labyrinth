@@ -7,20 +7,12 @@ package cn.edu.zju.cs.graphics.labyrinth;
 import static org.lwjgl.opengles.GLES20.*;
 import static org.lwjgl.system.MemoryUtil.memUTF8;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
 
-import cn.edu.zju.cs.graphics.labyrinth.util.IoUtils;
+import cn.edu.zju.cs.graphics.labyrinth.util.ResourceUtils;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.joml.Vector3f;
@@ -137,7 +129,7 @@ public class DemoUtils {
 	public static int createShader(String resource, int type, String version) throws IOException {
 		int shader = glCreateShader(type);
 
-		ByteBuffer source = IoUtils.getResourceAsByteBuffer(resource, 8192);
+		ByteBuffer source = ResourceUtils.getResourceAsByteBuffer(resource, 8192);
 
 		if ( version == null ) {
 			PointerBuffer strings = BufferUtils.createPointerBuffer(1);

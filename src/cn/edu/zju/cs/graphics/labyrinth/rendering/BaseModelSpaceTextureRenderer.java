@@ -13,7 +13,7 @@ import static org.lwjgl.opengles.GLES20.*;
 public abstract class BaseModelSpaceTextureRenderer {
 
     private int mProgram;
-    private int mPositionAttribute;
+    private int mVertexAttribute;
     private int mTextureSizeUniform;
     private int mModelMatrixUniform;
     private int mViewProjectionMatrixUniform;
@@ -25,8 +25,8 @@ public abstract class BaseModelSpaceTextureRenderer {
     public BaseModelSpaceTextureRenderer() throws IOException {
         mProgram = GlUtils.createProgram(ResourceUtils.makeShaderResource(getVertexShaderName()),
                 ResourceUtils.makeShaderResource(getFragmentShaderName()));
-        mPositionAttribute = GlUtils.getAttribLocation(mProgram, "aPosition");
-        glEnableVertexAttribArray(mPositionAttribute);
+        mVertexAttribute = GlUtils.getAttribLocation(mProgram, "aVertex");
+        glEnableVertexAttribArray(mVertexAttribute);
         mTextureSizeUniform = GlUtils.getUniformLocation(mProgram, "uTextureSize");
         mModelMatrixUniform = GlUtils.getUniformLocation(mProgram, "uModelMatrix");
         mViewProjectionMatrixUniform = GlUtils.getUniformLocation(mProgram,
@@ -49,18 +49,18 @@ public abstract class BaseModelSpaceTextureRenderer {
                        int texture, float textureWidth, float textureLength) {
         glUseProgram(mProgram);
         glBindBuffer(GL_ARRAY_BUFFER, vertexArrayBuffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer);
-        GlUtils.vertexAttribPointer(mPositionAttribute, positionSize);
+        GlUtils.vertexAttribPointer(mVertexAttribute, positionSize);
         glUniform2f(mTextureSizeUniform, textureWidth, textureLength);
         glUniformMatrix4fv(mModelMatrixUniform, false, modelMatrix.get(mModelMatrixBuffer));
         glUniformMatrix4fv(mViewProjectionMatrixUniform, false,
                 viewProjectionMatrix.get(mViewProjectionMatrixBuffer));
         GlUtils.uniformTexture(mTextureUniform, GL_TEXTURE0, texture);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer);
         onDrawElements();
         glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, 0);
         onElementsDrawn();
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
         glUseProgram(0);
     }
 

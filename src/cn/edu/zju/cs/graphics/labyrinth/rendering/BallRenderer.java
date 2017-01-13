@@ -16,7 +16,6 @@ public class BallRenderer implements Renderer<Ball> {
 
     private TextureRectangleRenderer mRenderer;
     private Matrix4f mModelMatrix = new Matrix4f();
-    private Matrix3f mTextureMatrix = new Matrix3f();
     private int mTexture;
 
     public static BallRenderer getInstance() throws IOException {
@@ -38,6 +37,6 @@ public class BallRenderer implements Renderer<Ball> {
                         (float) Ball.RADIUS)
                 .scale(TEXTURE_SCALE, TEXTURE_SCALE, 1f)
                 .scale(2f * (float) Ball.RADIUS, 2f * (float) Ball.RADIUS, 1f);
-        mRenderer.render(mModelMatrix, viewProjectionMatrix, mTextureMatrix, mTexture);
+        mRenderer.render(mModelMatrix, viewProjectionMatrix, mTexture);
     }
 }

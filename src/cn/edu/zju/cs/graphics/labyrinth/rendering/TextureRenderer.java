@@ -15,7 +15,7 @@ public class TextureRenderer {
     private static TextureRenderer sInstance;
 
     private int mProgram;
-    private int mPositionAttribute;
+    private int mVertexAttribute;
     private int mTextureCoordinateAttribute;
     private int mModelMatrixUniform;
     private int mViewProjectionMatrixUniform;
@@ -34,8 +34,8 @@ public class TextureRenderer {
     private TextureRenderer() throws IOException {
         mProgram = GlUtils.createProgram(ResourceUtils.makeShaderResource("generic.vs"),
                 ResourceUtils.makeShaderResource("generic.fs"));
-        mPositionAttribute = GlUtils.getAttribLocation(mProgram, "aPosition");
-        glEnableVertexAttribArray(mPositionAttribute);
+        mVertexAttribute = GlUtils.getAttribLocation(mProgram, "aVertex");
+        glEnableVertexAttribArray(mVertexAttribute);
         mTextureCoordinateAttribute = GlUtils.getAttribLocation(mProgram,
                 "aTextureCoordinate");
         glEnableVertexAttribArray(mTextureCoordinateAttribute);
@@ -50,9 +50,8 @@ public class TextureRenderer {
                        int texture) {
         glUseProgram(mProgram);
         glBindBuffer(GL_ARRAY_BUFFER, vertexArrayBuffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer);
         final int TEXTURE_COORDINATE_SIZE = 2;
-        GlUtils.vertexAttribPointer(mPositionAttribute, positionSize,
+        GlUtils.vertexAttribPointer(mVertexAttribute, positionSize,
                 positionSize + TEXTURE_COORDINATE_SIZE, 0);
         GlUtils.vertexAttribPointer(mTextureCoordinateAttribute, TEXTURE_COORDINATE_SIZE,
                 positionSize + TEXTURE_COORDINATE_SIZE, positionSize);
@@ -60,9 +59,10 @@ public class TextureRenderer {
         glUniformMatrix4fv(mViewProjectionMatrixUniform, false,
                 viewProjectionMatrix.get(mViewProjectionMatrixBuffer));
         GlUtils.uniformTexture(mTextureUniform, GL_TEXTURE0, texture);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer);
         glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, 0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
         glUseProgram(0);
     }
 }

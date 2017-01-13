@@ -18,8 +18,8 @@ import static org.lwjgl.opengles.GLES20.*;
 
 public class PrototypeRenderers {
 
-    private static int sPrototypeProgram;
-    private static int sPositionAttribute;
+    private static int sProgram;
+    private static int sVertexAttribute;
     private static Matrix4f sModelMatrix = new Matrix4f();
     private static int sModelMatrixUniform;
     private static FloatBuffer sModelMatrixBuffer = BufferUtils.createFloatBuffer(16);
@@ -122,24 +122,24 @@ public class PrototypeRenderers {
 
     public static void initialize() throws IOException {
 
-        sPrototypeProgram = GlUtils.createProgram(ResourceUtils.makeShaderResource("prototype.vs"),
+        sProgram = GlUtils.createProgram(ResourceUtils.makeShaderResource("prototype.vs"),
                 ResourceUtils.makeShaderResource("prototype.fs"));
-        sPositionAttribute = GlUtils.getAttribLocation(sPrototypeProgram, "aPosition");
-        sModelMatrixUniform = GlUtils.getUniformLocation(sPrototypeProgram, "uModelMatrix");
-        sViewProjectionMatrixUniform = GlUtils.getUniformLocation(sPrototypeProgram,
+        sVertexAttribute = GlUtils.getAttribLocation(sProgram, "aVertex");
+        sModelMatrixUniform = GlUtils.getUniformLocation(sProgram, "uModelMatrix");
+        sViewProjectionMatrixUniform = GlUtils.getUniformLocation(sProgram,
                 "uViewProjectionMatrix");
-        sColorUniform = GlUtils.getUniformLocation(sPrototypeProgram, "uColor");
+        sColorUniform = GlUtils.getUniformLocation(sProgram, "uColor");
 
-        sBallVertexBuffer = GlUtils.createVertexArrayBuffer(sBallVertexBufferData, GL_STATIC_DRAW);
-        sWallVertexBuffer = GlUtils.createVertexArrayBuffer(sWallVertexBufferData, GL_STATIC_DRAW);
-        sBaseHoleVertexBuffer = GlUtils.createVertexArrayBuffer(sBaseHoleVertexBufferData,
-                GL_STATIC_DRAW);
-        sMagnetVertexBuffer = GlUtils.createVertexArrayBuffer(sMagnetVertexBufferData,
-                GL_STATIC_DRAW);
+        sBallVertexBuffer = GlUtils.createVertexArrayBuffer(sBallVertexBufferData);
+        sWallVertexBuffer = GlUtils.createVertexArrayBuffer(sWallVertexBufferData);
+        sBaseHoleVertexBuffer = GlUtils.createVertexArrayBuffer(sBaseHoleVertexBufferData
+        );
+        sMagnetVertexBuffer = GlUtils.createVertexArrayBuffer(sMagnetVertexBufferData
+        );
     }
 
     public static void setViewProjectionMatrix(Matrix4f viewProjectionMatrix) {
-        glUseProgram(sPrototypeProgram);
+        glUseProgram(sProgram);
         glUniformMatrix4fv(sViewProjectionMatrixUniform, false,
                 viewProjectionMatrix.get(sViewProjectionMatrixBuffer));
         glUseProgram(0);
@@ -168,14 +168,14 @@ public class PrototypeRenderers {
 
     private static void renderPrototype(int vertexBuffer, FloatBuffer modelMatrixBuffer,
                                         FloatBuffer colorBuffer) {
-        glUseProgram(sPrototypeProgram);
+        glUseProgram(sProgram);
         glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-        glEnableVertexAttribArray(sPositionAttribute);
-        glVertexAttribPointer(sPositionAttribute, 2, GL_FLOAT, false, 0, 0L);
+        glEnableVertexAttribArray(sVertexAttribute);
+        glVertexAttribPointer(sVertexAttribute, 2, GL_FLOAT, false, 0, 0L);
         glUniformMatrix4fv(sModelMatrixUniform, false, modelMatrixBuffer);
         glUniform4fv(sColorUniform, colorBuffer);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        glDisableVertexAttribArray(sPositionAttribute);
+        glDisableVertexAttribArray(sVertexAttribute);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glUseProgram(0);
     }

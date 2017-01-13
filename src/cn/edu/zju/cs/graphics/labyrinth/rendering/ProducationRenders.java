@@ -5,7 +5,7 @@ import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
 import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
-import cn.edu.zju.cs.graphics.labyrinth.util.IoUtils;
+import cn.edu.zju.cs.graphics.labyrinth.util.ResourceUtils;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import static org.lwjgl.stb.STBImage.*;
@@ -18,7 +18,7 @@ import static org.lwjgl.opengles.GLES20.*;
 public class ProducationRenders {
 
     private static int sPrototypeProgram1, sPrototypeProgram2;
-    private static int sPositionAttribute, sPositionAttribute2;
+    private static int sVertexAttribute, sPositionAttribute2;
     private static Matrix4f sModelMatrix = new Matrix4f();
     private static int sModelMatrixUniform, sModelMatrixUniform2;
     private static FloatBuffer sModelMatrixBuffer = BufferUtils.createFloatBuffer(16);
@@ -178,9 +178,9 @@ public class ProducationRenders {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D,2);
         glUniform1i(sTex2,2);
-        sPositionAttribute = GlUtils.getAttribLocation(sPrototypeProgram1, "aPosition");
+        sVertexAttribute = GlUtils.getAttribLocation(sPrototypeProgram1, "aVertex");
         sModelMatrixUniform = GlUtils.getUniformLocation(sPrototypeProgram1, "uModelMatrix");
-        sPositionAttribute2 = GlUtils.getAttribLocation(sPrototypeProgram2, "aPosition");
+        sPositionAttribute2 = GlUtils.getAttribLocation(sPrototypeProgram2, "aVertex");
         sModelMatrixUniform2 = GlUtils.getUniformLocation(sPrototypeProgram2, "uModelMatrix");
         sViewProjectionMatrixUniform = GlUtils.getUniformLocation(sPrototypeProgram1,
                 "uViewProjectionMatrix");
@@ -197,7 +197,7 @@ public class ProducationRenders {
 
 
         setViewProjectionMatrix(new Matrix4f());
-        sBallVertexBuffer = GlUtils.createVertexArrayBuffer(sBallVertexBufferData, GL_STATIC_DRAW);
+        sBallVertexBuffer = GlUtils.createVertexArrayBuffer(sBallVertexBufferData);
 
     }
 
@@ -247,11 +247,11 @@ public class ProducationRenders {
         glBindTexture(GL_TEXTURE_2D,1);
         glUniform1i(sTex1,0);
         glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-        glEnableVertexAttribArray(sPositionAttribute);
-        glVertexAttribPointer(sPositionAttribute, 2, GL_FLOAT, false, 0, 0L);
+        glEnableVertexAttribArray(sVertexAttribute);
+        glVertexAttribPointer(sVertexAttribute, 2, GL_FLOAT, false, 0, 0L);
         glUniformMatrix4fv(sModelMatrixUniform, false, modelMatrixBuffer);
         glDrawArrays(way, 0, points);
-        glDisableVertexAttribArray(sPositionAttribute);
+        glDisableVertexAttribArray(sVertexAttribute);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glUseProgram(0);
     }
@@ -276,7 +276,7 @@ public class ProducationRenders {
             glUniform1i(sTex2,1);
             glBindBuffer(GL_ARRAY_BUFFER,sWallVertexBuffer);
             glEnableVertexAttribArray(sPositionAttribute2);
-            glVertexAttribPointer(sPositionAttribute,3,GL_FLOAT,false,0,0L);
+            glVertexAttribPointer(sVertexAttribute,3,GL_FLOAT,false,0,0L);
             glUniformMatrix4fv(sModelMatrixUniform2,false,getModelMatrixBuffer(wall));
             glDrawArrays(GL_TRIANGLES,0,12*9);
             //glDrawElements(GL_TRIANGLES,sWallIndexBuffer);
@@ -297,7 +297,7 @@ public class ProducationRenders {
         IntBuffer h = BufferUtils.createIntBuffer(1);
         IntBuffer comp = BufferUtils.createIntBuffer(1);
         ByteBuffer image;
-        imageBuffer = IoUtils.getResourceAsByteBuffer("cn/edu/zju/cs/graphics/labyrinth/texture/ball.png", 1024 * 8);
+        imageBuffer = ResourceUtils.getResourceAsByteBuffer("cn/edu/zju/cs/graphics/labyrinth/texture/ball.png", 1024 * 8);
         image = stbi_load_from_memory(imageBuffer,w,h,comp,3);
         glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,w.get(0),h.get(0),0,GL_RGB,GL_UNSIGNED_BYTE,image);
         stbi_image_free(image);
@@ -313,7 +313,7 @@ public class ProducationRenders {
         IntBuffer h = BufferUtils.createIntBuffer(1);
         IntBuffer comp = BufferUtils.createIntBuffer(1);
         ByteBuffer image;
-        imageBuffer = IoUtils.getResourceAsByteBuffer("cn/edu/zju/cs/graphics/labyrinth/texture/ball_tmp.jpg", 1024 * 8);
+        imageBuffer = ResourceUtils.getResourceAsByteBuffer("cn/edu/zju/cs/graphics/labyrinth/texture/ball_tmp.jpg", 1024 * 8);
         image = stbi_load_from_memory(imageBuffer,w,h,comp,3);
         glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,w.get(0),h.get(0),0,GL_RGB,GL_UNSIGNED_BYTE,image);
         stbi_image_free(image);
