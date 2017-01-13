@@ -3,12 +3,11 @@ package cn.edu.zju.cs.graphics.labyrinth.rendering;
 import cn.edu.zju.cs.graphics.labyrinth.model.BaseHole;
 import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
 import cn.edu.zju.cs.graphics.labyrinth.util.ResourceUtils;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 import java.io.IOException;
 
-public abstract class BaseHoleRenderer<HoleType extends BaseHole> implements Renderer<HoleType> {
+public abstract class BaseHoleRenderer<HoleType extends BaseHole> {
 
     private TextureRectangleRenderer mRenderer;
     private Matrix4f mModelMatrix = new Matrix4f();

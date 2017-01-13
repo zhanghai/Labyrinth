@@ -1,12 +1,10 @@
 package cn.edu.zju.cs.graphics.labyrinth.model;
 
 import cn.edu.zju.cs.graphics.labyrinth.dynamics.Bodies;
-import cn.edu.zju.cs.graphics.labyrinth.rendering.Renderer;
-import cn.edu.zju.cs.graphics.labyrinth.rendering.Renderers;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.geometry.Vector2;
 
-public class Ball extends Entity<Ball> {
+public class Ball extends Entity {
 
     // Smaller to fall in the hole easier; holes have the diameter of 1.
     public static final double RADIUS = 12d;
@@ -14,8 +12,8 @@ public class Ball extends Entity<Ball> {
     public static final double RESTITUTION = 0.5;
     public static final double LINEAR_DAMPING = 0.5;
 
-    public Ball(double positionX, double positionY, Renderer<Ball> renderer) {
-        super(Bodies.newBall(positionX, positionY), renderer);
+    public Ball(double positionX, double positionY) {
+        super(Bodies.newBall(positionX, positionY));
     }
 
     public double getMass() {

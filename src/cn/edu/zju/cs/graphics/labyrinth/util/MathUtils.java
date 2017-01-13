@@ -10,7 +10,7 @@ public class MathUtils {
         return Math.atan2(toY - fromY, toX - fromX);
     }
 
-    public static double direction(Entity<?> from, Entity<?> to) {
+    public static double direction(Entity from, Entity to) {
         return direction(from.getPositionX(), from.getPositionY(), to.getPositionX(),
                 to.getPositionY());
     }
@@ -19,7 +19,7 @@ public class MathUtils {
         return square(toX - fromX) + square(toY - fromY);
     }
 
-    public static double distanceSquared(Entity<?> from, Entity<?> to) {
+    public static double distanceSquared(Entity from, Entity to) {
         return distanceSquared(from.getPositionX(), from.getPositionY(), to.getPositionX(),
                 to.getPositionY());
     }
@@ -28,7 +28,7 @@ public class MathUtils {
         return Math.sqrt(distanceSquared(fromX, fromY, toX, toY));
     }
 
-    public static double distance(Entity<?> from, Entity<?> to) {
+    public static double distance(Entity from, Entity to) {
         return distance(from.getPositionX(), from.getPositionY(), to.getPositionX(),
                 to.getPositionY());
     }

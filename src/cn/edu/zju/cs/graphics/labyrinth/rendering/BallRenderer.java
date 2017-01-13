@@ -3,12 +3,11 @@ package cn.edu.zju.cs.graphics.labyrinth.rendering;
 import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
 import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
 import cn.edu.zju.cs.graphics.labyrinth.util.ResourceUtils;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 import java.io.IOException;
 
-public class BallRenderer implements Renderer<Ball> {
+public class BallRenderer {
 
     private static final float TEXTURE_SCALE = 120f / 102f;
 

@@ -1,10 +1,11 @@
 package cn.edu.zju.cs.graphics.labyrinth.rendering;
 
-import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
 import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
 import cn.edu.zju.cs.graphics.labyrinth.model.Labyrinth;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 import org.joml.Matrix4f;
+
+import java.io.IOException;
 
 import static org.lwjgl.opengles.GLES20.*;
 import static org.lwjgl.opengles.GLES30.glDrawBuffers;
@@ -21,14 +22,16 @@ public class ShadowMapRenderer {
     private int mFrameBuffer;
     private Matrix4f mLightMatrix;
 
-    public static ShadowMapRenderer getInstance() {
+    private WallRenderer mWallRenderer;
+
+    public static ShadowMapRenderer getInstance() throws IOException {
         if (sInstance == null) {
             sInstance = new ShadowMapRenderer();
         }
         return sInstance;
     }
 
-    private ShadowMapRenderer() {
+    private ShadowMapRenderer() throws IOException {
 
         // TODO: Refactor after it works.
         Matrix4f viewMatrix = new Matrix4f()
@@ -60,6 +63,8 @@ public class ShadowMapRenderer {
         glDrawBuffers(GL_NONE);
         glReadBuffer(GL_NONE);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        mWallRenderer = WallRenderer.getInstance();
     }
 
     public Matrix4f getLightMatrix() {
@@ -74,9 +79,9 @@ public class ShadowMapRenderer {
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_LENGTH);
         glBindFramebuffer(GL_FRAMEBUFFER, mFrameBuffer);
         glClear(GL_DEPTH_BUFFER_BIT);
-        for (Entity<?> entity : labyrinth.getEntities()) {
-            if (entity instanceof Wall || entity instanceof Ball) {
-                entity.render(mLightMatrix);
+        for (Entity entity : labyrinth.getEntities()) {
+            if (entity instanceof Wall) {
+                mWallRenderer.render((Wall) entity, mLightMatrix);
             }
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

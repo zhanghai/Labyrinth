@@ -12,8 +12,8 @@ import cn.edu.zju.cs.graphics.labyrinth.rendering.BallRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.FinishHoleRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.FloorRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.HoleRenderer;
+import cn.edu.zju.cs.graphics.labyrinth.rendering.LabyrinthRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.MagnetRenderer;
-import cn.edu.zju.cs.graphics.labyrinth.rendering.PrototypeRenderers;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.ShadowMapRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.WallRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.util.MatrixUtils;
@@ -51,7 +51,8 @@ public class LabyrinthApplication implements Labyrinth.Listener {
     private Matrix4f mViewProjectionMatrix = new Matrix4f();
 
     private ShadowMapRenderer mShadowMapRenderer;
-    private FloorRenderer mFloorRenderer;
+    private LabyrinthRenderer mLabyrinthRenderer;
+
     private Labyrinth mLabyrinth;
 
     private GLFWFramebufferSizeCallback mFramebufferSizeCallback;
@@ -159,35 +160,31 @@ public class LabyrinthApplication implements Labyrinth.Listener {
         glClearColor(1f, 1f, 1f, 1f);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        PrototypeRenderers.initialize();
 
         System.out.println("GL_VERSION: " + glGetString(GL_VERSION));
         System.out.println("GL_MAX_TEXTURE_SIZE: " + glGetInteger(GL_MAX_TEXTURE_SIZE));
 
         mShadowMapRenderer = ShadowMapRenderer.getInstance();
-        mFloorRenderer = FloorRenderer.getInstance();
-        WallRenderer wallRenderer = WallRenderer.getInstance();
-        BallRenderer ballRenderer = BallRenderer.getInstance();
-        HoleRenderer holeRenderer = HoleRenderer.getInstance();
-        FinishHoleRenderer finishHoleRenderer = FinishHoleRenderer.getInstance();
+        mLabyrinthRenderer = LabyrinthRenderer.getInstance();
+
         double wallThickness = Wall.THICKNESS_DEFAULT / 2;
         mLabyrinth = new Labyrinth()
                 .addEntity(new Hole(wallThickness + Hole.RADIUS,
-                        Labyrinth.LENGTH - (wallThickness + Hole.RADIUS), holeRenderer))
+                        Labyrinth.LENGTH - (wallThickness + Hole.RADIUS)))
                 .addEntity(new FinishHole(Labyrinth.WIDTH - (wallThickness + Hole.RADIUS),
-                        wallThickness + Hole.RADIUS, finishHoleRenderer))
+                        wallThickness + Hole.RADIUS))
                 .addEntity(new Wall(Labyrinth.WIDTH, wallThickness, Labyrinth.WIDTH / 2d,
-                        wallThickness / 2, wallRenderer))
+                        wallThickness / 2))
                 .addEntity(new Wall(wallThickness, Labyrinth.LENGTH,
-                        Labyrinth.WIDTH - wallThickness / 2, Labyrinth.LENGTH / 2d,
-                        wallRenderer))
+                        Labyrinth.WIDTH - wallThickness / 2, Labyrinth.LENGTH / 2d
+                ))
                 .addEntity(new Wall(Labyrinth.WIDTH, wallThickness, Labyrinth.WIDTH / 2d,
-                        Labyrinth.LENGTH - wallThickness / 2, wallRenderer))
+                        Labyrinth.LENGTH - wallThickness / 2))
                 .addEntity(new Wall(wallThickness, Labyrinth.LENGTH,
-                        wallThickness / 2, Labyrinth.LENGTH / 2d, wallRenderer))
+                        wallThickness / 2, Labyrinth.LENGTH / 2d))
                 //.addEntity(new Magnet(WIDTH / 2d, wallThickness))
                 .addEntity(new Ball(wallThickness + Ball.RADIUS, wallThickness
-                        + Ball.RADIUS, ballRenderer))
+                        + Ball.RADIUS))
                 .setListener(this);
     }
 
@@ -228,7 +225,7 @@ public class LabyrinthApplication implements Labyrinth.Listener {
     }
 
     @Override
-    public void onBallHitEntity(Ball ball, Entity<?> entity, ContactPoint point) {
+    public void onBallHitEntity(Ball ball, Entity entity, ContactPoint point) {
         // TODO: Audio.
     }
 
@@ -268,14 +265,8 @@ public class LabyrinthApplication implements Labyrinth.Listener {
 
         glViewport(0, 0, mFrameBufferWidth, mFrameBufferHeight);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        mFloorRenderer.render(mViewProjectionMatrix, mShadowMapRenderer.getLightMatrix(),
-                mShadowMapRenderer.getShadowMap());
-        mLabyrinth.render(mViewProjectionMatrix);
-        try {
-            MagnetRenderer.getInstance().render(mViewProjectionMatrix);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        mLabyrinthRenderer.render(mLabyrinth, mViewProjectionMatrix,
+                mShadowMapRenderer.getLightMatrix(), mShadowMapRenderer.getShadowMap());
 
         int error = glGetError();
         if (error != GL_NO_ERROR) {

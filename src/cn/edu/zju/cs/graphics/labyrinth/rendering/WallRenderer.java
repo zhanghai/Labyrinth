@@ -8,7 +8,7 @@ import org.joml.Matrix4f;
 
 import java.io.IOException;
 
-public class WallRenderer implements Renderer<Wall> {
+public class WallRenderer {
 
     private static WallRenderer sInstance;
 

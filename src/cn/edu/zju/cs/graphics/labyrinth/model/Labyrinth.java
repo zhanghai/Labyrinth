@@ -7,7 +7,6 @@ import org.dyn4j.dynamics.contact.ContactAdapter;
 import org.dyn4j.dynamics.contact.ContactPoint;
 import org.dyn4j.geometry.Vector2;
 import org.joml.Math;
-import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,7 +21,7 @@ public class Labyrinth {
     public static final double ROTATION_MAX_DEGREES = 30;
     private static final double GRAVITY = World.EARTH_GRAVITY.getMagnitude() * (24d / 0.005) / 100;
 
-    private List<Entity<?>> mEntities = new ArrayList<>();
+    private List<Entity> mEntities = new ArrayList<>();
     private Listener mListener;
     private World mWorld;
     {
@@ -36,10 +35,10 @@ public class Labyrinth {
         mWorld.addListener(new ContactAdapter() {
             @Override
             public void sensed(ContactPoint point) {
-                Entity<?> entity1 = Entity.ofBody(point.getBody1());
-                Entity<?> entity2 = Entity.ofBody(point.getBody2());
+                Entity entity1 = Entity.ofBody(point.getBody1());
+                Entity entity2 = Entity.ofBody(point.getBody2());
                 Ball ball;
-                Entity<?> sensor;
+                Entity sensor;
                 if (entity1 instanceof Ball) {
                     ball = (Ball) entity1;
                     sensor = entity2;
@@ -47,8 +46,8 @@ public class Labyrinth {
                     ball = (Ball) entity2;
                     sensor = entity1;
                 }
-                if (sensor instanceof BaseHole<?>) {
-                    BaseHole<?> hole = (BaseHole<?>) sensor;
+                if (sensor instanceof BaseHole) {
+                    BaseHole hole = (BaseHole) sensor;
                     if (MathUtils.distance(ball, hole) < BaseHole.RADIUS - Ball.RADIUS) {
                         mListener.onBallFallenIntoHole(ball, hole);
                     } else {
@@ -60,10 +59,10 @@ public class Labyrinth {
             }
             @Override
             public boolean begin(ContactPoint point) {
-                Entity<?> entity1 = Entity.ofBody(point.getBody1());
-                Entity<?> entity2 = Entity.ofBody(point.getBody2());
+                Entity entity1 = Entity.ofBody(point.getBody1());
+                Entity entity2 = Entity.ofBody(point.getBody2());
                 Ball ball;
-                Entity<?> other;
+                Entity other;
                 if (entity1 instanceof Ball) {
                     ball = (Ball) entity1;
                     other = entity2;
@@ -81,19 +80,19 @@ public class Labyrinth {
     private double mRotationX;
     private double mRotationY;
 
-    public Labyrinth addEntity(Entity<?> entity) {
+    public Labyrinth addEntity(Entity entity) {
         mEntities.add(entity);
         mWorld.addBody(entity.getBody());
         return this;
     }
 
-    public Labyrinth removeEntity(Entity<?> entity) {
+    public Labyrinth removeEntity(Entity entity) {
         mWorld.removeBody(entity.getBody());
         mEntities.remove(entity);
         return this;
     }
 
-    public List<Entity<?>> getEntities() {
+    public List<Entity> getEntities() {
         return Collections.unmodifiableList(mEntities);
     }
 
@@ -163,7 +162,7 @@ public class Labyrinth {
         mWorld.update(currentTimeSeconds - mWorldTimeSeconds, Integer.MAX_VALUE);
         mWorldTimeSeconds = currentTimeSeconds;
 
-        for (Entity<?> entity : mEntities) {
+        for (Entity entity : mEntities) {
             if (!(entity instanceof Ball)) {
                 continue;
             }
@@ -172,12 +171,6 @@ public class Labyrinth {
             if (!movement.isZero()) {
                 mListener.onBallRolling(ball, movement);
             }
-        }
-    }
-
-    public void render(Matrix4f viewProjectionMatrix) {
-        for (Entity<?> entity : mEntities) {
-            entity.render(viewProjectionMatrix);
         }
     }
 
@@ -225,7 +218,7 @@ public class Labyrinth {
          * false from the those methods as well.
          * </p>
          */
-        void onBallHitEntity(Ball ball, Entity<?> entity, ContactPoint point);
+        void onBallHitEntity(Ball ball, Entity entity, ContactPoint point);
 
         void onBallRolling(Ball ball, Vector2 movement);
     }
