@@ -27,7 +27,9 @@ public abstract class BaseHoleRenderer<HoleType extends BaseHole> {
         float textureScale = getTextureScale();
         mModelMatrix
                 .identity()
-                .translate((float) hole.getPositionX(), (float) hole.getPositionY(), GlUtils.BIAS)
+                .translate((float) hole.getPositionX(), (float) hole.getPositionY(),
+                        // For ball shadow at GlUtils.BIAS.
+                        2 * GlUtils.BIAS)
                 .scale(textureScale, textureScale, 1f)
                 .scale(2f * (float) BaseHole.RADIUS, 2f * (float) BaseHole.RADIUS, 1f);
         mRenderer.render(mModelMatrix, viewProjectionMatrix, mTexture);

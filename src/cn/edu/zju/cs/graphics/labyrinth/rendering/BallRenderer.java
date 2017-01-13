@@ -9,13 +9,14 @@ import java.io.IOException;
 
 public class BallRenderer {
 
-    private static final float TEXTURE_SCALE = 120f / 102f;
+    private static final float BALL_TEXTURE_SCALE = 120f / 102f;
 
     private static BallRenderer sInstance;
 
     private TextureRectangleRenderer mRenderer;
     private Matrix4f mModelMatrix = new Matrix4f();
-    private int mTexture;
+    private int mBallTexture;
+    private int mShadowTexture;
 
     public static BallRenderer getInstance() throws IOException {
         if (sInstance == null) {
@@ -26,16 +27,23 @@ public class BallRenderer {
 
     private BallRenderer() throws IOException {
         mRenderer = TextureRectangleRenderer.getInstance();
-        mTexture = GlUtils.createTexture(ResourceUtils.makeTextureResource("ball.png"));
+        mBallTexture = GlUtils.createTexture(ResourceUtils.makeTextureResource("ball.png"));
+        mShadowTexture = GlUtils.createTexture(ResourceUtils.makeTextureResource(
+                "ball-shadow.png"));
     }
 
     public void render(Ball ball, Matrix4f viewProjectionMatrix) {
         mModelMatrix
                 .identity()
+                .translate((float) ball.getPositionX(), (float) ball.getPositionY(), GlUtils.BIAS)
+                .scale(2f * (float) Ball.RADIUS, 2f * (float) Ball.RADIUS, 1f);
+        mRenderer.render(mModelMatrix, viewProjectionMatrix, mShadowTexture);
+        mModelMatrix
+                .identity()
                 .translate((float) ball.getPositionX(), (float) ball.getPositionY(),
                         (float) Ball.RADIUS)
-                .scale(TEXTURE_SCALE, TEXTURE_SCALE, 1f)
+                .scale(BALL_TEXTURE_SCALE, BALL_TEXTURE_SCALE, 1f)
                 .scale(2f * (float) Ball.RADIUS, 2f * (float) Ball.RADIUS, 1f);
-        mRenderer.render(mModelMatrix, viewProjectionMatrix, mTexture);
+        mRenderer.render(mModelMatrix, viewProjectionMatrix, mBallTexture);
     }
 }
