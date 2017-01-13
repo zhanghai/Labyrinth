@@ -2,7 +2,6 @@ package cn.edu.zju.cs.graphics.labyrinth;
 
 import cn.edu.zju.cs.graphics.labyrinth.model.Ball;
 import cn.edu.zju.cs.graphics.labyrinth.model.BaseHole;
-import cn.edu.zju.cs.graphics.labyrinth.model.BaseWall;
 import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
 import cn.edu.zju.cs.graphics.labyrinth.model.FinishHole;
 import cn.edu.zju.cs.graphics.labyrinth.model.Hole;
@@ -14,6 +13,7 @@ import cn.edu.zju.cs.graphics.labyrinth.rendering.FinishHoleRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.FloorRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.HoleRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.PrototypeRenderers;
+import cn.edu.zju.cs.graphics.labyrinth.rendering.ShadowMapRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.WallRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.util.MatrixUtils;
 import org.dyn4j.dynamics.contact.ContactPoint;
@@ -49,6 +49,7 @@ public class LabyrinthApplication implements Labyrinth.Listener {
     private Matrix4f mViewMatrix = new Matrix4f();
     private Matrix4f mViewProjectionMatrix = new Matrix4f();
 
+    private ShadowMapRenderer mShadowMapRenderer;
     private FloorRenderer mFloorRenderer;
     private Labyrinth mLabyrinth;
 
@@ -162,6 +163,7 @@ public class LabyrinthApplication implements Labyrinth.Listener {
         System.out.println("GL_VERSION: " + glGetString(GL_VERSION));
         System.out.println("GL_MAX_TEXTURE_SIZE: " + glGetInteger(GL_MAX_TEXTURE_SIZE));
 
+        mShadowMapRenderer = ShadowMapRenderer.getInstance();
         mFloorRenderer = FloorRenderer.getInstance();
         WallRenderer wallRenderer = WallRenderer.getInstance();
         BallRenderer ballRenderer = BallRenderer.getInstance();
@@ -250,18 +252,23 @@ public class LabyrinthApplication implements Labyrinth.Listener {
         MatrixUtils.skewYAroundX(mViewMatrix,
                 (float) Math.toRadians(mLabyrinth.getRotationY() * 0.75d));
         mViewMatrix.translate((float) -Labyrinth.WIDTH / 2f, (float) -Labyrinth.LENGTH / 2f,
-                (float) -BaseWall.HEIGHT);
+                (float) -Labyrinth.HEIGHT);
         mProjectionMatrix.setOrtho((float) -Labyrinth.WIDTH / 2f, (float) Labyrinth.WIDTH / 2f,
-                (float) -Labyrinth.LENGTH / 2f, (float) Labyrinth.LENGTH / 2f, -1000f, 1000f);
+                (float) -Labyrinth.LENGTH / 2f, (float) Labyrinth.LENGTH / 2f,
+                -2f * (float) Labyrinth.HEIGHT, 2f * (float) Labyrinth.HEIGHT);
         mProjectionMatrix.mul(mViewMatrix, mViewProjectionMatrix);
     }
 
     private void render() {
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
 
-        mFloorRenderer.render(mViewProjectionMatrix);
+        mShadowMapRenderer.render(mLabyrinth);
+
+        glViewport(0, 0, mFrameBufferWidth, mFrameBufferHeight);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        mFloorRenderer.render(mViewProjectionMatrix, mShadowMapRenderer.getLightMatrix(),
+                mShadowMapRenderer.getShadowMap());
         mLabyrinth.render(mViewProjectionMatrix);
 
         int error = glGetError();
@@ -273,7 +280,6 @@ public class LabyrinthApplication implements Labyrinth.Listener {
     private void loop() {
         while (!glfwWindowShouldClose(mWindow)) {
             glfwPollEvents();
-            glViewport(0, 0, mFrameBufferWidth, mFrameBufferHeight);
             update();
             render();
             glfwSwapBuffers(mWindow);

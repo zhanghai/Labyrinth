@@ -14,7 +14,7 @@ public class BallRenderer implements Renderer<Ball> {
 
     private static BallRenderer sInstance;
 
-    private RectangleRenderer mRectangleRenderer;
+    private TextureRectangleRenderer mRenderer;
     private Matrix4f mModelMatrix = new Matrix4f();
     private Matrix3f mTextureMatrix = new Matrix3f();
     private int mTexture;
@@ -27,7 +27,7 @@ public class BallRenderer implements Renderer<Ball> {
     }
 
     private BallRenderer() throws IOException {
-        mRectangleRenderer = RectangleRenderer.getInstance();
+        mRenderer = TextureRectangleRenderer.getInstance();
         mTexture = GlUtils.createTexture(ResourceUtils.makeTextureResource("ball.png"));
     }
 
@@ -38,6 +38,6 @@ public class BallRenderer implements Renderer<Ball> {
                         (float) Ball.RADIUS)
                 .scale(TEXTURE_SCALE, TEXTURE_SCALE, 1f)
                 .scale(2f * (float) Ball.RADIUS, 2f * (float) Ball.RADIUS, 1f);
-        mRectangleRenderer.render(mModelMatrix, viewProjectionMatrix, mTextureMatrix, mTexture);
+        mRenderer.render(mModelMatrix, viewProjectionMatrix, mTextureMatrix, mTexture);
     }
 }

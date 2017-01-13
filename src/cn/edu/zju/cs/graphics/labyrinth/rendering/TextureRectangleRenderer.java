@@ -10,7 +10,7 @@ import java.nio.IntBuffer;
 
 import static org.lwjgl.opengles.GLES20.*;
 
-public class RectangleRenderer {
+public class TextureRectangleRenderer {
 
     private final FloatBuffer mVertexArrayBufferData = GlUtils.createBuffer(4 * (2 + 2),
             new float[] {
@@ -24,21 +24,21 @@ public class RectangleRenderer {
             0, 2, 3
     });
 
-    private static RectangleRenderer sInstance;
+    private static TextureRectangleRenderer sInstance;
 
-    private GenericRenderer mRenderer;
+    private TextureRenderer mRenderer;
     private int mVertexArrayBuffer;
     private int mElementArrayBuffer;
 
-    public static RectangleRenderer getInstance() throws IOException {
+    public static TextureRectangleRenderer getInstance() throws IOException {
         if (sInstance == null) {
-            sInstance = new RectangleRenderer();
+            sInstance = new TextureRectangleRenderer();
         }
         return sInstance;
     }
 
-    private RectangleRenderer() throws IOException {
-        mRenderer = GenericRenderer.getInstance();
+    private TextureRectangleRenderer() throws IOException {
+        mRenderer = TextureRenderer.getInstance();
         mVertexArrayBuffer = GlUtils.createVertexArrayBuffer(mVertexArrayBufferData,
                 GL_STATIC_DRAW);
         mElementArrayBuffer = GlUtils.createVertexArrayIndexBuffer(mElementArrayBufferData,

@@ -24,7 +24,7 @@ public abstract class BaseModelSpaceTextureRenderer {
 
     public BaseModelSpaceTextureRenderer() throws IOException {
         mProgram = GlUtils.createProgram(ResourceUtils.makeShaderResource(getVertexShaderName()),
-                ResourceUtils.makeShaderResource("generic.fs"));
+                ResourceUtils.makeShaderResource(getFragmentShaderName()));
         mPositionAttribute = GlUtils.getAttribLocation(mProgram, "aPosition");
         glEnableVertexAttribArray(mPositionAttribute);
         mTextureSizeUniform = GlUtils.getUniformLocation(mProgram, "uTextureSize");
@@ -34,7 +34,15 @@ public abstract class BaseModelSpaceTextureRenderer {
         mTextureUniform = GlUtils.getUniformLocation(mProgram, "uTexture");
     }
 
+    protected int getProgram() {
+        return mProgram;
+    }
+
     abstract protected String getVertexShaderName();
+
+    protected String getFragmentShaderName() {
+        return "generic.fs";
+    }
 
     public void render(int vertexArrayBuffer, int positionSize, int elementArrayBuffer,
                        int elementCount, Matrix4f modelMatrix, Matrix4f viewProjectionMatrix,
@@ -50,9 +58,15 @@ public abstract class BaseModelSpaceTextureRenderer {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
         glUniform1i(mTextureUniform, 0);
+        onDrawElements();
         glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, 0);
+        onElementsDrawn();
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glUseProgram(0);
     }
+
+    protected void onDrawElements() {}
+
+    protected void onElementsDrawn() {}
 }

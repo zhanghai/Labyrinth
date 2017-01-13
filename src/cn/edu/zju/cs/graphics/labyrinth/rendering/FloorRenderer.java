@@ -11,7 +11,7 @@ public class FloorRenderer {
 
     private static FloorRenderer sInstance;
 
-    private ModelXyTextureRectangleRenderer mRenderer;
+    private ModelXyTextureShadowRectangleRenderer mRenderer;
     private Matrix4f mModelMatrix = new Matrix4f()
             .translate((float) Labyrinth.WIDTH / 2f, (float) Labyrinth.LENGTH / 2f, 0f)
             .scale((float) Labyrinth.WIDTH, (float) Labyrinth.LENGTH, 1f);
@@ -25,12 +25,12 @@ public class FloorRenderer {
     }
 
     private FloorRenderer() throws IOException {
-        mRenderer = ModelXyTextureRectangleRenderer.getInstance();
+        mRenderer = ModelXyTextureShadowRectangleRenderer.getInstance();
         mTexture = GlUtils.createTexture(ResourceUtils.makeTextureResource("floor.jpg"));
     }
 
-    public void render(Matrix4f viewProjectionMatrix) {
+    public void render(Matrix4f viewProjectionMatrix, Matrix4f lightMatrix, int shadowMap) {
         mRenderer.render(mModelMatrix, viewProjectionMatrix, mTexture, (float) Labyrinth.SIZE,
-                (float) Labyrinth.SIZE);
+                (float) Labyrinth.SIZE, lightMatrix, shadowMap);
     }
 }

@@ -10,13 +10,13 @@ import java.io.IOException;
 
 public abstract class BaseHoleRenderer<HoleType extends BaseHole> implements Renderer<HoleType> {
 
-    private RectangleRenderer mRectangleRenderer;
+    private TextureRectangleRenderer mRenderer;
     private Matrix4f mModelMatrix = new Matrix4f();
     private Matrix3f mTextureMatrix = new Matrix3f();
     private int mTexture;
 
     public BaseHoleRenderer() throws IOException {
-        mRectangleRenderer = RectangleRenderer.getInstance();
+        mRenderer = TextureRectangleRenderer.getInstance();
         mTexture = GlUtils.createTexture(ResourceUtils.makeTextureResource(
                 getTextureResourceName()));
     }
@@ -32,6 +32,6 @@ public abstract class BaseHoleRenderer<HoleType extends BaseHole> implements Ren
                 .translate((float) hole.getPositionX(), (float) hole.getPositionY(), GlUtils.BIAS)
                 .scale(textureScale, textureScale, 1f)
                 .scale(2f * (float) BaseHole.RADIUS, 2f * (float) BaseHole.RADIUS, 1f);
-        mRectangleRenderer.render(mModelMatrix, viewProjectionMatrix, mTextureMatrix, mTexture);
+        mRenderer.render(mModelMatrix, viewProjectionMatrix, mTextureMatrix, mTexture);
     }
 }

@@ -2,7 +2,6 @@ package cn.edu.zju.cs.graphics.labyrinth.rendering;
 
 import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
 import cn.edu.zju.cs.graphics.labyrinth.util.ResourceUtils;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 
@@ -11,9 +10,9 @@ import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengles.GLES20.*;
 
-public class GenericRenderer {
+public class TextureRenderer {
 
-    private static GenericRenderer sInstance;
+    private static TextureRenderer sInstance;
 
     private int mProgram;
     private int mPositionAttribute;
@@ -25,14 +24,14 @@ public class GenericRenderer {
     private FloatBuffer mModelMatrixBuffer = BufferUtils.createFloatBuffer(4 * 4);
     private FloatBuffer mViewProjectionMatrixBuffer = BufferUtils.createFloatBuffer(4 * 4);
 
-    public static GenericRenderer getInstance() throws IOException {
+    public static TextureRenderer getInstance() throws IOException {
         if (sInstance == null) {
-            sInstance = new GenericRenderer();
+            sInstance = new TextureRenderer();
         }
         return sInstance;
     }
 
-    private GenericRenderer() throws IOException {
+    private TextureRenderer() throws IOException {
         mProgram = GlUtils.createProgram(ResourceUtils.makeShaderResource("generic.vs"),
                 ResourceUtils.makeShaderResource("generic.fs"));
         mPositionAttribute = GlUtils.getAttribLocation(mProgram, "aPosition");

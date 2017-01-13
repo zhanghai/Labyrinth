@@ -18,6 +18,7 @@ public class Labyrinth {
     public static final double WIDTH = 480d;
     public static final double LENGTH = 320d;
     public static final double SIZE = Math.max(WIDTH, LENGTH);
+    public static final double HEIGHT = 48d;
     public static final double ROTATION_MAX_DEGREES = 30;
     private static final double GRAVITY = World.EARTH_GRAVITY.getMagnitude() * (24d / 0.005) / 100;
 

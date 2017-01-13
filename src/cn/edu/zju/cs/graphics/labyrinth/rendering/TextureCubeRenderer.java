@@ -9,7 +9,7 @@ import java.nio.IntBuffer;
 
 import static org.lwjgl.opengles.GLES20.GL_STATIC_DRAW;
 
-public class CubeRenderer {
+public class TextureCubeRenderer {
 
     private final FloatBuffer mVertexArrayBufferData = GlUtils.createBuffer(6 * 4 * (3 + 2),
             new float[] {
@@ -65,21 +65,21 @@ public class CubeRenderer {
             20, 22, 23,
     });
 
-    private static CubeRenderer sInstance;
+    private static TextureCubeRenderer sInstance;
 
-    private GenericRenderer mRenderer;
+    private TextureRenderer mRenderer;
     private int mVertexArrayBuffer;
     private int mElementArrayBuffer;
 
-    public static CubeRenderer getInstance() throws IOException {
+    public static TextureCubeRenderer getInstance() throws IOException {
         if (sInstance == null) {
-            sInstance = new CubeRenderer();
+            sInstance = new TextureCubeRenderer();
         }
         return sInstance;
     }
 
-    private CubeRenderer() throws IOException {
-        mRenderer = GenericRenderer.getInstance();
+    private TextureCubeRenderer() throws IOException {
+        mRenderer = TextureRenderer.getInstance();
         mVertexArrayBuffer = GlUtils.createVertexArrayBuffer(mVertexArrayBufferData,
                 GL_STATIC_DRAW);
         mElementArrayBuffer = GlUtils.createVertexArrayIndexBuffer(mElementArrayBufferData,

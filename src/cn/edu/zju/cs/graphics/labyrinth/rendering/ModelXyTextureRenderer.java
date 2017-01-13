@@ -13,7 +13,7 @@ public class ModelXyTextureRenderer extends BaseModelSpaceTextureRenderer {
         return sInstance;
     }
 
-    private ModelXyTextureRenderer() throws IOException {}
+    protected ModelXyTextureRenderer() throws IOException {}
 
     @Override
     protected String getVertexShaderName() {
