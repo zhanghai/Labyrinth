@@ -8,14 +8,14 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="org.lwjgl:lwjgl:3.1.0" level="project" />
-    <orderEntry type="library" name="org.lwjgl:lwjgl-glfw:3.1.0" level="project" />
-    <orderEntry type="library" name="org.lwjgl:lwjgl-jemalloc:3.1.0" level="project" />
-    <orderEntry type="library" name="org.lwjgl:lwjgl-openal:3.1.0" level="project" />
-    <orderEntry type="library" name="org.lwjgl:lwjgl-opengles:3.1.0" level="project" />
-    <orderEntry type="library" name="org.joml:joml:1.9.0" level="project" />
-    <orderEntry type="library" name="org.lwjgl:lwjgl-stb:3.1.0" level="project" />
-    <orderEntry type="library" name="org.lwjgl:lwjgl-egl:3.1.0" level="project" />
+    <orderEntry type="library" name="org.lwjgl:lwjgl:3.1.1" level="project" />
+    <orderEntry type="library" name="org.lwjgl:lwjgl-glfw:3.1.1" level="project" />
+    <orderEntry type="library" name="org.lwjgl:lwjgl-jemalloc:3.1.1" level="project" />
+    <orderEntry type="library" name="org.lwjgl:lwjgl-openal:3.1.1" level="project" />
+    <orderEntry type="library" name="org.lwjgl:lwjgl-opengles:3.1.1" level="project" />
+    <orderEntry type="library" name="org.joml:joml:1.9.1" level="project" />
+    <orderEntry type="library" name="org.lwjgl:lwjgl-stb:3.1.1" level="project" />
+    <orderEntry type="library" name="org.lwjgl:lwjgl-egl:3.1.1" level="project" />
     <orderEntry type="library" name="org.dyn4j:dyn4j:3.2.3" level="project" />
     <orderEntry type="library" name="org.lwjgl:lwjgl-assimp:3.1.1" level="project" />
   </component>

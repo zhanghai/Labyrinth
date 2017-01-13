@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="org.lwjgl:lwjgl-egl:3.1.1" type="repository">
+    <properties maven-id="org.lwjgl:lwjgl-egl:3.1.1" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-egl-3.1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-3.1.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-egl-3.1.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-egl-3.1.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

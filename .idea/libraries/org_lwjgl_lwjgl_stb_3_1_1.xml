@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="org.lwjgl:lwjgl-stb:3.1.1" type="repository">
+    <properties maven-id="org.lwjgl:lwjgl-stb:3.1.1" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-stb-3.1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-3.1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-stb-3.1.1-natives-linux.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-stb-3.1.1-natives-macos.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-stb-3.1.1-natives-windows.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-stb-3.1.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-stb-3.1.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
