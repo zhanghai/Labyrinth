@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class BallRenderer {
 
-    private static final float BALL_TEXTURE_SCALE = 120f / 102f;
+    private static final float TEXTURE_SCALE = 120f / 102f;
 
     private static BallRenderer sInstance;
 
@@ -36,14 +36,11 @@ public class BallRenderer {
         mModelMatrix
                 .identity()
                 .translate((float) ball.getPositionX(), (float) ball.getPositionY(), GlUtils.BIAS)
+                .scale(TEXTURE_SCALE, TEXTURE_SCALE, 1f)
                 .scale(2f * (float) Ball.RADIUS, 2f * (float) Ball.RADIUS, 1f);
         mRenderer.render(mModelMatrix, viewProjectionMatrix, mShadowTexture);
         mModelMatrix
-                .identity()
-                .translate((float) ball.getPositionX(), (float) ball.getPositionY(),
-                        (float) Ball.RADIUS)
-                .scale(BALL_TEXTURE_SCALE, BALL_TEXTURE_SCALE, 1f)
-                .scale(2f * (float) Ball.RADIUS, 2f * (float) Ball.RADIUS, 1f);
+                .translate(0, 0, (float) Ball.RADIUS);
         mRenderer.render(mModelMatrix, viewProjectionMatrix, mBallTexture);
     }
 }

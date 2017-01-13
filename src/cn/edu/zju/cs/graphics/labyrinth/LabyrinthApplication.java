@@ -167,15 +167,11 @@ public class LabyrinthApplication implements Labyrinth.Listener {
         mShadowMapRenderer = ShadowMapRenderer.getInstance();
         mLabyrinthRenderer = LabyrinthRenderer.getInstance();
 
-        double wallThickness = Wall.THICKNESS_DEFAULT / 2;
         mLabyrinth = new Labyrinth()
-                .addEntity(new Hole(wallThickness + Hole.RADIUS,
-                        Labyrinth.LENGTH - (wallThickness + Hole.RADIUS)))
-                .addEntity(new FinishHole(Labyrinth.WIDTH - (wallThickness + Hole.RADIUS),
-                        wallThickness + Hole.RADIUS))
-                //.addEntity(new Magnet(WIDTH / 2d, wallThickness))
-                .addEntity(new Ball(wallThickness + Ball.RADIUS, wallThickness
-                        + Ball.RADIUS))
+                .addEntity(new Hole(20d + Hole.RADIUS, Labyrinth.LENGTH - (20d + Hole.RADIUS)))
+                .addEntity(new FinishHole(Labyrinth.WIDTH - (20d + Hole.RADIUS), 20d + Hole.RADIUS))
+                .addEntity(new Magnet(Labyrinth.WIDTH / 2d, Labyrinth.LENGTH / 2d))
+                .addEntity(new Ball(20d + Ball.RADIUS, 20d + Ball.RADIUS))
                 .setListener(this);
     }
 

@@ -2,6 +2,7 @@ package cn.edu.zju.cs.graphics.labyrinth.rendering;
 
 import cn.edu.zju.cs.graphics.labyrinth.model.Entity;
 import cn.edu.zju.cs.graphics.labyrinth.model.Labyrinth;
+import cn.edu.zju.cs.graphics.labyrinth.model.Magnet;
 import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 import org.joml.Matrix4f;
 
@@ -23,6 +24,7 @@ public class ShadowMapRenderer {
     private Matrix4f mLightMatrix;
 
     private WallRenderer mWallRenderer;
+    private MagnetRenderer mMagnetRenderer;
 
     public static ShadowMapRenderer getInstance() throws IOException {
         if (sInstance == null) {
@@ -65,6 +67,7 @@ public class ShadowMapRenderer {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         mWallRenderer = WallRenderer.getInstance();
+        mMagnetRenderer = MagnetRenderer.getInstance();
     }
 
     public Matrix4f getLightMatrix() {
@@ -82,6 +85,8 @@ public class ShadowMapRenderer {
         for (Entity entity : labyrinth.getEntities()) {
             if (entity instanceof Wall) {
                 mWallRenderer.render((Wall) entity, mLightMatrix);
+            } else if (entity instanceof Magnet) {
+                mMagnetRenderer.render((Magnet)entity, mLightMatrix);
             }
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
