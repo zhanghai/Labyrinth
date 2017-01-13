@@ -19,7 +19,7 @@ public class MagnetRenderer {
 
     private ModelRenderer mRenderer;
     private Model mModel;
-    private Matrix4f mModelMatrix;
+    private Matrix4f mModelMatrix = new Matrix4f();
 
     private MagnetRenderer() throws IOException {
         mRenderer = ModelRenderer.getInstance();
