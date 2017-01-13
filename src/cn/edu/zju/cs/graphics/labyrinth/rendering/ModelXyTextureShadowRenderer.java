@@ -64,8 +64,6 @@ public class ModelXyTextureShadowRenderer extends ModelXyTextureRenderer {
         super.onDrawElements();
 
         glUniformMatrix4fv(mLightMatrixUniform, false, mLightMatrixBuffer);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, mShadowMap);
-        glUniform1i(mShadowMapUniform, 1);
+        GlUtils.uniformTexture(mShadowMapUniform, GL_TEXTURE1, mShadowMap);
     }
 }

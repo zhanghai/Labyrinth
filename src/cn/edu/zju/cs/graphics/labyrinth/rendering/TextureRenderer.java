@@ -59,9 +59,7 @@ public class TextureRenderer {
         glUniformMatrix4fv(mModelMatrixUniform, false, modelMatrix.get(mModelMatrixBuffer));
         glUniformMatrix4fv(mViewProjectionMatrixUniform, false,
                 viewProjectionMatrix.get(mViewProjectionMatrixBuffer));
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glUniform1i(mTextureUniform, 0);
+        GlUtils.uniformTexture(mTextureUniform, GL_TEXTURE0, texture);
         glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

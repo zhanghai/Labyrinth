@@ -156,6 +156,17 @@ public class GlUtils {
         return location;
     }
 
+    public static void uniformTexture(int uniform, int textureUnit, int textureTarget,
+                                      int texture) {
+        glActiveTexture(textureUnit);
+        glBindTexture(textureTarget, texture);
+        glUniform1i(uniform, textureUnit - GL_TEXTURE0);
+    }
+
+    public static void uniformTexture(int uniform, int textureUnit, int texture) {
+        uniformTexture(uniform, textureUnit, GL_TEXTURE_2D, texture);
+    }
+
     public static void vertexAttribPointer(int index, int size, int stride, int offset) {
         glVertexAttribPointer(index, size, GL_FLOAT, false, stride * Float.BYTES,
                 offset * Float.BYTES);
