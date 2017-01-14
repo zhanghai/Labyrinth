@@ -1,14 +1,22 @@
 package cn.edu.zju.cs.graphics.labyrinth.rendering;
 
 import org.lwjgl.PointerBuffer;
+import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIMaterial;
+import org.lwjgl.assimp.AIMaterialProperty;
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIScene;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.lwjgl.assimp.Assimp.AI_MATKEY_COLOR_AMBIENT;
+import static org.lwjgl.assimp.Assimp.AI_MATKEY_COLOR_DIFFUSE;
+import static org.lwjgl.assimp.Assimp.AI_MATKEY_COLOR_SPECULAR;
+import static org.lwjgl.assimp.Assimp.aiGetMaterialColor;
 import static org.lwjgl.assimp.Assimp.aiReleaseImport;
+import static org.lwjgl.assimp.Assimp.aiTextureType_AMBIENT;
+import static org.lwjgl.assimp.Assimp.aiTextureType_NONE;
 
 public class Model {
 
@@ -17,6 +25,8 @@ public class Model {
     public List<Material> mMaterials;
 
     public Model(AIScene scene) {
+
+        mScene = scene;
 
         int meshCount = scene.mNumMeshes();
         PointerBuffer meshesBuffer = scene.mMeshes();
@@ -56,9 +66,29 @@ public class Model {
     public static class Material {
 
         public AIMaterial mMaterial;
+        public AIColor4D mAmbientColor;
+        public AIColor4D mDiffuseColor;
+        public AIColor4D mSpecularColor;
 
         public Material(AIMaterial material) {
-            material = material;
+
+            mMaterial = material;
+
+            mAmbientColor = AIColor4D.create();
+            if (aiGetMaterialColor(mMaterial, AI_MATKEY_COLOR_AMBIENT,
+                    aiTextureType_NONE, 0, mAmbientColor) != 0) {
+                throw new IllegalStateException("aiGetMaterialColor");
+            }
+            mDiffuseColor = AIColor4D.create();
+            if (aiGetMaterialColor(mMaterial, AI_MATKEY_COLOR_DIFFUSE,
+                    aiTextureType_NONE, 0, mDiffuseColor) != 0) {
+                throw new IllegalStateException("aiGetMaterialColor");
+            }
+            mSpecularColor = AIColor4D.create();
+            if (aiGetMaterialColor(mMaterial, AI_MATKEY_COLOR_SPECULAR,
+                    aiTextureType_NONE, 0, mSpecularColor) != 0) {
+                throw new IllegalStateException("aiGetMaterialColor");
+            }
         }
     }
 }

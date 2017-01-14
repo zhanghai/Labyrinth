@@ -3,7 +3,7 @@ package cn.edu.zju.cs.graphics.labyrinth.util;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.Model;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
-import org.lwjgl.assimp.AIPropertyStore;
+import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIScene;
 import org.lwjgl.opengles.GLES20;
 import org.lwjgl.system.CustomBuffer;
@@ -22,6 +22,13 @@ public class GlUtils {
     private GlUtils() {}
 
     public static final float BIAS = 0.001f;
+
+    public static void checkError() {
+        int error = glGetError();
+        if (error != GL_NO_ERROR) {
+            throw new IllegalStateException("glGetError(): " + error);
+        }
+    }
 
     /**
      * @deprecated Use {@link #createBuffer(int, float[])} for size check.
@@ -193,6 +200,14 @@ public class GlUtils {
         return new Model(scene);
     }
 
+    public static void uniformColor3(int uniform, AIColor4D color) {
+        nglUniform3fv(uniform, 1, color.address());
+    }
+
+    public static void uniformColor4(int uniform, AIColor4D color) {
+        nglUniform4fv(uniform, 1, color.address());
+    }
+
     public static void uniformTexture(int uniform, int textureUnit, int textureTarget,
                                       int texture) {
         glActiveTexture(textureUnit);
@@ -212,18 +227,4 @@ public class GlUtils {
     public static void vertexAttribPointer(int index, int size) {
         vertexAttribPointer(index, size, 0, 0);
     }
-//
-//    public static class AiResourceFileProc implements AIFileOpenProcI, AIFileCloseProcI {
-//
-//        @Override
-//        public long invoke(long pFileIO, long fileName, long openMode) {
-//            // AIFileOpenProcI
-//            return 0;
-//        }
-//
-//        @Override
-//        public void invoke(long pFileIO, long pFile) {
-//            // AIFileCloseProcI
-//        }
-//    }
 }

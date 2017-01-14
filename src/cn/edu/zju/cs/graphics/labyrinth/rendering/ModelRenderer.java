@@ -2,10 +2,11 @@ package cn.edu.zju.cs.graphics.labyrinth.rendering;
 
 import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
 import cn.edu.zju.cs.graphics.labyrinth.util.ResourceUtils;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.assimp.AIFace;
-import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIVector3D;
 
 import java.io.IOException;
@@ -24,10 +25,20 @@ public class ModelRenderer {
     //private int mTextureCoordinateAttribute;
     private int mModelMatrixUniform;
     private int mViewProjectionMatrixUniform;
+    private int mNormalMatrixUniform;
+    private int mLightPositionUniform;
+    private int mViewPositionUniform;
+    private int mAmbientColorUniform;
+    private int mDiffuseColorUniform;
+    private int mSpecularColorUniform;
     //private int mTextureUniform;
 
     private FloatBuffer mModelMatrixBuffer = BufferUtils.createFloatBuffer(4 * 4);
     private FloatBuffer mViewProjectionMatrixBuffer = BufferUtils.createFloatBuffer(4 * 4);
+    private Matrix3f mNormalMatrix = new Matrix3f();
+    private FloatBuffer mNormalMatrixBuffer = BufferUtils.createFloatBuffer(3 * 3);
+    private FloatBuffer mLightPositionBuffer = BufferUtils.createFloatBuffer(3);
+    private FloatBuffer mViewPositionBuffer = BufferUtils.createFloatBuffer(3);
 
     public static ModelRenderer getInstance() throws IOException {
         if (sInstance == null) {
@@ -49,11 +60,17 @@ public class ModelRenderer {
         mModelMatrixUniform = GlUtils.getUniformLocation(mProgram, "uModelMatrix");
         mViewProjectionMatrixUniform = GlUtils.getUniformLocation(mProgram,
                 "uViewProjectionMatrix");
+        mNormalMatrixUniform = GlUtils.getUniformLocation(mProgram, "uNormalMatrix");
+        mLightPositionUniform = GlUtils.getUniformLocation(mProgram, "uLightPosition");
+        mViewPositionUniform = GlUtils.getUniformLocation(mProgram, "uViewPosition");
+        mAmbientColorUniform = GlUtils.getUniformLocation(mProgram, "uAmbientColor");
+        mDiffuseColorUniform = GlUtils.getUniformLocation(mProgram, "uDiffuseColor");
+        mSpecularColorUniform = GlUtils.getUniformLocation(mProgram, "uSpecularColor");
         //mTextureUniform = GlUtils.getUniformLocation(mProgram, "uTexture");
     }
 
-    public void render(Model model, Matrix4f modelMatrix, Matrix4f viewProjectionMatrix/*,
-                       int texture*/) {
+    public void render(Model model, Matrix4f modelMatrix, Matrix4f viewProjectionMatrix,
+                       Vector3f lightPosition, Vector3f viewPosition/*, int texture*/) {
         glUseProgram(mProgram);
         for (Model.Mesh mesh : model.mMeshes){
             if (mesh.mVertexArrayBuffer == 0) {
@@ -78,6 +95,16 @@ public class ModelRenderer {
             glUniformMatrix4fv(mModelMatrixUniform, false, modelMatrix.get(mModelMatrixBuffer));
             glUniformMatrix4fv(mViewProjectionMatrixUniform, false,
                     viewProjectionMatrix.get(mViewProjectionMatrixBuffer));
+            Matrix4f temp = new Matrix4f(modelMatrix);
+            temp.invert().transpose();
+            mNormalMatrix.set(temp);//.invert().transpose();
+            glUniformMatrix3fv(mNormalMatrixUniform, false, mNormalMatrix.get(mNormalMatrixBuffer));
+            Model.Material material = model.mMaterials.get(mesh.mMesh.mMaterialIndex());
+            glUniform3fv(mLightPositionUniform, lightPosition.get(mLightPositionBuffer));
+            glUniform3fv(mViewPositionUniform, viewPosition.get(mViewPositionBuffer));
+            GlUtils.uniformColor3(mAmbientColorUniform, material.mAmbientColor);
+            GlUtils.uniformColor3(mDiffuseColorUniform, material.mDiffuseColor);
+            GlUtils.uniformColor3(mSpecularColorUniform, material.mSpecularColor);
             //GlUtils.uniformTexture(mTextureUniform, GL_TEXTURE0, texture);
             if (mesh.mElementArrayBuffer == 0) {
                 int faceCount = mesh.mMesh.mNumFaces();

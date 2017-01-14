@@ -16,6 +16,7 @@ import cn.edu.zju.cs.graphics.labyrinth.rendering.LabyrinthRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.MagnetRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.ShadowMapRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.WallRenderer;
+import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
 import cn.edu.zju.cs.graphics.labyrinth.util.MatrixUtils;
 import org.dyn4j.dynamics.contact.ContactPoint;
 import org.dyn4j.geometry.Vector2;
@@ -255,10 +256,7 @@ public class LabyrinthApplication implements Labyrinth.Listener {
         mLabyrinthRenderer.render(mLabyrinth, mViewProjectionMatrix,
                 mShadowMapRenderer.getLightMatrix(), mShadowMapRenderer.getShadowMap());
 
-        int error = glGetError();
-        if (error != GL_NO_ERROR) {
-            throw new IllegalStateException("glGetError(): " + error);
-        }
+        GlUtils.checkError();
     }
 
     private void loop() {
