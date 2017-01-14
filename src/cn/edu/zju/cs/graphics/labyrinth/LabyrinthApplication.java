@@ -183,7 +183,7 @@ public class LabyrinthApplication implements Labyrinth.Listener {
                 .addEntity(new Wall(91.56f, wallThickness, 260.89f, 223.56f + 4f)) // Wall 12
                 .addEntity(new Wall(wallThickness, 87.11f, 261.78f, 58.67f)) // Wall 13
                 .addEntity(new Wall(87.11f, wallThickness, 312.89f, 94.67f)) // Wall 14
-                .addEntity(new Wall(wallThickness, 173.33f, 348.61f, 188.89f)) // Wall 15
+                .addEntity(new Wall(wallThickness, 173.33f + 2f, 348.61f, 188.89f + 1f)) // Wall 15
                 //.addEntity(new Wall(75.56f, wallThickness, 303.67f, 181.78f)) // Wall 16
                 .addEntity(new Wall(75.56f, wallThickness, 303.67f, 267.89f + 2f)) // Wall 17
                 .addEntity(new Wall(84.44f, wallThickness, 362.22f, 52.22f)) // Wall 18
