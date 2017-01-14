@@ -35,7 +35,9 @@ public class BallRenderer {
     public void render(Ball ball, Matrix4f viewProjectionMatrix) {
         mModelMatrix
                 .identity()
-                .translate((float) ball.getPositionX(), (float) ball.getPositionY(), GlUtils.BIAS)
+                .translate((float) ball.getPositionX(), (float) ball.getPositionY(),
+                        // For hole shadow at GlUtils.BIAS.
+                        2 * GlUtils.BIAS)
                 .scale(TEXTURE_SCALE, TEXTURE_SCALE, 1f)
                 .scale(2f * (float) Ball.RADIUS, 2f * (float) Ball.RADIUS, 1f);
         mRenderer.render(mModelMatrix, viewProjectionMatrix, mShadowTexture);
