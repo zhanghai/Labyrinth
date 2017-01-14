@@ -21,7 +21,7 @@ public class GlUtils {
 
     private GlUtils() {}
 
-    public static final float BIAS = 0.001f;
+    public static final float BIAS = 0.01f;
 
     public static void checkError() {
         int error = glGetError();
