@@ -1,6 +1,7 @@
 package cn.edu.zju.cs.graphics.labyrinth.model;
 
 import cn.edu.zju.cs.graphics.labyrinth.dynamics.Bodies;
+import cn.edu.zju.cs.graphics.labyrinth.rendering.Renderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.Renderers;
 
 public class Magnet extends Entity<Magnet> {
@@ -12,7 +13,7 @@ public class Magnet extends Entity<Magnet> {
     public static final double MAGNET_RECTANGLE_LENGTH = 32d;
     public static final double MAGNET_RESTITUTION = BaseWall.RESTITUTION;
 
-    public Magnet(double positionX, double positionY) {
-        super(Bodies.newMagnet(positionX, positionY), Renderers.MAGNET);
+    public Magnet(double positionX, double positionY, Renderer<Magnet> renderer) {
+        super(Bodies.newMagnet(positionX, positionY), renderer);
     }
 }
