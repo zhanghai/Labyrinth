@@ -1,6 +1,7 @@
 package cn.edu.zju.cs.graphics.labyrinth.model;
 
 import cn.edu.zju.cs.graphics.labyrinth.util.MathUtils;
+import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.dynamics.Settings;
 import org.dyn4j.dynamics.World;
 import org.dyn4j.dynamics.contact.ContactAdapter;
@@ -39,12 +40,15 @@ public class Labyrinth {
                 Entity entity2 = Entity.ofBody(point.getBody2());
                 Ball ball;
                 Entity sensor;
+                BodyFixture sensorFixture;
                 if (entity1 instanceof Ball) {
                     ball = (Ball) entity1;
                     sensor = entity2;
+                    sensorFixture = point.getFixture2();
                 } else {
                     ball = (Ball) entity2;
                     sensor = entity1;
+                    sensorFixture = point.getFixture1();
                 }
                 if (sensor instanceof BaseHole) {
                     BaseHole hole = (BaseHole) sensor;
@@ -54,7 +58,8 @@ public class Labyrinth {
                         mListener.onBallFallingTowardsHole(ball, hole);
                     }
                 } else if (sensor instanceof Magnet) {
-                    // TODO
+                    Magnet magnet = (Magnet) sensor;
+                    mListener.onBallAttractedByMagnet(ball, magnet, sensorFixture);
                 }
             }
             @Override
@@ -196,7 +201,7 @@ public class Labyrinth {
          * false from the those methods as well.
          * </p>
          */
-        void onBallAttractedByMagnet(Ball ball, Magnet magnet);
+        void onBallAttractedByMagnet(Ball ball, Magnet magnet, BodyFixture fieldFixture);
 
         /**
          * Modification of the {@link World} is permitted from this methods.

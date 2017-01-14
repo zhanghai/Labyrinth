@@ -11,7 +11,9 @@ import cn.edu.zju.cs.graphics.labyrinth.model.Wall;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.LabyrinthRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.ShadowMapRenderer;
 import cn.edu.zju.cs.graphics.labyrinth.util.GlUtils;
+import cn.edu.zju.cs.graphics.labyrinth.util.MathUtils;
 import cn.edu.zju.cs.graphics.labyrinth.util.MatrixUtils;
+import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.dynamics.contact.ContactPoint;
 import org.dyn4j.geometry.Vector2;
 import org.joml.Matrix4f;
@@ -199,8 +201,14 @@ public class LabyrinthApplication implements Labyrinth.Listener {
     }
 
     @Override
-    public void onBallAttractedByMagnet(Ball ball, Magnet magnet) {
-        // TODO
+    public void onBallAttractedByMagnet(Ball ball, Magnet magnet, BodyFixture fieldFixture) {
+        Vector2 fixtureCenter = fieldFixture.getShape().getCenter();
+        Vector2 attraction = new Vector2(magnet.getPositionX() + fixtureCenter.x,
+                magnet.getPositionY() + fixtureCenter.y)
+                .subtract(ball.getPositionX(), ball.getPositionY());
+        double distance = attraction.getMagnitude();
+        attraction.setMagnitude(200000 * ball.getMass() / MathUtils.square(distance));
+        ball.setForce(attraction);
     }
 
     @Override

@@ -75,10 +75,20 @@ public class Bodies {
         rightRectangleShape.rotate(Math.toRadians(-7.5), 0, Magnet.CIRCLE_Y);
         BodyFixture rightRectangleFixture = new BodyFixture(rightRectangleShape);
         rightRectangleFixture.setRestitution(Magnet.RESTITUTION);
+        Circle leftFieldShape = Geometry.createCircle(Magnet.FIELD_SENSOR_RADIUS);
+        leftFieldShape.translate(Magnet.FIELD_X_LEFT, Magnet.FIELD_Y);
+        BodyFixture leftFieldFixture = new BodyFixture(leftFieldShape);
+        leftFieldFixture.setSensor(true);
+        Circle rightFieldShape = Geometry.createCircle(Magnet.FIELD_SENSOR_RADIUS);
+        rightFieldShape.translate(Magnet.FIELD_X_RIGHT, Magnet.FIELD_Y);
+        BodyFixture rightFieldFixture = new BodyFixture(rightFieldShape);
+        rightFieldFixture.setSensor(true);
         Body body = new Body()
                 .addFixture(circleFixture)
                 .addFixture(leftRectangleFixture)
                 .addFixture(rightRectangleFixture)
+                .addFixture(leftFieldFixture)
+                .addFixture(rightFieldFixture)
                 .setMass(MassType.INFINITE);
         return setBodyPosition(body, positionX, positionY);
     }
