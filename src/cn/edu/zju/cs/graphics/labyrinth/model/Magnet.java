@@ -11,7 +11,7 @@ public class Magnet extends Entity {
     public static final double RECTANGLE_WIDTH = 18d;
     public static final double RECTANGLE_LENGTH = 28.5d;
     public static final double RESTITUTION = BaseWall.RESTITUTION;
-    public static final double FIELD_RADIUS = 48d;
+    public static final double FIELD_RADIUS = 56d;
     public static final double FIELD_SENSOR_RADIUS = FIELD_RADIUS - Ball.RADIUS;
     public static final double FIELD_X_LEFT = -13d;
     public static final double FIELD_X_RIGHT = 13d;
