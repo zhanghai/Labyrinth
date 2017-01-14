@@ -21,18 +21,27 @@ import org.dyn4j.dynamics.contact.ContactPoint;
 import org.dyn4j.geometry.Vector2;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.Sys;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
+import org.lwjgl.openal.*;
+import org.lwjgl.openal.ALC11;
+import org.lwjgl.openal.ALC10.*;
 import org.lwjgl.opengles.GLES;
+import org.lwjgl.openal.EXTThreadLocalContext.*;
 import org.lwjgl.system.Configuration;
-import org.lwjgl.openal.AL;
-import org.lwjgl.openal.AL10;
-
+import org.lwjgl.util.WaveData;
+import java.util.List;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.nio.IntBuffer;
+import java.io.InputStream;
+import java.nio.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengles.GLES20.*;
@@ -62,7 +71,71 @@ public class LabyrinthApplication implements Labyrinth.Listener {
     private GLFWKeyCallback mKeyCallback;
     private GLFWCursorPosCallback mCursorPositionCallback;
 
+    private IntBuffer audioBuffer;
+    private IntBuffer audioSource;
+    private static final int BALL_ROLL = 0;
+    private static final int BALL_HIT = 1;
+    private static final int BALL_FALL = 2;
+
     private void init() throws IOException {
+        // init audio
+        audioBuffer = BufferUtils.createIntBuffer(3);
+        audioSource = BufferUtils.createIntBuffer(3);
+        //AL.createCapabilities()
+        long device = ALC10.alcOpenDevice((ByteBuffer)null);
+        ALCCapabilities deviceCaps = ALC.createCapabilities(device);
+       
+        String defaultDeviceSpecifier = ALC10.alcGetString(NULL, ALC10.ALC_DEFAULT_DEVICE_SPECIFIER);
+
+            long context = ALC10.alcCreateContext(device,(IntBuffer) null);
+        ALC10.alcMakeContextCurrent(context);
+        AL.createCapabilities(deviceCaps);
+
+        AL10.alGenBuffers(audioBuffer);
+        if(AL10.alGetError() != AL10.AL_NO_ERROR)
+            return;
+
+        java.io.FileInputStream fin1 = new java.io.FileInputStream("res/cn/edu/zju/cs/graphics/labyrinth/sound/ball-roll-wood.wav");
+        InputStream fin = new BufferedInputStream(fin1);
+        WaveData ballRoll = WaveData.create(fin);
+        AL10.alBufferData(audioBuffer.get(BALL_ROLL), ballRoll.format, ballRoll.data, ballRoll.samplerate);
+
+        fin1 = new java.io.FileInputStream("res/cn/edu/zju/cs/graphics/labyrinth/sound/ball-collision-wood.wav");
+        fin = new BufferedInputStream(fin1);
+        WaveData ballHit = WaveData.create(fin);
+        AL10.alBufferData(audioBuffer.get(BALL_HIT), ballHit.format,ballHit.data,ballHit.samplerate);
+
+        fin1 = new java.io.FileInputStream("res/cn/edu/zju/cs/graphics/labyrinth/sound/hole-metal.wav");
+        fin = new BufferedInputStream(fin1);
+        WaveData ballFall = WaveData.create(fin);
+        AL10.alBufferData(audioBuffer.get(BALL_FALL), ballFall.format,ballFall.data,ballFall.samplerate);
+
+        FloatBuffer listenerOri =
+                BufferUtils.createFloatBuffer(6).put(new float[] { 0.0f, 0.0f, -1.0f,  0.0f, 1.0f, 0.0f });
+//        AL10.alListener3f(AL10.AL_POSITION,0.0f,0.0f,0.0f);
+//        AL10.alListener3f(AL10.AL_VELOCITY,0.0f,0.0f,0.0f);
+//        AL10.alListenerfv(AL10.AL_ORIENTATION,new float[] { 0.0f, 0.0f, -1.0f,  0.0f, 1.0f, 0.0f });
+
+        AL10.alGenSources(audioSource);
+        AL10.alSourcei(audioSource.get(BALL_ROLL), AL10.AL_BUFFER, audioBuffer.get(BALL_ROLL));
+//        AL10.alSourcef(audioSource.get(BALL_ROLL),AL10.AL_PITCH, 1.0f);
+        AL10.alSourcef(audioSource.get(BALL_ROLL),AL10.AL_GAIN, 0.2f);
+        AL10.alSourcef(audioSource.get(BALL_ROLL),AL10.AL_LOOPING, AL10.AL_TRUE);
+//        AL10.alSource3f(audioSource.get(BALL_ROLL),AL10.AL_VELOCITY, 0f,0f,0f);
+
+        AL10.alSourcei(audioSource.get(BALL_HIT), AL10.AL_BUFFER, audioBuffer.get(BALL_HIT));
+//        AL10.alSourcef(audioSource.get(BALL_HIT),AL10.AL_PITCH, 1.0f);
+//        AL10.alSourcef(audioSource.get(BALL_HIT),AL10.AL_GAIN, 1.0f);
+        AL10.alSourcef(audioSource.get(BALL_HIT),AL10.AL_LOOPING, AL10.AL_FALSE);
+//        AL10.alSource3f(audioSource.get(BALL_HIT),AL10.AL_VELOCITY, 0f,0f,0f);
+
+        AL10.alSourcei(audioSource.get(BALL_FALL), AL10.AL_BUFFER, audioBuffer.get(BALL_FALL));
+//        AL10.alSourcef(audioSource.get(BALL_FALL),AL10.AL_PITCH, 1.0f);
+        AL10.alSourcef(audioSource.get(BALL_FALL),AL10.AL_GAIN, 0.4f);
+        AL10.alSourcef(audioSource.get(BALL_FALL),AL10.AL_LOOPING, AL10.AL_FALSE);
+//        AL10.alSource3f(audioSource.get(BALL_FALL),AL10.AL_VELOCITY, 0f,0f,0f);
+
+
 
         if (!glfwInit()) {
             throw new IllegalStateException("Failed to initialize GLFW");
@@ -248,6 +321,8 @@ public class LabyrinthApplication implements Labyrinth.Listener {
     @Override
     public void onBallFallenIntoHole(Ball ball, BaseHole hole) {
         ball.stopMovement();
+//        AL10.alSource3f(audioSource.get(BALL_FALL), AL10.AL_POSITION, (float) ball.getPositionX(), (float) ball.getPositionY(), 1.0f);
+        AL10.alSourcePlay(audioSource.get(BALL_FALL));
         if (hole instanceof Hole) {
             // TODO: Die.
             ball
@@ -264,12 +339,32 @@ public class LabyrinthApplication implements Labyrinth.Listener {
     @Override
     public void onBallHitEntity(Ball ball, Entity entity, ContactPoint point) {
         // TODO: Audio.
+        float v = (float)Math.sqrt(ball.getVelocity().x * ball.getVelocity().x + ball.getVelocity().y * ball.getVelocity().y);
+        System.out.println(v);
+        AL10.alSourcef(audioSource.get(BALL_HIT), AL10.AL_GAIN, v/500);
+        AL10.alSourcePlay(audioSource.get(BALL_HIT));
     }
 
     @Override
     public void onBallRolling(Ball ball, Vector2 movement) {
         // TODO: Audio.
+        float v = (float)Math.sqrt(ball.getVelocity().x * ball.getVelocity().x + ball.getVelocity().y * ball.getVelocity().y);
+        AL10.alSourcef(audioSource.get(BALL_ROLL), AL10.AL_GAIN, v/300);
+
+        if (AL10.alGetSourcei(audioSource.get(BALL_ROLL), AL10.AL_SOURCE_STATE) != AL10.AL_PLAYING) {
+//            AL10.alSource3f(audioSource.get(BALL_ROLL), AL10.AL_POSITION, (float) ball.getPositionX(), (float) ball.getPositionY(), 1.0f);
+            AL10.alSourcePlay(audioSource.get(BALL_ROLL));
+        }
     }
+
+    @Override
+    public void onBallStop() {
+        // TODO: Audio.
+        //IntBuffer state;
+        if (AL10.alGetSourcei(audioSource.get(BALL_ROLL), AL10.AL_SOURCE_STATE) == AL10.AL_PLAYING)
+            AL10.alSourceStop(audioSource.get(BALL_ROLL));
+    }
+
 
     private void update() {
 

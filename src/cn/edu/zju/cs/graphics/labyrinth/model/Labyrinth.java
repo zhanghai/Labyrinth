@@ -182,6 +182,9 @@ public class Labyrinth {
             if (!movement.isZero()) {
                 mListener.onBallRolling(ball, movement);
             }
+            else if(movement.isZero()) {
+                mListener.onBallStop();
+            }
         }
     }
 
@@ -232,5 +235,7 @@ public class Labyrinth {
         void onBallHitEntity(Ball ball, Entity entity, ContactPoint point);
 
         void onBallRolling(Ball ball, Vector2 movement);
+
+        void onBallStop();
     }
 }
