@@ -28,6 +28,8 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengles.GLES;
 import org.lwjgl.system.Configuration;
+import org.lwjgl.openal.AL;
+import org.lwjgl.openal.AL10;
 
 import java.io.IOException;
 import java.nio.IntBuffer;
@@ -166,11 +168,59 @@ public class LabyrinthApplication implements Labyrinth.Listener {
 
         mShadowMapRenderer = ShadowMapRenderer.getInstance();
         mLabyrinthRenderer = LabyrinthRenderer.getInstance();
-
+        float wallThickness = 15f;
         mLabyrinth = new Labyrinth()
                 .addEntity(new Hole(20d + Hole.RADIUS, Labyrinth.LENGTH - (20d + Hole.RADIUS)))
-                .addEntity(new FinishHole(Labyrinth.WIDTH - (20d + Hole.RADIUS), 20d + Hole.RADIUS))
-                .addEntity(new Magnet(Labyrinth.WIDTH / 2d, Labyrinth.LENGTH / 2d))
+                //.addEntity(new FinishHole(Labyrinth.WIDTH - (20d + Hole.RADIUS), 20d + Hole.RADIUS))
+                //.addEntity(new Magnet(Labyrinth.WIDTH / 2d, Labyrinth.LENGTH / 2d))
+                .addEntity(new Hole(135.11f,
+                        125.78f))
+                .addEntity(new Hole(285.33f,
+                        32f))
+                .addEntity(new Hole(420.44f,
+                        90.67f))
+                .addEntity(new Hole(450.78f,
+                        184.89f))
+                .addEntity(new FinishHole(433.78,
+                        281.78))
+                .addEntity(new Wall(59.56f, wallThickness, 44.89f,          // Wall 1
+                        55.11f))
+                .addEntity(new Wall(85.33f, wallThickness, 57.78f,          // Wall 2
+                        183.11f))
+                .addEntity(new Wall(wallThickness, 50.22f, 108f,          // Wall 3
+                        183.11f))
+                .addEntity(new Wall(wallThickness, 17.78f, 71.56f,          // Wall 4
+                        241.33f))
+                .addEntity(new Wall(88f, wallThickness, 108f,          // Wall 5
+                        257.78f))
+                .addEntity(new Wall(wallThickness, 156.5f, 159.56f,          // Wall 6
+                        187.11f))
+                .addEntity(new Wall(96.89f, wallThickness, 118.67f,          // Wall 7
+                        101.33f))
+                .addEntity(new Wall(wallThickness, 78.67f, 121.33f,          // Wall 8
+                        54.44f))
+                .addEntity(new Wall(32, wallThickness, 184f,          // Wall 9
+                        54.67f))
+                .addEntity(new Wall(wallThickness, 258.67f, 207.56f,          // Wall 10
+                        176.44f))
+                .addEntity(new Wall(91.56f, wallThickness, 260.89f,          // Wall 11
+                        137.33f))
+                .addEntity(new Wall(91.56f, wallThickness, 260.89f,          // Wall 12
+                        223.56f))
+                .addEntity(new Wall(wallThickness, 87.11f, 261.78f,          // Wall 13
+                        58.67f))
+                .addEntity(new Wall(87.11f, wallThickness, 312.89f,          // Wall 14
+                        94.67f))
+                .addEntity(new Wall(wallThickness, 173.33f, 348.61f,          // Wall 15
+                        188.89f))
+                .addEntity(new Wall(75.56f, wallThickness, 303.67f,          // Wall 16
+                        181.78f))
+                .addEntity(new Wall(75.56f, wallThickness, 303.67f,          // Wall 17
+                        267.89f))
+                .addEntity(new Wall(84.44f, wallThickness, 362.22f,          // Wall 18
+                        52.22f))
+                .addEntity(new Wall(wallThickness, 248.22f, 396.89f,          // Wall 19
+                        183.78f))
                 .addEntity(new Ball(20d + Ball.RADIUS, 20d + Ball.RADIUS))
                 .setListener(this);
     }
