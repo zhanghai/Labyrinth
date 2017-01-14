@@ -3,6 +3,7 @@ package cn.edu.zju.cs.graphics.labyrinth.util;
 import cn.edu.zju.cs.graphics.labyrinth.rendering.Model;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
+import org.lwjgl.assimp.AIPropertyStore;
 import org.lwjgl.assimp.AIScene;
 import org.lwjgl.opengles.GLES20;
 import org.lwjgl.system.CustomBuffer;
@@ -178,9 +179,13 @@ public class GlUtils {
         return location;
     }
 
-    public static Model loadModel(String name) throws IOException {
-        AIScene scene = aiImportFile(ResourceUtils.getResourceFile(
-                ResourceUtils.makeModelResource(name)),
+    public static Model loadModel(String resource) throws IOException {
+        //AIPropertyStore properties = aiCreatePropertyStore();
+        //aiSetImportPropertyInteger(properties, AI_CONFIG_PP_PTV_NORMALIZE, 1);
+        //AIScene scene = aiImportFileExWithProperties(ResourceUtils.getResourceFile(resource),
+        //        aiProcess_JoinIdenticalVertices | aiProcess_PreTransformVertices
+        //                | aiProcess_Triangulate, null, properties);
+        AIScene scene = aiImportFile(ResourceUtils.getResourceFile(resource),
                 aiProcess_JoinIdenticalVertices | aiProcess_Triangulate);
         if (scene == null) {
             throw new IllegalStateException(aiGetErrorString());

@@ -6,8 +6,10 @@ import cn.edu.zju.cs.graphics.labyrinth.model.BaseWall;
 import cn.edu.zju.cs.graphics.labyrinth.model.Magnet;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
+import org.dyn4j.geometry.Circle;
 import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.MassType;
+import org.dyn4j.geometry.Rectangle;
 
 public class Bodies {
 
@@ -55,34 +57,28 @@ public class Bodies {
     }
 
     public static Body newMagnet(double positionX, double positionY) {
-        /*Circle circleShape = Geometry.createCircle(Magnet.CIRCLE_RADIUS);
+        Circle circleShape = Geometry.createCircle(Magnet.CIRCLE_RADIUS);
         circleShape.translate(0, Magnet.CIRCLE_Y);
         BodyFixture circleFixture = new BodyFixture(circleShape);
         circleFixture.setRestitution(Magnet.RESTITUTION);
         Rectangle leftRectangleShape = Geometry.createRectangle(Magnet.RECTANGLE_WIDTH,
                 Magnet.RECTANGLE_LENGTH);
         leftRectangleShape.translate(Magnet.RECTANGLE_WIDTH / 2 - Magnet.CIRCLE_RADIUS,
-                        Magnet.RECTANGLE_LENGTH / 2 + Magnet.CIRCLE_Y);
+                -Magnet.RECTANGLE_LENGTH / 2 + Magnet.CIRCLE_Y);
         leftRectangleShape.rotate(Math.toRadians(7.5), 0, Magnet.CIRCLE_Y);
         BodyFixture leftRectangleFixture = new BodyFixture(leftRectangleShape);
         leftRectangleFixture.setRestitution(Magnet.RESTITUTION);
         Rectangle rightRectangleShape = Geometry.createRectangle(Magnet.RECTANGLE_WIDTH,
                 Magnet.RECTANGLE_LENGTH);
-        rightRectangleShape.translate(Magnet.RECTANGLE_WIDTH / 2 - Magnet.CIRCLE_RADIUS,
-                Magnet.RECTANGLE_LENGTH / 2 + Magnet.CIRCLE_Y);
-        rightRectangleShape.rotate(Math.toRadians(7.5), 0, Magnet.CIRCLE_Y);
+        rightRectangleShape.translate(-Magnet.RECTANGLE_WIDTH / 2 + Magnet.CIRCLE_RADIUS,
+                -Magnet.RECTANGLE_LENGTH / 2 + Magnet.CIRCLE_Y);
+        rightRectangleShape.rotate(Math.toRadians(-7.5), 0, Magnet.CIRCLE_Y);
         BodyFixture rightRectangleFixture = new BodyFixture(rightRectangleShape);
         rightRectangleFixture.setRestitution(Magnet.RESTITUTION);
         Body body = new Body()
                 .addFixture(circleFixture)
                 .addFixture(leftRectangleFixture)
                 .addFixture(rightRectangleFixture)
-                .setMass(MassType.INFINITE);
-                */
-        BodyFixture fixture = new BodyFixture(Geometry.createRectangle(50d, 56d));
-        fixture.setRestitution(Magnet.RESTITUTION);
-        Body body = new Body()
-                .addFixture(fixture)
                 .setMass(MassType.INFINITE);
         return setBodyPosition(body, positionX, positionY);
     }
