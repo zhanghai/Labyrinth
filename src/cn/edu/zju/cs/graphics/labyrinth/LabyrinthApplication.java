@@ -18,16 +18,27 @@ import org.dyn4j.dynamics.contact.ContactPoint;
 import org.dyn4j.geometry.Vector2;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.Sys;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
+import org.lwjgl.openal.*;
+import org.lwjgl.openal.ALC11;
+import org.lwjgl.openal.ALC10.*;
 import org.lwjgl.opengles.GLES;
+import org.lwjgl.openal.EXTThreadLocalContext.*;
 import org.lwjgl.system.Configuration;
-
+import org.lwjgl.util.WaveData;
+import java.util.List;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.nio.IntBuffer;
+import java.io.InputStream;
+import java.nio.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengles.GLES20.*;
@@ -43,6 +54,9 @@ public class LabyrinthApplication implements Labyrinth.Listener {
     private int mFrameBufferWidth = mWidth;
     private int mFrameBufferHeight = mHeight;
 
+    private boolean mNavi = false;
+    private Ball mBall;
+
     private Matrix4f mProjectionMatrix = new Matrix4f();
     private Matrix4f mViewMatrix = new Matrix4f();
     private Matrix4f mViewProjectionMatrix = new Matrix4f();
@@ -57,7 +71,61 @@ public class LabyrinthApplication implements Labyrinth.Listener {
     private GLFWKeyCallback mKeyCallback;
     private GLFWCursorPosCallback mCursorPositionCallback;
 
+    private IntBuffer audioBuffer;
+    private IntBuffer audioSource;
+    private static final int BALL_ROLL = 0;
+    private static final int BALL_HIT = 1;
+    private static final int BALL_FALL = 2;
+
     private void init() throws IOException {
+        // init audio
+        audioBuffer = BufferUtils.createIntBuffer(3);
+        audioSource = BufferUtils.createIntBuffer(3);
+        //AL.createCapabilities()
+        long device = ALC10.alcOpenDevice((ByteBuffer)null);
+        ALCCapabilities deviceCaps = ALC.createCapabilities(device);
+       
+        String defaultDeviceSpecifier = ALC10.alcGetString(NULL, ALC10.ALC_DEFAULT_DEVICE_SPECIFIER);
+
+            long context = ALC10.alcCreateContext(device,(IntBuffer) null);
+        ALC10.alcMakeContextCurrent(context);
+        AL.createCapabilities(deviceCaps);
+
+        AL10.alGenBuffers(audioBuffer);
+        if(AL10.alGetError() != AL10.AL_NO_ERROR)
+            return;
+
+        java.io.FileInputStream fin1 = new java.io.FileInputStream("res/cn/edu/zju/cs/graphics/labyrinth/sound/ball-roll-wood.wav");
+        InputStream fin = new BufferedInputStream(fin1);
+        WaveData ballRoll = WaveData.create(fin);
+        AL10.alBufferData(audioBuffer.get(BALL_ROLL), ballRoll.format, ballRoll.data, ballRoll.samplerate);
+
+        fin1 = new java.io.FileInputStream("res/cn/edu/zju/cs/graphics/labyrinth/sound/ball-collision-wood.wav");
+        fin = new BufferedInputStream(fin1);
+        WaveData ballHit = WaveData.create(fin);
+        AL10.alBufferData(audioBuffer.get(BALL_HIT), ballHit.format,ballHit.data,ballHit.samplerate);
+
+        fin1 = new java.io.FileInputStream("res/cn/edu/zju/cs/graphics/labyrinth/sound/hole-metal.wav");
+        fin = new BufferedInputStream(fin1);
+        WaveData ballFall = WaveData.create(fin);
+        AL10.alBufferData(audioBuffer.get(BALL_FALL), ballFall.format,ballFall.data,ballFall.samplerate);
+
+        FloatBuffer listenerOri =
+                BufferUtils.createFloatBuffer(6).put(new float[] { 0.0f, 0.0f, -1.0f,  0.0f, 1.0f, 0.0f });
+
+        AL10.alGenSources(audioSource);
+        AL10.alSourcei(audioSource.get(BALL_ROLL), AL10.AL_BUFFER, audioBuffer.get(BALL_ROLL));
+        AL10.alSourcef(audioSource.get(BALL_ROLL),AL10.AL_GAIN, 0.2f);
+        AL10.alSourcef(audioSource.get(BALL_ROLL),AL10.AL_LOOPING, AL10.AL_TRUE);
+
+        AL10.alSourcei(audioSource.get(BALL_HIT), AL10.AL_BUFFER, audioBuffer.get(BALL_HIT));
+        AL10.alSourcef(audioSource.get(BALL_HIT),AL10.AL_LOOPING, AL10.AL_FALSE);
+
+        AL10.alSourcei(audioSource.get(BALL_FALL), AL10.AL_BUFFER, audioBuffer.get(BALL_FALL));
+        AL10.alSourcef(audioSource.get(BALL_FALL),AL10.AL_GAIN, 0.4f);
+        AL10.alSourcef(audioSource.get(BALL_FALL),AL10.AL_LOOPING, AL10.AL_FALSE);
+
+
 
         if (!glfwInit()) {
             throw new IllegalStateException("Failed to initialize GLFW");
@@ -107,6 +175,9 @@ public class LabyrinthApplication implements Labyrinth.Listener {
                     case GLFW_KEY_LEFT:
                     case GLFW_KEY_A:
                         mLabyrinth.addRotationX(-KEY_ROTATION_STEP_DEGREES);
+                        break;
+                    case GLFW_KEY_N:
+                        mNavi = !mNavi;
                         break;
                     case GLFW_KEY_RIGHT:
                     case GLFW_KEY_F:
@@ -164,7 +235,9 @@ public class LabyrinthApplication implements Labyrinth.Listener {
         mShadowMapRenderer = ShadowMapRenderer.getInstance();
         mLabyrinthRenderer = LabyrinthRenderer.getInstance();
 
+
         final float wallThickness = 15f;
+        mBall = new Ball(20d + Ball.RADIUS, 20d + Ball.RADIUS);
         mLabyrinth = new Labyrinth()
                 .addEntity(new Hole(135.11f, 125.78f))
                 .addEntity(new Hole(285.33f, 32f))
@@ -196,7 +269,8 @@ public class LabyrinthApplication implements Labyrinth.Listener {
 //                .addEntity(new Hole(20d + Hole.RADIUS, Labyrinth.LENGTH - (20d + Hole.RADIUS)))
 //                .addEntity(new FinishHole(Labyrinth.WIDTH - (20d + Hole.RADIUS), 20d + Hole.RADIUS))
 //                .addEntity(new Magnet(Labyrinth.WIDTH / 2d, Labyrinth.LENGTH / 2d))
-                .addEntity(new Ball(20d + Ball.RADIUS, 20d + Ball.RADIUS))
+
+                .addEntity(mBall)
                 .setListener(this);
     }
 
@@ -229,6 +303,8 @@ public class LabyrinthApplication implements Labyrinth.Listener {
     @Override
     public void onBallFallenIntoHole(Ball ball, BaseHole hole) {
         ball.stopMovement();
+//        AL10.alSource3f(audioSource.get(BALL_FALL), AL10.AL_POSITION, (float) ball.getPositionX(), (float) ball.getPositionY(), 1.0f);
+        AL10.alSourcePlay(audioSource.get(BALL_FALL));
         if (hole instanceof Hole) {
             // TODO: Die.
             ball
@@ -245,12 +321,31 @@ public class LabyrinthApplication implements Labyrinth.Listener {
     @Override
     public void onBallHitEntity(Ball ball, Entity entity, ContactPoint point) {
         // TODO: Audio.
+        float v = (float)Math.sqrt(ball.getVelocity().x * ball.getVelocity().x + ball.getVelocity().y * ball.getVelocity().y);
+        AL10.alSourcef(audioSource.get(BALL_HIT), AL10.AL_GAIN, v/500);
+        AL10.alSourcePlay(audioSource.get(BALL_HIT));
     }
 
     @Override
     public void onBallRolling(Ball ball, Vector2 movement) {
         // TODO: Audio.
+        float v = (float)Math.sqrt(ball.getVelocity().x * ball.getVelocity().x + ball.getVelocity().y * ball.getVelocity().y);
+        AL10.alSourcef(audioSource.get(BALL_ROLL), AL10.AL_GAIN, v/300);
+
+        if (AL10.alGetSourcei(audioSource.get(BALL_ROLL), AL10.AL_SOURCE_STATE) != AL10.AL_PLAYING) {
+//            AL10.alSource3f(audioSource.get(BALL_ROLL), AL10.AL_POSITION, (float) ball.getPositionX(), (float) ball.getPositionY(), 1.0f);
+            AL10.alSourcePlay(audioSource.get(BALL_ROLL));
+        }
     }
+
+    @Override
+    public void onBallStop() {
+        // TODO: Audio.
+        //IntBuffer state;
+        if (AL10.alGetSourcei(audioSource.get(BALL_ROLL), AL10.AL_SOURCE_STATE) == AL10.AL_PLAYING)
+            AL10.alSourceStop(audioSource.get(BALL_ROLL));
+    }
+
 
     private void update() {
 
@@ -267,11 +362,18 @@ public class LabyrinthApplication implements Labyrinth.Listener {
                 (float) Math.toRadians(mLabyrinth.getRotationX() * 0.75d));
         MatrixUtils.skewYAroundX(mViewMatrix,
                 (float) Math.toRadians(mLabyrinth.getRotationY() * 0.75d));
-        mViewMatrix.translate((float) -Labyrinth.WIDTH / 2f, (float) -Labyrinth.LENGTH / 2f,
-                (float) -Labyrinth.HEIGHT);
+//        mViewMatrix.translate((float) -Labyrinth.WIDTH / 2f, (float) -Labyrinth.LENGTH / 2f,
+//                (float) -Labyrinth.HEIGHT);
+        if (!mNavi)
+            mViewMatrix.translate((float) -Labyrinth.WIDTH / 2f, (float) -Labyrinth.LENGTH / 2f,
+                    (float) -Labyrinth.HEIGHT);
+        else {
+            mViewMatrix.rotateX((float) Math.toRadians(-30)).translate(-(float) mBall.getPositionX(), -(float) mBall.getPositionY(),
+                    (float) -Labyrinth.HEIGHT);
+        }
         mProjectionMatrix.setOrtho((float) -Labyrinth.WIDTH / 2f, (float) Labyrinth.WIDTH / 2f,
                 (float) -Labyrinth.LENGTH / 2f, (float) Labyrinth.LENGTH / 2f,
-                -2f * (float) Labyrinth.HEIGHT, 2f * (float) Labyrinth.HEIGHT);
+                -1000f, 1000f);
         mProjectionMatrix.mul(mViewMatrix, mViewProjectionMatrix);
     }
 
