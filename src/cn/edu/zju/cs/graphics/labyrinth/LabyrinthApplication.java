@@ -179,15 +179,18 @@ public class LabyrinthApplication implements Labyrinth.Listener {
                 .addEntity(new Wall(wallThickness, 78.67f, 121.33f, 54.44f)) // Wall 8
                 .addEntity(new Wall(32, wallThickness, 184f, 54.67f)) // Wall 9
                 .addEntity(new Wall(wallThickness, 258.67f, 207.56f, 176.44f)) // Wall 10
-                .addEntity(new Wall(91.56f, wallThickness, 260.89f, 137.33f)) // Wall 11
-                .addEntity(new Wall(91.56f, wallThickness, 260.89f, 223.56f)) // Wall 12
+                //.addEntity(new Wall(91.56f, wallThickness, 260.89f, 137.33f)) // Wall 11
+                .addEntity(new Wall(91.56f, wallThickness, 260.89f, 223.56f + 4f)) // Wall 12
                 .addEntity(new Wall(wallThickness, 87.11f, 261.78f, 58.67f)) // Wall 13
                 .addEntity(new Wall(87.11f, wallThickness, 312.89f, 94.67f)) // Wall 14
                 .addEntity(new Wall(wallThickness, 173.33f, 348.61f, 188.89f)) // Wall 15
-                .addEntity(new Wall(75.56f, wallThickness, 303.67f, 181.78f)) // Wall 16
-                .addEntity(new Wall(75.56f, wallThickness, 303.67f, 267.89f)) // Wall 17
+                //.addEntity(new Wall(75.56f, wallThickness, 303.67f, 181.78f)) // Wall 16
+                .addEntity(new Wall(75.56f, wallThickness, 303.67f, 267.89f + 2f)) // Wall 17
                 .addEntity(new Wall(84.44f, wallThickness, 362.22f, 52.22f)) // Wall 18
                 .addEntity(new Wall(wallThickness, 248.22f, 396.89f, 183.78f)) // Wall 19
+                .addEntity(new Magnet(240f + 5f, 192f - 5f))
+                .addEntity(new Hole(231f, 144f))
+                .addEntity(new Hole(259f, 144f))
 //                .addEntity(new Hole(20d + Hole.RADIUS, Labyrinth.LENGTH - (20d + Hole.RADIUS)))
 //                .addEntity(new FinishHole(Labyrinth.WIDTH - (20d + Hole.RADIUS), 20d + Hole.RADIUS))
 //                .addEntity(new Magnet(Labyrinth.WIDTH / 2d, Labyrinth.LENGTH / 2d))
