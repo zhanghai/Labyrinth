@@ -95,13 +95,11 @@ public class ModelRenderer {
             glUniformMatrix4fv(mModelMatrixUniform, false, modelMatrix.get(mModelMatrixBuffer));
             glUniformMatrix4fv(mViewProjectionMatrixUniform, false,
                     viewProjectionMatrix.get(mViewProjectionMatrixBuffer));
-            Matrix4f temp = new Matrix4f(modelMatrix);
-            temp.invert().transpose();
-            mNormalMatrix.set(temp);//.invert().transpose();
+            mNormalMatrix.set(modelMatrix).invert().transpose();
             glUniformMatrix3fv(mNormalMatrixUniform, false, mNormalMatrix.get(mNormalMatrixBuffer));
-            Model.Material material = model.mMaterials.get(mesh.mMesh.mMaterialIndex());
             glUniform3fv(mLightPositionUniform, lightPosition.get(mLightPositionBuffer));
             glUniform3fv(mViewPositionUniform, viewPosition.get(mViewPositionBuffer));
+            Model.Material material = model.mMaterials.get(mesh.mMesh.mMaterialIndex());
             GlUtils.uniformColor3(mAmbientColorUniform, material.mAmbientColor);
             GlUtils.uniformColor3(mDiffuseColorUniform, material.mDiffuseColor);
             GlUtils.uniformColor3(mSpecularColorUniform, material.mSpecularColor);

@@ -5,7 +5,6 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIScene;
-import org.lwjgl.opengles.GLES20;
 import org.lwjgl.system.CustomBuffer;
 
 import java.io.IOException;
@@ -171,7 +170,7 @@ public class GlUtils {
     }
 
     public static int getUniformLocation(int program, CharSequence name) {
-        int location = GLES20.glGetUniformLocation(program, name);
+        int location = glGetUniformLocation(program, name);
         if (location < 0) {
             throw new AssertionError("Uniform not found: " + name);
         }
@@ -179,7 +178,7 @@ public class GlUtils {
     }
 
     public static int getAttribLocation(int program, CharSequence name) {
-        int location = GLES20.glGetAttribLocation(program, name);
+        int location = glGetAttribLocation(program, name);
         if (location < 0) {
             throw new AssertionError("Attribute not found: " + name);
         }

@@ -13,9 +13,9 @@ import java.util.List;
 import static org.lwjgl.assimp.Assimp.AI_MATKEY_COLOR_AMBIENT;
 import static org.lwjgl.assimp.Assimp.AI_MATKEY_COLOR_DIFFUSE;
 import static org.lwjgl.assimp.Assimp.AI_MATKEY_COLOR_SPECULAR;
+import static org.lwjgl.assimp.Assimp.aiGetErrorString;
 import static org.lwjgl.assimp.Assimp.aiGetMaterialColor;
 import static org.lwjgl.assimp.Assimp.aiReleaseImport;
-import static org.lwjgl.assimp.Assimp.aiTextureType_AMBIENT;
 import static org.lwjgl.assimp.Assimp.aiTextureType_NONE;
 
 public class Model {
@@ -43,9 +43,7 @@ public class Model {
         }
     }
 
-    // FIXME
-    @Override
-    public void finalize() {
+    public void free() {
         aiReleaseImport(mScene);
     }
 
@@ -77,17 +75,17 @@ public class Model {
             mAmbientColor = AIColor4D.create();
             if (aiGetMaterialColor(mMaterial, AI_MATKEY_COLOR_AMBIENT,
                     aiTextureType_NONE, 0, mAmbientColor) != 0) {
-                throw new IllegalStateException("aiGetMaterialColor");
+                throw new IllegalStateException(aiGetErrorString());
             }
             mDiffuseColor = AIColor4D.create();
             if (aiGetMaterialColor(mMaterial, AI_MATKEY_COLOR_DIFFUSE,
                     aiTextureType_NONE, 0, mDiffuseColor) != 0) {
-                throw new IllegalStateException("aiGetMaterialColor");
+                throw new IllegalStateException(aiGetErrorString());
             }
             mSpecularColor = AIColor4D.create();
             if (aiGetMaterialColor(mMaterial, AI_MATKEY_COLOR_SPECULAR,
                     aiTextureType_NONE, 0, mSpecularColor) != 0) {
-                throw new IllegalStateException("aiGetMaterialColor");
+                throw new IllegalStateException(aiGetErrorString());
             }
         }
     }
